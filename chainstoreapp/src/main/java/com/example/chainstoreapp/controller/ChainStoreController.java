@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.chainstoreapp.entity.SearchRequirement;
 import com.example.chainstoreapp.entity.SearchResult;
+import com.example.chainstoreapp.form.ChainStoreForm;
+import com.example.chainstoreapp.helper.ChainStoreHelper;
 import com.example.chainstoreapp.service.ChainStoreService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,13 +32,17 @@ public class ChainStoreController {
 	
 //	検索結果一覧画面の表示
 	@GetMapping("/search")
-	public String search(Model model, RedirectAttributes attributes){
+	public String search(ChainStoreForm form, Model model, RedirectAttributes attributes){
+		
+//		検索条件をフォームからエンティティへ変換
+		SearchRequirement searchReq = ChainStoreHelper.convertSearchReq(form);
+		
 //		サービスを用いてメニュー群を取得
-		List<SearchResult> searchResults = chainStoreService.searchMenu();
+		List<SearchResult> searchResults = chainStoreService.searchMenu(searchReq);
 
 		if(searchResults != null) {
 //			取得できればモデルに格納
-			model.addAttribute("searchresults", chainStoreService.searchMenu());
+			model.addAttribute("searchresults", chainStoreService.searchMenu(searchReq));
 		}else {
 //			できなければフラッシュメッセージを設定
 			attributes.addFlashAttribute("errorMessage", "対象データがありません");
