@@ -1,7 +1,5 @@
 package com.example.chainstoreapp.form;
 
-import java.util.ArrayList;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,12 +10,12 @@ import lombok.NoArgsConstructor;
 public class ChainStoreForm {
 	
 //	キーワード
-	private ArrayList<String> keywords;
+	private String keyword;
 	
 //	検索範囲の中心
 	private String center;
 	
 //	検索範囲
-	private int range;
+	private int radius;
 	
 }

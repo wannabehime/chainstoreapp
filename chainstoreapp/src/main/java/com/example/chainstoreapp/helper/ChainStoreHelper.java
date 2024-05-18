@@ -8,18 +8,18 @@ public class ChainStoreHelper {
 //	SearchRequirementへの変換
 	public static SearchRequirement convertSearchReq(ChainStoreForm form){
 		SearchRequirement searchReq = new SearchRequirement();
-		searchReq.setKeywords(form.getKeywords());
+		searchReq.setKeyword(form.getKeyword());
 		searchReq.setCenter(form.getCenter());
-		searchReq.setRange(form.getRange());
+		searchReq.setRadius(form.getRadius());
 		return searchReq;
 	}
 	
 //	ChainStoreFormへの変換
 	public static ChainStoreForm convertChainStoreForm(SearchRequirement searchReq) {
 		ChainStoreForm form = new ChainStoreForm();
-		form.setKeywords(searchReq.getKeywords());
+		form.setKeyword(searchReq.getKeyword());
 		form.setCenter(searchReq.getCenter());
-		form.setRange(searchReq.getRange());
+		form.setRadius(searchReq.getRadius());
 		return form;
 	}
 }

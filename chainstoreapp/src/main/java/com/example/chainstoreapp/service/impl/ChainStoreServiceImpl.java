@@ -1,6 +1,8 @@
 package com.example.chainstoreapp.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -28,13 +30,16 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 		
 //		urlのテンプレート
 		String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&keyword={keyword}&location={location}&radius={radius}";
-//		検索条件をテンプレートに代入
-		String keyword = searchReq.getKeywords();
+//		テンプレートに代入する検索条件を作成
+		Map<String, String> params = new HashMap<>();
+		params.put("keyword", searchReq.getKeyword());
+//		# TODO: centerは場所の文字列で入力される。緯度経度に直す必要あり
+		params.put("location", searchReq.getCenter());
+		params.put("radius", String.valueOf(searchReq.getRadius()));
 		
+		SearchResult searchResult = restTemplate.getForObject(url, SearchResult.class, params);
 		
-		SearchResult searchResult = restTemplate.getForObject(url, SearchResult.class);
-		
-		return searchResults;
+		return searchResult;
 	}
 
 }
