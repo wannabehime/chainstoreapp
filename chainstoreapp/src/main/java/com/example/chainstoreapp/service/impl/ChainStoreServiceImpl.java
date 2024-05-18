@@ -48,7 +48,8 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 			PlacesAPIResponse response = mapper.readValue(body, PlacesAPIResponse.class);
 		    Object result = /*(*/response.getResults()/*)[0]*/;
 //		    確認用
-//		    System.out.println(result);
+		    String json = mapper.writeValueAsString(result;
+		    System.out.println(json);
 		}catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
