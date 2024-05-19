@@ -13,6 +13,7 @@ public class SearchRequirement {
 	private String keyword;
 	
 //	検索範囲の中心
+//	#TODO: パラメータは緯度経度
 	private String center;
 	
 //	検索範囲

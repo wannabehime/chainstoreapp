@@ -42,7 +42,7 @@ public class ChainStoreController {
 
 		if(searchResults != null) {
 //			取得できればモデルに格納
-			model.addAttribute("searchresults", chainStoreService.searchMenu(searchReq));
+			model.addAttribute("searchresults", searchResults);
 		}else {
 //			できなければフラッシュメッセージを設定
 			attributes.addFlashAttribute("errorMessage", "対象データがありません");

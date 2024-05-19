@@ -2,12 +2,14 @@ package com.example.chainstoreapp.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.chainstoreapp.entity.PlacesAPIResponse;
+import com.example.chainstoreapp.entity.PlacesAPIResponse.Results;
 import com.example.chainstoreapp.entity.SearchRequirement;
 import com.example.chainstoreapp.entity.SearchResult;
 import com.example.chainstoreapp.service.ChainStoreService;
@@ -38,25 +40,32 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 		
 //		APIを利用して結果をJSONで格納
 		String body = restTemplate.getForObject(url, String.class, params);
-		
-//	    確認用
-//	    System.out.println(body);
+
+//		returnするリストを用意
+		ArrayList<SearchResult> searchResult = new ArrayList<>();
 		
 //		JSONからエンティティへの変換
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			PlacesAPIResponse response = mapper.readValue(body, PlacesAPIResponse.class);
-		    Object result = /*(*/response.getResults()/*)[0]*/;
-//		    確認用
-		    String json = mapper.writeValueAsString(result;
-		    System.out.println(json);
+			List<Results> results = response.getResults();
+			for(int i = 0; i < results.size(); i++) {
+				String name = results.get(i).getName();
+				if(name.matches("松屋.*店")) {
+					double lat = results.get(i).getGeometry().getLocation().getLat();
+					double lng = results.get(i).getGeometry().getLocation().getLng();
+					boolean open_now = results.get(i).getOpening_hours().isOpen_now();
+					SearchResult searchRes = new SearchResult();
+					searchRes.setStoreName(name);
+					searchRes.setOpen_now(open_now);
+					searchResult.add(i, searchRes);
+				}
+			}
 		}catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
-		
-	    ArrayList<SearchResult> searchResult = new ArrayList<>();
 	    return searchResult;
-
+	    
 	}
 
 }
