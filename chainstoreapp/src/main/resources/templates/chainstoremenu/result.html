@@ -29,8 +29,11 @@
 	<!--	<script src="initmap.js"></script>-->
 	
 	<script>
+		var directionsRenderer;
+		var map;
+		
 		function initMap() {
-			let directionsRenderer = new google.maps.DirectionsRenderer();
+			directionsRenderer = new google.maps.DirectionsRenderer();
 			// #TODO: 現在地を取得して代入する
 			let tokyoStation = new google.maps.LatLng(35.681236, 139.767125);
 			let mapOptions = {
@@ -38,8 +41,8 @@
 				zoom: 15
 			};
 			//varにした
-			var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-			//directionsRenderer.setMap(map);
+			map = new google.maps.Map(document.getElementById('map'), mapOptions);
+			directionsRenderer.setMap(map);
 		}
 		
 		document.getElementById('btn').addEventListener('click', function(){calcRoute(this)});
@@ -47,7 +50,7 @@
 			let latlng = obj.previousElementSibling.value;
 			//alert(latlng);
 			let directionsService = new google.maps.DirectionsService();
-			let directionsRenderer = new google.maps.DirectionsRenderer();
+			directionsRenderer = new google.maps.DirectionsRenderer();
 			// #TODO: 現在地と目的地を緯度経度で渡す
 			let request = {
 				origin: {lat: 35.681236, lng: 139.767125},
