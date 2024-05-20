@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.chainstoreapp.entity.PlacesAPIResponse;
-import com.example.chainstoreapp.entity.PlacesAPIResponse.Results;
+import com.example.chainstoreapp.entity.PlacesAPIResponse.Result;
 import com.example.chainstoreapp.entity.SearchRequirement;
 import com.example.chainstoreapp.entity.SearchResult;
 import com.example.chainstoreapp.service.ChainStoreService;
@@ -47,14 +47,18 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 //		JSONからエンティティへの変換
 		ObjectMapper mapper = new ObjectMapper();
 		try {
+//			エンティティにマッピング
 			PlacesAPIResponse response = mapper.readValue(body, PlacesAPIResponse.class);
-			List<Results> results = response.getResults();
+//			検索結果リストの取り出し
+			List<Result> results = response.getResults();
 			for(int i = 0; i < results.size(); i++) {
-				String name = results.get(i).getName();
+				Result result = results.get(i);
+				String name = result.getName();
+//				#TODO: 松屋の場合、名前が「松屋～店」のみをreturnするリストに格納
 				if(name.matches("松屋.*店")) {
-					double lat = results.get(i).getGeometry().getLocation().getLat();
-					double lng = results.get(i).getGeometry().getLocation().getLng();
-					boolean open_now = results.get(i).getOpening_hours().isOpen_now();
+					double lat = result.getGeometry().getLocation().getLat();
+					double lng = result.getGeometry().getLocation().getLng();
+					boolean open_now = result.getOpening_hours().isOpen_now();
 					SearchResult searchRes = new SearchResult();
 					searchRes.setStoreName(name);
 					searchRes.setOpen_now(open_now);
