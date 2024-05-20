@@ -37,14 +37,15 @@
 				center: tokyoStation,
 				zoom: 15
 			};
-			let map = new google.maps.Map(document.getElementById('map'), mapOptions);
-			directionsRenderer.setMap(map);
+			//varにした
+			var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+			//directionsRenderer.setMap(map);
 		}
 		
 		document.getElementById('btn').addEventListener('click', function(){calcRoute(this)});
 		function calcRoute(obj) {
 			let latlng = obj.previousElementSibling.value;
-			alert(latlng);
+			//alert(latlng);
 			let directionsService = new google.maps.DirectionsService();
 			let directionsRenderer = new google.maps.DirectionsRenderer();
 			// #TODO: 現在地と目的地を緯度経度で渡す
@@ -56,6 +57,9 @@
 			directionsService.route(request, function(result, status) {
 				if (status === 'OK') {
 					alert(status);
+					//alert(result);
+					//↓必要？
+					//directionsRenderer.setMap(map);
 					directionsRenderer.setDirections(result);
 				} else {
 					alert('Directions request failed due to ' + status);
