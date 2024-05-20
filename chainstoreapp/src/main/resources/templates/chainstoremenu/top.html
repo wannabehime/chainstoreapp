@@ -21,39 +21,7 @@
 	</form>
 	<div id="map"></div>
 
+	<script src="initmap.js"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap" async defer></script>
-	<script>
-		function initMap() {
-			// #TODO: 現在地を取得して代入する
-			let request = {
-				center: {lat: 35.681236, lng: 139.767125},
-				zoom: 15
-			};
-			let map = new google.maps.Map(document.getElementById('map'), request);
-		
-			let directionsService = new google.maps.DirectionsService();
-			let directionsRenderer = new google.maps.DirectionsRenderer();
-			directionsRenderer.setMap(map);
-		
-			calculateAndDisplayRoute(directionsService, directionsRenderer);
-		}
-	  
-		function calculateAndDisplayRoute(directionsService, directionsRenderer) {
-			// #TODO: 現在地と目的地を緯度経度で渡す
-			let request = {
-				origin: {lat: 35.681236, lng: 139.767125},
-				destination: {query: '秋葉原駅'},
-				travelMode: 'WALKING'
-			};
-			directionsService.route(request,	
-			function(response, status) {
-				if (status === 'OK') {
-					directionsRenderer.setDirections(response);
-				} else {
-					alert('Directions request failed due to ' + status);
-				}
-			});
-		}
-	</script>
 </body>
 </html>

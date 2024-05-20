@@ -12,6 +12,11 @@ public class SearchResult {
 //	店舗名
 	private String storeName;
 	
+//	緯度
+	private double lat;
+//	経度
+	private double lng;
+	
 //	距離（単位：メートル）
 //	#TODO: RouteAPIで取得の必要あり
 //	private int distance;

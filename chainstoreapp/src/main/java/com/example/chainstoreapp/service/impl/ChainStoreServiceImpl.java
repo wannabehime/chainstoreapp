@@ -61,6 +61,8 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 					boolean open_now = result.getOpening_hours().isOpen_now();
 					SearchResult searchRes = new SearchResult();
 					searchRes.setStoreName(name);
+					searchRes.setLat(lat);
+					searchRes.setLng(lng);
 					searchRes.setOpen_now(open_now);
 					searchResult.add(i, searchRes);
 				}

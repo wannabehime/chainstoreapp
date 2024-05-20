@@ -3,14 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <title>Result</title>
+<style>
+	#map {
+	  width: 800px;
+	  height: 600px;
+	  border: 1px solid #999;
+	}
+</style>
 </head>
 <body>
 	<h3>検索結果</h3>
-	<div th:each="searchresult : ${searchresults}">
+	<div th:each="searchresult : ${searchresults}" th:object="${searchresult}">
 		<p>
-			<div th:text="${searchresult.storeName}"></div><br>
-			<div th:text="${searchresult.open_now}"></div>
+			<span th:text="*{storeName}"></span>
+			<span th:text="*{open_now}"></span>
+<!--			<span th:text="*{lat}"></span>-->
+<!--			<span th:text="*{lng}"></span>-->
+			<input type="hidden" th:value="|{lat: *{lat}, lng: *{lng}}|">
+			<button id="btn">ルート検索</button>
 		</p>
 	</div>
+	<div id="map"></div>
+	
+	<!--	#TODO: なぜかjs読み込めない-->
+	<!--	<script src="initmap.js"></script>-->
+	
+	<script>
+		function initMap() {
+			let directionsRenderer = new google.maps.DirectionsRenderer();
+			// #TODO: 現在地を取得して代入する
+			let tokyoStation = new google.maps.LatLng(35.681236, 139.767125);
+			let mapOptions = {
+				center: tokyoStation,
+				zoom: 15
+			};
+			let map = new google.maps.Map(document.getElementById('map'), mapOptions);
+			directionsRenderer.setMap(map);
+		}
+		
+		document.getElementById('btn').addEventListener('click', function(){calcRoute(this)});
+		function calcRoute(obj) {
+			let latlng = obj.previousElementSibling.value;
+			alert(latlng);
+			let directionsService = new google.maps.DirectionsService();
+			let directionsRenderer = new google.maps.DirectionsRenderer();
+			// #TODO: 現在地と目的地を緯度経度で渡す
+			let request = {
+				origin: {lat: 35.681236, lng: 139.767125},
+				destination: {lat: 35.694272, lng: 139.7649897},
+				travelMode: 'WALKING'
+			};
+			directionsService.route(request, function(result, status) {
+				if (status === 'OK') {
+					alert(status);
+					directionsRenderer.setDirections(result);
+				} else {
+					alert('Directions request failed due to ' + status);
+				}
+			});
+		}
+	</script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap" async defer></script>
 </body>
 </html>
