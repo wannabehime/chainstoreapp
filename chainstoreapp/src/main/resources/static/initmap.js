@@ -16,7 +16,7 @@ function initMap() {
 		};
 		
 		map = new google.maps.Map(document.getElementById('map'), mapOptions); //マップの作成
-		let marker = new google.maps.marker.AdvancedMarkerElement({
+		new google.maps.marker.AdvancedMarkerElement({
 			position: nowLatLng, //マーカーの位置（必須）
 			map: map //マーカーを表示する地図
 		});

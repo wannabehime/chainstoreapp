@@ -14,14 +14,12 @@
 <body>
 	<h3>検索結果</h3>
 	<div th:each="searchresult : ${searchresults}" th:object="${searchresult}">
-		<p>
+		<div class="menuinfos">
 			<span th:text="*{storeName}"></span>
 			<span th:text="*{open_now} == true ? '営業中' : '営業時間外'"></span>
-<!--			<span th:text="*{lat}"></span>-->
-<!--			<span th:text="*{lng}"></span>-->
-			<input type="hidden" th:value="*{lat}" th:name="*{lng}">
+			<input class="hiddens" type="hidden" th:value="*{lat}" th:name="*{lng}">
 			<button class="btn">ルート検索</button> <!-- #TODO: 下で直前の要素を取得しているので変更あるとき注意 -->
-		</p>
+		</div>
 	</div>
 	<div id="map"></div>
 	
@@ -33,7 +31,7 @@
 		let nowLatLng;
 		
 		function initMap() {
-			let map;
+			var map;
 			
 			function success(position) {
 				let coords = position.coords;
@@ -45,14 +43,14 @@
 				};
 				
 				map = new google.maps.Map(document.getElementById('map'), mapOptions); //マップの作成
-				let marker = new google.maps.marker.AdvancedMarkerElement({
+				new google.maps.marker.AdvancedMarkerElement({
 					position: nowLatLng, //マーカーの位置（必須）
 					map: map //マーカーを表示する地図
 				});
 				directionsRenderer = new google.maps.DirectionsRenderer();
 				directionsRenderer.setMap(map); //レンダラにマップを関連付け
 			}
-			
+
 			function fail(error) {
 				alert('位置情報の取得に失敗しました。エラーコード：' + error.code);
 				let latLng = new google.maps.LatLng(35.6812405, 139.7649361); //東京駅
@@ -75,6 +73,18 @@
 			
 			navigator.geolocation.getCurrentPosition(success, fail, options); //現在地が取得できればsuccessに位置情報、できなければfail関数にエラー、optionsは各種設定
 			
+			let hiddens = document.querySelectorAll('.hiddens');
+			for(let i = 0; i < hiddens.length; i++){
+				let lat = hiddens[i].value;
+				let lng = hiddens[i].getAttribute('name');
+				let latLng = new google.maps.LatLng(lat, lng);				
+				//console.log(map);
+				new google.maps.marker.AdvancedMarkerElement({
+					position: latLng, //マーカーの位置（必須）
+					map: map //マーカーを表示する地図
+				});
+			}
+			
 		}
 		
 		document.querySelectorAll('.btn').forEach(element => element.addEventListener('click', function(){calcRoute(this)})); //ルート検索ボタンに検索関数を結び付け
@@ -92,9 +102,10 @@
 			new google.maps.DirectionsService().route(request, function(result, status) { //第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
 				if (status === 'OK') {
 					//alert(status);
-					let distance = result.routes[0].legs[0].distance.text;
+					let distance = result.routes[0].legs[0].distance.text;  
 					let duration = result.routes[0].legs[0].duration.text;
-					preSibling.insertAdjacentHTML('afterend', '<span>' + distance + '</span>');
+					preSibling.insertAdjacentHTML('afterend', '<span>' + duration + '</span>');
+					preSibling.insertAdjacentHTML('afterend', '<span>' + distance + '</span>');  //resultの中から距離と所要時間を取得して表示
 					directionsRenderer.setDirections(result); //ルートをマップに表示
 				} else {
 					alert(status);
