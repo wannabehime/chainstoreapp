@@ -14,7 +14,7 @@
 <body>
 	<h3>検索欄</h3>
 	<form action="/chainstoremenus/search" method="get">
-		<label>キーワード<input type="text" name="keyword"></label><br>
+		<label>ブランド名<input type="text" name="keyword"></label><br>
 		<label>場所<input type="text" name="center"></label><br>
 		<label>範囲<input type="number" name="radius"></label>
 		<input type="submit" value="検索">
@@ -22,6 +22,6 @@
 	<div id="map"></div>
 
 	<script src="initmap.js"></script>
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap" async defer></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap&libraries=marker" async defer></script>
 </body>
 </html>
