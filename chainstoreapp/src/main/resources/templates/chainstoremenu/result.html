@@ -47,6 +47,20 @@
 					position: nowLatLng, //マーカーの位置（必須）
 					map: map //マーカーを表示する地図
 				});
+				
+				// #TODO: failの場合と重複しているが、succeesの外に出すと非同期処理の前に処理してしまう
+				let hiddens = document.querySelectorAll('.hiddens');
+				for(let i = 0; i < hiddens.length; i++){
+					let lat = hiddens[i].value;
+					let lng = hiddens[i].getAttribute('name');
+					let latLng = new google.maps.LatLng(lat, lng);				
+					//console.log(map);
+					new google.maps.marker.AdvancedMarkerElement({
+						position: latLng, //マーカーの位置（必須）
+						map: map //マーカーを表示する地図
+					});
+				}
+				
 				directionsRenderer = new google.maps.DirectionsRenderer();
 				directionsRenderer.setMap(map); //レンダラにマップを関連付け
 			}
@@ -61,6 +75,18 @@
 				};
 				map = new google.maps.Map(document.getElementById('map'), mapOptions);
 				
+				let hiddens = document.querySelectorAll('.hiddens');
+				for(let i = 0; i < hiddens.length; i++){
+					let lat = hiddens[i].value;
+					let lng = hiddens[i].getAttribute('name');
+					let latLng = new google.maps.LatLng(lat, lng);				
+					//console.log(map);
+					new google.maps.marker.AdvancedMarkerElement({
+						position: latLng, //マーカーの位置（必須）
+						map: map //マーカーを表示する地図
+					});
+				}
+				
 				directionsRenderer = new google.maps.DirectionsRenderer();
 				directionsRenderer.setMap(map); //レンダラにマップを関連付け
 			}
@@ -73,17 +99,7 @@
 			
 			navigator.geolocation.getCurrentPosition(success, fail, options); //現在地が取得できればsuccessに位置情報、できなければfail関数にエラー、optionsは各種設定
 			
-			let hiddens = document.querySelectorAll('.hiddens');
-			for(let i = 0; i < hiddens.length; i++){
-				let lat = hiddens[i].value;
-				let lng = hiddens[i].getAttribute('name');
-				let latLng = new google.maps.LatLng(lat, lng);				
-				//console.log(map);
-				new google.maps.marker.AdvancedMarkerElement({
-					position: latLng, //マーカーの位置（必須）
-					map: map //マーカーを表示する地図
-				});
-			}
+			
 			
 		}
 		
