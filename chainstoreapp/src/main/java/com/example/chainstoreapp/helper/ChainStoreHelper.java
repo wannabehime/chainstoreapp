@@ -10,6 +10,7 @@ public class ChainStoreHelper {
 		SearchRequirement searchReq = new SearchRequirement();
 		searchReq.setKeyword(form.getKeyword());
 		searchReq.setCenter(form.getCenter());
+		searchReq.setNowLatLng(form.getNowLatLng());
 		searchReq.setRadius(form.getRadius());
 		return searchReq;
 	}
@@ -19,6 +20,7 @@ public class ChainStoreHelper {
 		ChainStoreForm form = new ChainStoreForm();
 		form.setKeyword(searchReq.getKeyword());
 		form.setCenter(searchReq.getCenter());
+		form.setNowLatLng(searchReq.getNowLatLng());
 		form.setRadius(searchReq.getRadius());
 		return form;
 	}

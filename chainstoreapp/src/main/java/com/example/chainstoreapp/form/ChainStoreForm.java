@@ -9,12 +9,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChainStoreForm {
 	
-//	キーワード
+//	ブランド名
 	private String keyword;
 	
 //	検索範囲の中心
-//	#TODO: パラメータは緯度経度
 	private String center;
+	
+//	現在地の経緯度
+	private String nowLatLng;
 	
 //	検索範囲
 	private int radius;
