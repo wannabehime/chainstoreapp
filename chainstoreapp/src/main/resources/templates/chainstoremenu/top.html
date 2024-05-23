@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>ChainStore Menus</title>
-<style>
-	#map {
-	  width: 800px;
-	  height: 600px;
-	  border: 1px solid #999;
-	}
-</style>
+	<meta charset="UTF-8">
+	<title>ChainStore Menus</title>
+	<style>
+		#map {
+		  width: 800px;
+		  height: 600px;
+		  border: 1px solid #999;
+		}
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 	<!--jQueryを読み込み-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script> 	<!--jQuery UIを読み込み-->
 </head>
 <body>
 	<h3>検索欄</h3>
 	<form action="/chainstoremenus/search" method="get">
 		<label>ブランド名<input type="text" name="keyword"></label><br>
-		<label>場所<input type="text" name="center"></label><br>
+		<label>場所<input id="center" type="text" name="center" placeholder="駅名または「現在地」"></label><br>
 		<label>範囲<input type="number" name="radius"></label>
 		<input id="nowlatlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
 		<input type="submit" value="検索">
@@ -23,6 +25,29 @@
 	<div id="map"></div>
 
 	<script>
+//		====== 検索の中心をオートコンプリート ======
+		$(function(){
+			$('#center').autocomplete({
+			    source: function(request, response) {
+			        $.ajax({
+			            url: "/chainstoremenus/getstationnames",
+			            dataType: "json",
+			            data: {
+			                term: request.term
+			            },
+			            success: function(data) {
+			                response(data);
+			            },
+						error: function(request, status, error) {
+			             // TODO: エラー時どうする
+			            }
+			        });
+			    },
+			    minLength: 2
+			});
+		});
+		
+//		====== 地図の初期化 ======
 		var directionsRenderer;
 		let nowLatLng;
 		

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.chainstoreapp.entity.SearchRequirement;
@@ -13,6 +15,7 @@ import com.example.chainstoreapp.entity.SearchResult;
 import com.example.chainstoreapp.form.ChainStoreForm;
 import com.example.chainstoreapp.helper.ChainStoreHelper;
 import com.example.chainstoreapp.service.ChainStoreService;
+import com.example.chainstoreapp.service.StationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,12 +25,21 @@ import lombok.RequiredArgsConstructor;
 public class ChainStoreController {
 	
 //	サービスのDI
+	private final StationService stationService;
 	private final ChainStoreService chainStoreService;
 
 //	トップ検索画面の表示
 	@GetMapping
 	public String top() {
 		return "chainstoremenu/top";
+	}
+	
+//	駅名の一部から、候補となる駅名リストを返す
+	@GetMapping("/getstationnames")
+	@ResponseBody
+	public List<String> getStationNames(@RequestParam String term){
+		List<String> stationNames = stationService.getStationNames(term);
+		return stationNames;
 	}
 	
 //	検索結果一覧画面の表示

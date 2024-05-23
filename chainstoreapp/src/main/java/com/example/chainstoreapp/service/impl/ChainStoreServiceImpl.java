@@ -74,7 +74,7 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 		
 		String nearbyBody = restTemplate.getForObject(nearbyUrl, String.class, nearbyParams);
 
-		ArrayList<SearchResult> searchResult = new ArrayList<>(); //returnするリストを用意
+		ArrayList<SearchResult> searchResults = new ArrayList<>(); //returnするリストを用意
 		
 //		JSONからエンティティへの変換
 		try {
@@ -93,13 +93,13 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 					searchRes.setLat(lat);
 					searchRes.setLng(lng);
 					searchRes.setOpen_now(open_now);
-					searchResult.add(i, searchRes);
+					searchResults.add(i, searchRes);
 				}
 			}
 		}catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
-	    return searchResult;
+	    return searchResults;
 	    
 	}
 
