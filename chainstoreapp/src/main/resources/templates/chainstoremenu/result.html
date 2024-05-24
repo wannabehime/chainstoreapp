@@ -33,9 +33,9 @@
 		let map;
 		let markers = [];
 		let markerPositions = [];
+		let bounds;
 
 		function initMap() {
-			
 			
 			function success(position) {
 				let coords = position.coords;
@@ -54,23 +54,25 @@
 				markers.push(nowMarker);
 				markerPositions.push({lat: coords.latitude, lng: coords.longitude});
 				
-				// #TODO: failの場合と重複しているが、succeesの外に出すと非同期処理の前に処理してしまう
+				bounds = new google.maps.LatLngBounds(); //マップに表示する矩形領域インスタンス生成
+				bounds.extend(nowLatLng); //現在地を格納
+				
+				// #TODO: failの場合と重複しているが、successの外に出すと非同期処理の前に処理してしまう
 				let hiddens = document.querySelectorAll('.hiddens');
 				for(let i = 0; i < hiddens.length; i++){
 					let lat = hiddens[i].value;
 					let lng = hiddens[i].getAttribute('name');
 					let latLng = new google.maps.LatLng(lat, lng);				
-					//console.log(map);
 					let marker = new google.maps.marker.AdvancedMarkerElement({
 						position: latLng, //マーカーの位置（必須）
 						map: map //マーカーを表示する地図
 					});
 					markers.push(marker);
 					markerPositions.push({lat: lat, lng: lng});
+					bounds.extend(latLng);
 				}
 				
-				directionsRenderer = new google.maps.DirectionsRenderer();
-				directionsRenderer.setMap(map); //レンダラにマップを関連付け
+				map.fitBounds(bounds); //マップに矩形領域を伝える
 			}
 
 			function fail(error) {
@@ -82,23 +84,24 @@
 					mapId: "574de86c3981bebd"
 				};
 				map = new google.maps.Map(document.getElementById('map'), mapOptions);
+				bounds = new google.maps.LatLngBounds(); // Boundsを初期化
+                bounds.extend(latLng);
 				
 				let hiddens = document.querySelectorAll('.hiddens');
 				for(let i = 0; i < hiddens.length; i++){
 					let lat = hiddens[i].value;
 					let lng = hiddens[i].getAttribute('name');
 					let latLng = new google.maps.LatLng(lat, lng);				
-					//console.log(map);
 					let marker = new google.maps.marker.AdvancedMarkerElement({
 						position: latLng, //マーカーの位置（必須）
 						map: map //マーカーを表示する地図
 					});
 					markers.push(marker);
 					markerPositions.push({lat: lat, lng: lng});
+					bounds.extend(latLng);
 				}
 				
-				directionsRenderer = new google.maps.DirectionsRenderer();
-				directionsRenderer.setMap(map); //レンダラにマップを関連付け
+				map.fitBounds(bounds);
 			}
 			
 			const options = {
@@ -108,13 +111,13 @@
 			};
 			
 			navigator.geolocation.getCurrentPosition(success, fail, options); //現在地が取得できればsuccessに位置情報、できなければfail関数にエラー、optionsは各種設定
-			
-			
-			
 		}
 		
 		document.querySelectorAll('.btn').forEach(element => element.addEventListener('click', function(){calcRoute(this)})); //ルート検索ボタンに検索関数を結び付け
 		function calcRoute(obj) {
+			directionsRenderer = new google.maps.DirectionsRenderer(); 
+			directionsRenderer.setMap(map); //レンダラに結びつける地図情報を与える
+			
 			let preSibling = obj.previousElementSibling;
 			let lat = preSibling.value;
 			let lng = preSibling.getAttribute('name');
@@ -127,15 +130,14 @@
 			
 			new google.maps.DirectionsService().route(request, function(result, status) { //第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
 				if (status === 'OK') {
-					//alert(status);
 					let distance = result.routes[0].legs[0].distance.text;  
 					let duration = result.routes[0].legs[0].duration.text;
-					preSibling.insertAdjacentHTML('afterend', '<span>' + duration + '</span>');
-					preSibling.insertAdjacentHTML('afterend', '<span>' + distance + '</span>');  //resultの中から距離と所要時間を取得して表示
+					obj.insertAdjacentHTML('afterend', '<span>' + duration + '</span>');
+					obj.insertAdjacentHTML('afterend', '<span>' + distance + '</span>');  //resultの中から距離と所要時間を取得して表示
 					directionsRenderer.setDirections(result); //ルートをマップに表示
 					
 					markers.forEach(marker => {
-						marker.map = null;
+						marker.map = null; //ルート案内以外のマーカーを削除
 					});
 				} else {
 					alert(status);
@@ -143,6 +145,7 @@
 			});
 		}
 		
+//		====== ルート表示後、メニュー一覧に戻る ======
 		document.getElementById('button').addEventListener('click', backToList);
 		function backToList(){
 			markerPositions.forEach(position => {
@@ -151,9 +154,10 @@
 					map: map
 				});
 				markers.push(marker); // 新しいマーカーの参照を保存
+				bounds.extend(new google.maps.LatLng(position.lat, position.lng));
 			});
-			
-			directionsRenderer.setDirections(null);
+			map.fitBounds(bounds);
+            directionsRenderer.setMap(null); //ルート案内を消すためにレンダラとマップの関連を削除
 		}
 	</script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap&libraries=marker" async defer></script>
