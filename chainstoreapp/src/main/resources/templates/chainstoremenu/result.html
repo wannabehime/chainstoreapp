@@ -21,6 +21,7 @@
 			<button class="btn">ルート検索</button> <!-- #TODO: 下で直前の要素を取得しているので変更あるとき注意 -->
 		</div>
 	</div>
+	<button id="button">一覧に戻る</button>
 	<div id="map"></div>
 	
 	<!--	#TODO: なぜかjs読み込めない-->
@@ -29,9 +30,12 @@
 	<script>
 		var directionsRenderer;
 		let nowLatLng;
-		
+		let map;
+		let markers = [];
+		let markerPositions = [];
+
 		function initMap() {
-			var map;
+			
 			
 			function success(position) {
 				let coords = position.coords;
@@ -43,10 +47,12 @@
 				};
 				
 				map = new google.maps.Map(document.getElementById('map'), mapOptions); //マップの作成
-				new google.maps.marker.AdvancedMarkerElement({
+				let nowMarker = new google.maps.marker.AdvancedMarkerElement({
 					position: nowLatLng, //マーカーの位置（必須）
 					map: map //マーカーを表示する地図
 				});
+				markers.push(nowMarker);
+				markerPositions.push({lat: coords.latitude, lng: coords.longitude});
 				
 				// #TODO: failの場合と重複しているが、succeesの外に出すと非同期処理の前に処理してしまう
 				let hiddens = document.querySelectorAll('.hiddens');
@@ -55,10 +61,12 @@
 					let lng = hiddens[i].getAttribute('name');
 					let latLng = new google.maps.LatLng(lat, lng);				
 					//console.log(map);
-					new google.maps.marker.AdvancedMarkerElement({
+					let marker = new google.maps.marker.AdvancedMarkerElement({
 						position: latLng, //マーカーの位置（必須）
 						map: map //マーカーを表示する地図
 					});
+					markers.push(marker);
+					markerPositions.push({lat: lat, lng: lng});
 				}
 				
 				directionsRenderer = new google.maps.DirectionsRenderer();
@@ -81,10 +89,12 @@
 					let lng = hiddens[i].getAttribute('name');
 					let latLng = new google.maps.LatLng(lat, lng);				
 					//console.log(map);
-					new google.maps.marker.AdvancedMarkerElement({
+					let marker = new google.maps.marker.AdvancedMarkerElement({
 						position: latLng, //マーカーの位置（必須）
 						map: map //マーカーを表示する地図
 					});
+					markers.push(marker);
+					markerPositions.push({lat: lat, lng: lng});
 				}
 				
 				directionsRenderer = new google.maps.DirectionsRenderer();
@@ -123,10 +133,27 @@
 					preSibling.insertAdjacentHTML('afterend', '<span>' + duration + '</span>');
 					preSibling.insertAdjacentHTML('afterend', '<span>' + distance + '</span>');  //resultの中から距離と所要時間を取得して表示
 					directionsRenderer.setDirections(result); //ルートをマップに表示
+					
+					markers.forEach(marker => {
+						marker.map = null;
+					});
 				} else {
 					alert(status);
 				}
 			});
+		}
+		
+		document.getElementById('button').addEventListener('click', backToList);
+		function backToList(){
+			markerPositions.forEach(position => {
+				let marker = new google.maps.marker.AdvancedMarkerElement({
+					position: new google.maps.LatLng(position.lat, position.lng),
+					map: map
+				});
+				markers.push(marker); // 新しいマーカーの参照を保存
+			});
+			
+			directionsRenderer.setDirections(null);
 		}
 	</script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap&libraries=marker" async defer></script>
