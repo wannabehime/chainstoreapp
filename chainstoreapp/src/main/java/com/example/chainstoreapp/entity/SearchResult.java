@@ -18,9 +18,12 @@ public class SearchResult {
 	private double lng;
 	
 //	距離（単位：メートル）
-//	#TODO: RouteAPIで取得の必要あり
-//	private int distance;
+	private String distance;
+	
+//	所要時間
+	private String duration;
 	
 //	営業中か否か（true: 営業中）
 	private boolean open_now;
+	
 }

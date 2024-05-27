@@ -17,6 +17,8 @@
 		<div class="menuinfos">
 			<span th:text="*{storeName}"></span>
 			<span th:text="*{open_now} == true ? '営業中' : '営業時間外'"></span>
+			<span th:text="*{distance}"></span>
+			<span th:text="*{duration}"></span>
 			<input class="hiddens" type="hidden" th:value="*{lat}" th:name="*{lng}">
 			<button class="btn">ルート検索</button> <!-- #TODO: 下で直前の要素を取得しているので変更あるとき注意 -->
 		</div>
@@ -36,6 +38,7 @@
 		let bounds;
 
 		function initMap() {
+			directionsRenderer = new google.maps.DirectionsRenderer();
 			
 			function success(position) {
 				let coords = position.coords;
@@ -113,9 +116,10 @@
 			navigator.geolocation.getCurrentPosition(success, fail, options); //現在地が取得できればsuccessに位置情報、できなければfail関数にエラー、optionsは各種設定
 		}
 		
+//		====== ルート検索 ======
 		document.querySelectorAll('.btn').forEach(element => element.addEventListener('click', function(){calcRoute(this)})); //ルート検索ボタンに検索関数を結び付け
+		
 		function calcRoute(obj) {
-			directionsRenderer = new google.maps.DirectionsRenderer(); 
 			directionsRenderer.setMap(map); //レンダラに結びつける地図情報を与える
 			
 			let preSibling = obj.previousElementSibling;
@@ -130,10 +134,10 @@
 			
 			new google.maps.DirectionsService().route(request, function(result, status) { //第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
 				if (status === 'OK') {
-					let distance = result.routes[0].legs[0].distance.text;  
-					let duration = result.routes[0].legs[0].duration.text;
-					obj.insertAdjacentHTML('afterend', '<span>' + duration + '</span>');
-					obj.insertAdjacentHTML('afterend', '<span>' + distance + '</span>');  //resultの中から距離と所要時間を取得して表示
+//					let distance = result.routes[0].legs[0].distance.text;  
+//					let duration = result.routes[0].legs[0].duration.text;
+//					obj.insertAdjacentHTML('afterend', '<span>' + duration + '</span>');
+//					obj.insertAdjacentHTML('afterend', '<span>' + distance + '</span>');  //resultの中から距離と所要時間を取得して表示
 					directionsRenderer.setDirections(result); //ルートをマップに表示
 					
 					markers.forEach(marker => {

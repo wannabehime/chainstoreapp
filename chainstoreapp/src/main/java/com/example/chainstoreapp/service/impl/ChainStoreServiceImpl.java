@@ -2,14 +2,11 @@ package com.example.chainstoreapp.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.chainstoreapp.entity.PlacesAPIResponse;
-import com.example.chainstoreapp.entity.PlacesAPIResponse.Result;
 import com.example.chainstoreapp.entity.SearchRequirement;
 import com.example.chainstoreapp.entity.SearchResult;
 import com.example.chainstoreapp.service.ChainStoreService;
@@ -65,33 +62,53 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 		}
 		
 //		=== ここから店舗検索 ===
+//		指定した起点から、同心円状の範囲にある店舗を検索するためのAPIのURL
 		String nearbyUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&language=ja&keyword={keyword}&location={location}&radius={radius}";
 
+//		店舗名・起点・範囲をパラメータにセット
 		Map<String, String> nearbyParams = new HashMap<>();
 		nearbyParams.put("keyword", searchReq.getKeyword());
 		nearbyParams.put("location", location);
 		nearbyParams.put("radius", String.valueOf(searchReq.getRadius()));
 		
-		String nearbyBody = restTemplate.getForObject(nearbyUrl, String.class, nearbyParams);
+		String nearbyBody = restTemplate.getForObject(nearbyUrl, String.class, nearbyParams); //APIから結果をJSON文字列で取得
 
 		ArrayList<SearchResult> searchResults = new ArrayList<>(); //returnするリストを用意
 		
 //		JSONからエンティティへの変換
 		try {
-			PlacesAPIResponse response = mapper.readValue(nearbyBody, PlacesAPIResponse.class); //エンティティにマッピング
-			List<Result> results = response.getResults(); //検索結果リストの取り出し
-			for(int i = 0; i < results.size(); i++) {
-				Result result = results.get(i);
-				String name = result.getName();
-				boolean open_now = result.getOpening_hours().isOpen_now();
+//			現在地から各店舗までの距離・時間を取得するAPIのURL
+//			TODO: 現在地取得できなかったらどうする
+			String directionUrl = "https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&language=ja&mode=walking&destination={destination}&origin={origin}";
+			String origin = searchReq.getNowLatLng().replaceAll("[()]", ""); //起点となる現在地の経緯度を取得
+			
+			JsonNode neabyNode = mapper.readTree(nearbyBody).path("results");
+			for(int i = 0; i < neabyNode.size(); i++) {
+				JsonNode nearbyResultNode = neabyNode.get(i);
+				String name = nearbyResultNode.path("name").asText();
+				boolean open_now = nearbyResultNode.path("opening_hours").path("open_now").asBoolean();
+				
 //				#TODO: 松屋の場合、名前が「松屋～店」のみをreturnするリストに格納
 				if(name.matches("松屋.*店") && open_now == true) {
-					double lat = result.getGeometry().getLocation().getLat();
-					double lng = result.getGeometry().getLocation().getLng();
+					double lat = nearbyResultNode.path("geometry").path("location").path("lat").asDouble();
+					double lng = nearbyResultNode.path("geometry").path("location").path("lng").asDouble();
+					
+					String destination = lat + ", " + lng; //目的地の経緯度
+					Map<String, String> directionParams = new HashMap<>(); //テンプレートに代入する検索条件を作成
+					directionParams.put("origin", origin);
+					directionParams.put("destination", destination);
+					String directionBody = restTemplate.getForObject(directionUrl, String.class, directionParams);
+					
+					JsonNode directionNode = mapper.readTree(directionBody).path("routes").get(0).path("legs").get(0);
+					String distance = directionNode.path("distance").path("text").asText();
+					String duration = directionNode.path("duration").path("text").asText();
+					
 					SearchResult searchRes = new SearchResult();
 					searchRes.setStoreName(name);
 					searchRes.setLat(lat);
 					searchRes.setLng(lng);
+					searchRes.setDistance(distance);
+					searchRes.setDuration(duration);
 					searchRes.setOpen_now(open_now);
 					searchResults.add(i, searchRes);
 				}
