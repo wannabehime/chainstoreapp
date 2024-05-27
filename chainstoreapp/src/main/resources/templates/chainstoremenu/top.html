@@ -37,7 +37,7 @@
 		<label>ブランド名：<input type="text" id="brandInput" name="keyword" placeholder="ブランド名を入力"></label>
 		<div class="dropdown"></div><br>
 		<label>場所：<input id="center" type="text" name="center" placeholder="駅名または「現在地」"></label>
-		<button id="currentsearchbtn">現在地から検索</button><br>
+		<button type="button" id="currentsearchbtn">現在地から検索</button><br>
 		<label>範囲：
 			<select name="radius">
 				<option>--検索範囲を選んでください--</option>
@@ -100,7 +100,7 @@
 	   
 //	   ====== 「現在地から検索」ボタンの挙動 ======
 		$('#currentsearchbtn').on('click', function() {
-			$('#brandInput').val('現在地');
+			$('#center').val('現在地');
 	    });
 					
 //		====== 検索の中心をオートコンプリート ======
