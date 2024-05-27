@@ -15,9 +15,17 @@ public class Station {
 	private int id;
 	
 //	駅名
-	private String name;
+	private String station_name;
 	
-//	振り仮名
-	private String pronunciation;
+//	都道府県
+	private String prefecture;
+	
+//	住所
+	private String address;
+	
+//	緯度
+	private double latitude;
+//	経度
+	private double longitude;
 
 }
