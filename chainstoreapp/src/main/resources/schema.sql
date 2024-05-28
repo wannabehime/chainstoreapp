@@ -2,7 +2,8 @@ DROP TABLE IF EXISTS stations;
 
 CREATE TABLE stations(
 	id INT NOT NULL AUTO_INCREMENT, 
-	station_name VARCHAR(50) NOT NULL, 
+	name VARCHAR(50) NOT NULL,
+	company VARCHAR(15) NOT NULL, 
 	prefecture VARCHAR(4) NOT NULL, 
 	address VARCHAR(50) NOT NULL, 
 	latitude DOUBLE NOT NULL, 

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.chainstoreapp.repository.StationMapper">
+	<select id="selectByStation_Name" resultType="com.example.chainstoreapp.entity.Station">
+		SELECT
+			*,
+			CASE 
+    			WHEN COUNT(*) OVER (PARTITION BY name) > 1
+   				THEN CONCAT(name, ' (', prefecture, ')') 
+    			ELSE name
+  			END AS name_with_prefecture
+		FROM stations
+		WHERE name LIKE #{searchTerm}
+		ORDER BY 
+			CASE
+				WHEN name = #{name} THEN 0
+				WHEN name LIKE #{prefix} THEN 1
+    			ELSE 2
+  			END,
+  			name
+  		LIMIT 10;
+	</select>
+</mapper>
