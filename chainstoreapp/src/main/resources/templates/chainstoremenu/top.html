@@ -126,30 +126,33 @@
 		});
 		
 //		====== 地図の初期化 ======
-		var directionsRenderer;
-		let nowLatLng;
-		
 		function initMap() {
 			var map;
+			let marker;
 			
 			function success(position) {
-				let coords = position.coords;
-				nowLatLng = new google.maps.LatLng(coords.latitude, coords.longitude);
+				let nowLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 				let mapOptions = {
 					zoom: 15,
 					center: nowLatLng,
 					mapId: "574de86c3981bebd"
 				};
 				
-				document.getElementById('nowlatlng').value = nowLatLng;
-				map = new google.maps.Map(document.getElementById('map'), mapOptions); //マップの作成
-				new google.maps.marker.AdvancedMarkerElement({
-					position: nowLatLng, //マーカーの位置（必須）
-					map: map //マーカーを表示する地図
-				});
+				document.getElementById('nowlatlng').value = nowLatLng;  //店舗検索の中心として、フォームのhiddenで送る現在地の更新
 				
-				directionsRenderer = new google.maps.DirectionsRenderer();
-				directionsRenderer.setMap(map); //レンダラにマップを関連付け
+				if(typeof map === 'undefined'){
+					map = new google.maps.Map(document.getElementById('map'), mapOptions); 	// マップがまだ存在しない場合は新しく作成
+				}
+				
+				if (typeof marker === 'undefined') { // マーカーがまだ存在しない場合は新しく作成
+	            	marker = new google.maps.marker.AdvancedMarkerElement({
+		                position: nowLatLng,
+		                map: map,
+            		});
+        		} else { 							// マーカーが存在する場合は位置を更新
+            		marker.position = nowLatLng;
+        		}
+				
 			}
 		
 			function fail(error) {
@@ -160,10 +163,11 @@
 					center: latLng,
 					mapId: "574de86c3981bebd"
 				};
-				map = new google.maps.Map(document.getElementById('map'), mapOptions);
 				
-				directionsRenderer = new google.maps.DirectionsRenderer();
-				directionsRenderer.setMap(map); //レンダラにマップを関連付け
+				if(typeof map === 'undefined'){
+					map = new google.maps.Map(document.getElementById('map'), mapOptions); 	// マップがまだ存在しない場合は新しく作成
+				}
+				
 			}
 			
 			const options = {
@@ -172,8 +176,7 @@
 			  maximumAge: 0, //キャッシュの位置情報の有効期限。期限内だと新たに取得せずキャッシュから返す
 			};
 			
-			navigator.geolocation.getCurrentPosition(success, fail, options); //現在地が取得できればsuccessに位置情報、できなければfail関数にエラー、optionsは各種設定
-			
+			navigator.geolocation.watchPosition(success, fail, options); //現在地が取得できればsuccessに位置情報、できなければfail関数にエラーを代入、optionsは各種設定
 		}
 	</script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap&libraries=marker" async defer></script>
