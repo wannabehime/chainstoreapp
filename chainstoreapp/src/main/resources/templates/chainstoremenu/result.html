@@ -4,171 +4,146 @@
 <meta charset="UTF-8">
 <title>Result</title>
 <style>
-	#map {
-	  width: 800px;
-	  height: 600px;
-	  border: 1px solid #999;
-	}
+    #map {
+      width: 800px;
+      height: 600px;
+      border: 1px solid #999;
+    }
 </style>
 </head>
 <body>
-	<h3>検索結果</h3>
-	<div th:each="searchresult : ${searchresults}" th:object="${searchresult}">
-		<div class="menuinfos">
-			<span th:text="*{storeName}"></span>
-			<span th:text="*{open_now} == true ? '営業中' : '営業時間外'"></span>
-			<span th:text="*{distance}"></span>
-			<span th:text="*{duration}"></span>
-			<input class="hiddens" type="hidden" th:value="*{lat}" th:name="*{lng}">
-			<button class="btn">ルート検索</button> <!-- #TODO: 下で直前の要素を取得しているので変更あるとき注意 -->
-		</div>
-	</div>
-	<button id="button">一覧に戻る</button>
-	<div id="map"></div>
-	
-	<!--	#TODO: なぜかjs読み込めない-->
-	<!--	<script src="initmap.js"></script>-->
-	
-	<script>
-		var directionsRenderer;
-		let nowLatLng;
-		let map;
-		let markers = [];
-		let markerPositions = [];
-		let bounds;
+    <h3>検索結果</h3>
+    <div th:each="searchresult : ${searchresults}" th:object="${searchresult}">
+        <div class="menuinfos">
+            <span th:text="*{storeName}"></span>
+            <span th:text="*{open_now} == true ? '営業中' : '営業時間外'"></span>
+            <span th:text="*{distance}"></span>
+            <span th:text="*{duration}"></span>
+            <input class="hiddens" type="hidden" th:value="*{lat}" th:name="*{lng}">
+            <button class="btn">ルート検索</button>
+        </div>
+    </div>
+    <button id="button">一覧に戻る</button>
+    <div id="map"></div>
+    
+    <script>
+        var directionsRenderer;
+        let currentLatLng;
+        let map;
+        let markers = [];
+        let bounds;
+        let currentMarker;
 
-		function initMap() {
+        function initMap() {
 			directionsRenderer = new google.maps.DirectionsRenderer();
-			let nowMarker
-			
-			function success(position) {
-				nowLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-				let mapOptions = {
-					zoom: 15,
-					center: nowLatLng,
-					mapId: "574de86c3981bebd"
-				};
-				
-				if(typeof map === 'undefined'){
-					map = new google.maps.Map(document.getElementById('map'), mapOptions); 	// マップがまだ存在しない場合は新しく作成
-				}
-				
-				if (typeof nowMarker === 'undefined') { // マーカーがまだ存在しない場合は新しく作成
-					nowMarker = new google.maps.marker.AdvancedMarkerElement({
-						position: nowLatLng, //マーカーの位置（必須）
-						map: map //マーカーを表示する地図
-					});
-        		} else { 							// マーカーが存在する場合は位置を更新
-            		nowMarker.position = nowLatLng;
-        		}
-				markers.push(nowMarker);
-				markerPositions.push({lat: position.coords.latitude, lng: position.coords.longitude});
-				
-				bounds = new google.maps.LatLngBounds(); //マップに表示する矩形領域インスタンス生成
-				bounds.extend(nowLatLng); //現在地を格納
-				
-				// #TODO: failの場合と重複しているが、successの外に出すと非同期処理の前に処理してしまう
-				let hiddens = document.querySelectorAll('.hiddens');
-				for(let i = 0; i < hiddens.length; i++){
-					let lat = hiddens[i].value;
-					let lng = hiddens[i].getAttribute('name');
-					let latLng = new google.maps.LatLng(lat, lng);				
-					let marker = new google.maps.marker.AdvancedMarkerElement({
-						position: latLng, //マーカーの位置（必須）
-						map: map //マーカーを表示する地図
-					});
-					markers.push(marker);
-					markerPositions.push({lat: lat, lng: lng});
-					bounds.extend(latLng);
-				}
-				
-				map.fitBounds(bounds); //マップに矩形領域を伝える
-			}
+            
+            function success(position) {
+				currentLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); //現在地のlatlngオブジェクトを取得
+                
+                if (typeof map === 'undefined') { // マップがまだ存在しない場合は新しく作成
+                    map = new google.maps.Map(document.getElementById('map'), {mapId: "574de86c3981bebd"});
+                }
+                
+                if (typeof currentMarker === 'undefined') { // 現在地のマーカーがまだ存在しない場合は新しく作成
+					currentMarker = new google.maps.marker.AdvancedMarkerElement({
+                        position: currentLatLng,
+                        map: map
+                    });
+                } else {                            		// マーカーが存在する場合は位置を更新
+					currentMarker.position = currentLatLng;
+                }
 
-			function fail(error) {
-				alert('位置情報の取得に失敗しました。エラーコード：' + error.code);
-				let latLng = new google.maps.LatLng(35.6812405, 139.7649361); //東京駅
-				let mapOptions = {
-					zoom: 15,
-					center: latLng,
-					mapId: "574de86c3981bebd"
-				};
-				if(typeof map === 'undefined'){
-					map = new google.maps.Map(document.getElementById('map'), mapOptions); 	// マップがまだ存在しない場合は新しく作成
-				}
-				bounds = new google.maps.LatLngBounds(); // Boundsを初期化
-                bounds.extend(latLng);
-				
-				let hiddens = document.querySelectorAll('.hiddens');
-				for(let i = 0; i < hiddens.length; i++){
-					let lat = hiddens[i].value;
-					let lng = hiddens[i].getAttribute('name');
-					let latLng = new google.maps.LatLng(lat, lng);				
-					let marker = new google.maps.marker.AdvancedMarkerElement({
-						position: latLng, //マーカーの位置（必須）
-						map: map //マーカーを表示する地図
-					});
-					markers.push(marker);
-					markerPositions.push({lat: lat, lng: lng});
-					bounds.extend(latLng);
-				}
-				
-				map.fitBounds(bounds);
-			}
-			
-			const options = {
-			  enableHighAccuracy: true, //精度（trueだと良い）
-			  timeout: 5000, //制限時間
-			  maximumAge: 0, //キャッシュの位置情報の有効期限。期限内だと新たに取得せずキャッシュから返す
-			};
-			
-			navigator.geolocation.watchPosition(success, fail, options); //現在地が取得できればsuccessに位置情報、できなければfail関数にエラーを代入、optionsは各種設定
-		}
-		
-//		====== ルート検索 ======
-		document.querySelectorAll('.btn').forEach(element => element.addEventListener('click', function(){calcRoute(this)})); //ルート検索ボタンに検索関数を結び付け
-		
-		function calcRoute(obj) {
-			directionsRenderer.setMap(map); //レンダラに結びつける地図情報を与える
-			
-			let preSibling = obj.previousElementSibling;
-			let lat = preSibling.value;
-			let lng = preSibling.getAttribute('name');
-			let deslatLng = new google.maps.LatLng(lat, lng); //hiddenにある目的地の経緯度を取得
-			let request = {
-				origin: nowLatLng, //現在地の経緯度 #TODO: 現在地が取得できなかった場合どうする
-				destination: deslatLng,
-				travelMode: 'WALKING'
-			};
-			
-			new google.maps.DirectionsService().route(request, function(result, status) { //第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
-				if (status === 'OK') {
-					directionsRenderer.setDirections(result); //ルートをマップに表示
+                if (markers.length === 0) { //検索結果の店舗のマーカーがまだ存在しない場合は新しく作成し、全てのマーカーが収まるようにマップに表示
+					bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域インスタンス生成
 					
-					markers.forEach(marker => {
-						marker.map = null; //ルート案内以外のマーカーを削除
-					});
-				} else {
-					alert(status);
+                    let hiddens = document.querySelectorAll('.hiddens');
+                    for (let i = 0; i < hiddens.length; i++) {
+                        let latLng = new google.maps.LatLng(hiddens[i].value, hiddens[i].getAttribute('name'));                
+                        let marker = new google.maps.marker.AdvancedMarkerElement({ //各店舗のマーカーを生成
+                            position: latLng,
+                            map: map
+                        });
+                        markers.push(marker); //マーカーを格納
+                        bounds.extend(latLng); //矩形領域に各店舗の位置を追加
+                    }
+
+                    bounds.extend(currentLatLng); //矩形領域に現在地を追加
+                    map.fitBounds(bounds); //マップに矩形領域を伝える
+                }
+            }
+
+            function fail(error) {
+                alert('位置情報の取得に失敗しました。エラーコード：' + error.code);
+                
+                if (typeof map === 'undefined') { // マップがまだ存在しない場合は新しく作成
+                    map = new google.maps.Map(document.getElementById('map'), {mapId: "574de86c3981bebd"});
 				}
-			});
-		}
-		
-//		====== ルート表示後、メニュー一覧に戻る ======
-		document.getElementById('button').addEventListener('click', backToList);
-		function backToList(){
-			markerPositions.forEach(position => {
-				let marker = new google.maps.marker.AdvancedMarkerElement({
-					position: new google.maps.LatLng(position.lat, position.lng),
-					map: map
-				});
-				markers.push(marker); // 新しいマーカーの参照を保存
-				bounds.extend(new google.maps.LatLng(position.lat, position.lng));
-			});
-			map.fitBounds(bounds);
-            directionsRenderer.setMap(null); //ルート案内を消すためにレンダラとマップの関連を削除
-		}
-	</script>
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap&libraries=marker" async defer></script>
+                
+				if (markers.length === 0) {	//検索結果の店舗のマーカーがまだ存在しない場合は新しく作成し、全てのマーカーが収まるようにマップに表示
+					bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域インスタンス生成
+					
+	                 let hiddens = document.querySelectorAll('.hiddens');
+	                 for (let i = 0; i < hiddens.length; i++) {
+	                     let latLng = new google.maps.LatLng(hiddens[i].value, hiddens[i].getAttribute('name'));                
+	                     let marker = new google.maps.marker.AdvancedMarkerElement({ //各店舗のマーカーを生成
+	                         position: latLng,
+	                         map: map
+	                     });
+	                     markers.push(marker); //マーカーを格納
+	                     bounds.extend(latLng);	//矩形領域に各店舗の位置を追加
+	                 }
+					// TODO: 検索結果なかったらどうする 
+	                 map.fitBounds(bounds); //マップに矩形領域を伝える
+	             }
+            }
+            
+            const options = {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0,
+            };
+            
+            navigator.geolocation.watchPosition(success, fail, options); // 現在地が取得できればsuccessに位置情報、できなければfail関数にエラーを代入、optionsは各種設定
+        }
+        
+        document.querySelectorAll('.btn').forEach(element => element.addEventListener('click', function(){calcRoute(this)})); // ルート検索ボタンに検索関数を結び付け
+        
+        function calcRoute(obj) {
+            directionsRenderer.setMap(map); // レンダラに結びつける地図情報を与える
+            
+            let preSibling = obj.previousElementSibling;
+            let desLatLng = new google.maps.LatLng(preSibling.value, preSibling.getAttribute('name')); // hiddenにある目的地の経緯度を取得
+            let request = {
+                origin: currentLatLng, // 現在地の経緯度
+                destination: desLatLng,
+                travelMode: 'WALKING'
+            };
+            
+            new google.maps.DirectionsService().route(request, function(result, status) { // 第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(result); // ルートをマップに表示
+                    markers.forEach(marker => {
+                    	marker.map = null; // 各店舗のマーカーを削除
+                    });
+                } else {
+                    alert(status);
+                }
+            });
+        }
+        
+        document.getElementById('button').addEventListener('click', backToList);
+        function backToList(){
+			directionsRenderer.setMap(null); // ルート案内を消すためにレンダラとマップの関連を削除
+			
+            bounds = new google.maps.LatLngBounds(); // 最新の現在地のみを保持するために矩形領域をリセット
+            bounds.extend(currentLatLng); // 最新の現在地を追加
+            markers.forEach(marker => {
+                marker.map = map; // 各店舗のマーカーを再表示
+				bounds.extend(marker.position); //各店舗の位置を再追加
+            });
+            map.fitBounds(bounds); // マップに矩形領域を伝える
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap&libraries=marker" async defer></script>
 </body>
 </html>

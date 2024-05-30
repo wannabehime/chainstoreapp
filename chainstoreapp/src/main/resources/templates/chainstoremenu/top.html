@@ -128,43 +128,42 @@
 //		====== 地図の初期化 ======
 		function initMap() {
 			var map;
-			let marker;
+			let currentMarker;
 			
 			function success(position) {
-				let nowLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-				let mapOptions = {
-					zoom: 15,
-					center: nowLatLng,
-					mapId: "574de86c3981bebd"
-				};
+				let currentLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 				
-				document.getElementById('nowlatlng').value = nowLatLng;  //店舗検索の中心として、フォームのhiddenで送る現在地の更新
+				document.getElementById('nowlatlng').value = currentLatLng;  //店舗検索の中心として、フォームのhiddenで送る現在地の更新
 				
 				if(typeof map === 'undefined'){
+					let mapOptions = {
+						zoom: 15,
+						center: currentLatLng,
+						mapId: "574de86c3981bebd"
+					};
 					map = new google.maps.Map(document.getElementById('map'), mapOptions); 	// マップがまだ存在しない場合は新しく作成
 				}
 				
-				if (typeof marker === 'undefined') { // マーカーがまだ存在しない場合は新しく作成
-	            	marker = new google.maps.marker.AdvancedMarkerElement({
-		                position: nowLatLng,
+				if (typeof currentMarker === 'undefined') { // マーカーがまだ存在しない場合は新しく作成
+					currentMarker = new google.maps.marker.AdvancedMarkerElement({
+		                position: currentLatLng,
 		                map: map,
             		});
         		} else { 							// マーカーが存在する場合は位置を更新
-            		marker.position = nowLatLng;
+					currentMarker.position = currentLatLng;
         		}
 				
 			}
 		
 			function fail(error) {
 				alert('位置情報の取得に失敗しました。エラーコード：' + error.code);
-				let latLng = new google.maps.LatLng(35.6812405, 139.7649361); //東京駅
-				let mapOptions = {
-					zoom: 15,
-					center: latLng,
-					mapId: "574de86c3981bebd"
-				};
-				
 				if(typeof map === 'undefined'){
+					let latLng = new google.maps.LatLng(35.6812405, 139.7649361); //東京駅
+					let mapOptions = {
+						zoom: 15,
+						center: latLng,
+						mapId: "574de86c3981bebd"
+					};
 					map = new google.maps.Map(document.getElementById('map'), mapOptions); 	// マップがまだ存在しない場合は新しく作成
 				}
 				
