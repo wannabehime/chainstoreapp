@@ -24,7 +24,7 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 	private final RestTemplate restTemplate;
 	
 //	ユーザーの入力からメニュー一覧を取得
-	public ArrayList<SearchResult> searchMenu(SearchRequirement searchReq) {
+	public String searchMenu(SearchRequirement searchReq) {
 		
 //		=== 初めに店舗検索の中心地を確定させる ===
 		String location = null; //店舗検索の中心の緯度経度を入れる変数
@@ -113,11 +113,12 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 					searchResults.add(i, searchRes);
 				}
 			}
+			return mapper.writeValueAsString(searchResults);
+			
 		}catch (JsonProcessingException e) {
 			e.printStackTrace();
+			return null;
 		}
-	    return searchResults;
-	    
 	}
 
 }

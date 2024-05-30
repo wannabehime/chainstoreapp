@@ -49,24 +49,15 @@
 		<input id="nowlatlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
 		<input type="submit" value="検索">
 	</form>
-	<div id="map"></div>
 	
-<!--	<h3>検索結果</h3>-->
-<!--    <div th:each="searchresult : ${searchresults}" th:object="${searchresult}">-->
-<!--        <div class="menuinfos">-->
-<!--            <span th:text="*{storeName}"></span>-->
-<!--            <span th:text="*{open_now} == true ? '営業中' : '営業時間外'"></span>-->
-<!--            <span th:text="*{distance}"></span>-->
-<!--            <span th:text="*{duration}"></span>-->
-<!--            <input class="hiddens" type="hidden" th:value="*{lat}" th:name="*{lng}">-->
-<!--            <button class="btn">ルート検索</button>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    <button id="button">一覧に戻る</button>-->
-<!--    <div id="map"></div>-->
+	<h3>検索結果</h3>
+	<div id="results"></div>
+    <button type="button" id="button">一覧に戻る</button>
+	
+	<div id="map"></div>
 
 	<script>
-//		====== ブランド名の候補をドロップダウン ======
+//		====== ブランド名候補のドロップダウン ======
 		// ブランド候補リスト
 	   const brands = ['松屋', 'マクドナルド', '星乃珈琲店'];
 	
@@ -112,12 +103,12 @@
 		 });
 	   }
 	   
-//	   ====== 「現在地から検索」ボタンの挙動 ======
+//	   ====== 「現在地から検索」ボタン ======
 		$('#currentsearchbtn').on('click', function() {
 			$('#center').val('現在地');
 	    });
 					
-//		====== 検索の中心をオートコンプリート ======
+//		====== 検索の中心のオートコンプリート ======
 		$(function(){
 			$('#center').autocomplete({
 			    source: function(request, response) {
@@ -140,12 +131,18 @@
 		});
 		
 //		====== 地図の初期化 ======
+		var directionsRenderer;
+		let currentLatLng;		
+		let map;
+		let markers = [];
+		let bounds;
+		
 		function initMap() {
-			var map;
 			let currentMarker;
+			directionsRenderer = new google.maps.DirectionsRenderer();
 			
 			function success(position) {
-				let currentLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+				currentLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 				
 				document.getElementById('nowlatlng').value = currentLatLng;  //店舗検索の中心として、フォームのhiddenで送る現在地の更新
 				
@@ -192,49 +189,98 @@
 			navigator.geolocation.watchPosition(success, fail, options); //現在地が取得できればsuccessに位置情報、できなければfail関数にエラーを代入、optionsは各種設定
 		}
 		
-		// JSONデータを受け取って処理する関数
-//		function processData(data) {
-		    // JSONデータをパースしてJavaScriptのオブジェクトに変換
-//		    var jsonData = JSON.parse(data);
-		
-		    // オブジェクトのプロパティにアクセスして必要な情報を取得
-//		    var storeName = jsonData.storeName;
-//		    var distance = jsonData.distance;
-//		    var duration = jsonData.duration;
-//		    var openNow = jsonData.open_now;
-		
-		    // HTML要素にデータを表示する
-//		    document.getElementById('storeName').innerText = storeName;
-//		    document.getElementById('distance').innerText = distance;
-//		    document.getElementById('duration').innerText = duration;
-//		    document.getElementById('openNow').innerText = openNow ? '営業中' : '営業時間外';
-//		}
-		
+//		====== メニュー検索 ======
 		$(function(){
 		    $('#searchForm').submit(function(e){
 		        e.preventDefault(); // フォームの通常の送信を停止
-		
-		        var formData = $(this).serialize(); // フォームデータをシリアライズ
-				console.log(formData);
-		
-				// Ajaxリクエストでデータを取得し、成功時にprocessData関数を呼び出す例
+		        var request = $(this).serialize(); // フォームデータをシリアライズ
 				$.ajax({
 				    url: '/chainstoremenus/search',
 				    type: 'GET',
-				    success: function(response) {
-				        console.log(response);
+					data: request,
+				    success: response => {
+				        success(response);
 				    },
-				    error: function(xhr, status, error) {
+				    error: (xhr, status, error) => {
 						// TODO: エラー時どうする
 						console.log(status);
-				        console.log(error);
 				    }
 				});
 		    });
 		});
-
-
-
+		
+		function success(response) {
+		    let responseObj = JSON.parse(response); // JSONデータをパースしてJavaScriptのオブジェクトに変換
+			$('#results').empty(); // 以前の結果をクリア
+			markers.forEach(marker => {
+            	marker.map = null; // 各店舗のマーカーを削除
+            });
+			markers = []; // マーカーを初期化s
+			bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域インスタンス生成
+			
+			responseObj.forEach(obj => {
+                let resultDiv = $('<div>').addClass('menuinfos');
+                resultDiv.append($('<span>').text(obj.storeName));
+                resultDiv.append($('<span>').text(obj.open_now ? '営業中' : '営業時間外'));
+                resultDiv.append($('<span>').text(obj.distance));
+                resultDiv.append($('<span>').text(obj.duration));
+                resultDiv.append($('<input>').attr('type', 'hidden').addClass('hiddens').attr('name', obj.lng).val(obj.lat));
+                resultDiv.append($('<button>').addClass('btn').text('ルート検索'));
+				$('#results').append(resultDiv);
+				
+				let marker = new google.maps.marker.AdvancedMarkerElement({ //各店舗のマーカーを生成
+                    position: {lat: obj.lat, lng: obj.lng},
+                    map: map
+                });
+				markers.push(marker); //マーカーを格納
+				bounds.extend({lat: obj.lat, lng: obj.lng}); //矩形領域に各店舗の位置を追加
+            });
+			
+			if(currentLatLng !== 'undefined'){
+				bounds.extend(currentLatLng); //現在地が取得できていれば矩形領域に追加
+			}
+			map.fitBounds(bounds); //マップに矩形領域を伝える
+			
+            $('.btn').on('click', function(){calcRoute(this);}); // ルート検索ボタンにイベントを追加
+			$('#button').on('click', backToList);
+		}
+		
+//		====== ルート検索 ======
+		function calcRoute(obj) {
+            directionsRenderer.setMap(map); // レンダラに結びつける地図情報を与える
+            
+            let preSibling = obj.previousElementSibling;
+            let desLatLng = new google.maps.LatLng(preSibling.value, preSibling.getAttribute('name')); // hiddenにある目的地の経緯度を取得
+            let request = {
+                origin: currentLatLng, // 現在地の経緯度
+                destination: desLatLng,
+                travelMode: 'WALKING'
+            };
+            
+            new google.maps.DirectionsService().route(request, (result, status) => { // 第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(result); // ルートをマップに表示
+                    markers.forEach(marker => {
+                    	marker.map = null; // 各店舗のマーカーを削除
+                    });
+                } else {
+                    alert(status);
+                }
+            });
+        }
+		
+//		====== 一覧に戻る ======
+		function backToList(){
+			directionsRenderer.setMap(null); // ルート案内を消すためにレンダラとマップの関連を削除
+			
+            bounds = new google.maps.LatLngBounds(); // 最新の現在地のみを保持するために矩形領域をリセット
+            bounds.extend(currentLatLng); // 最新の現在地を追加
+            markers.forEach(marker => {
+                marker.map = map; // 各店舗のマーカーを再表示
+				bounds.extend(marker.position); //各店舗の位置を再追加
+            });
+            map.fitBounds(bounds); // マップに矩形領域を伝える
+        }
 	</script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap&libraries=marker" async defer></script>
 </body>

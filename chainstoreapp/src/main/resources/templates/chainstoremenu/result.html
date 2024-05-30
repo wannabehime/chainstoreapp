@@ -12,7 +12,7 @@
 </style>
 </head>
 <body>
-    <h3>検索結果</h3>
+<!--    <h3>検索結果</h3>
     <div th:each="searchresult : ${searchresults}" th:object="${searchresult}">
         <div class="menuinfos">
             <span th:text="*{storeName}"></span>
@@ -25,7 +25,7 @@
     </div>
     <button id="button">一覧に戻る</button>
     <div id="map"></div>
-    
+-->   
     <script>
         var directionsRenderer;
         let currentLatLng;
@@ -34,10 +34,10 @@
         let bounds;
         let currentMarker;
 
-        function initMap() {
+/*        function initMap() {
 			directionsRenderer = new google.maps.DirectionsRenderer();
             
-            function success(position) {
+           function success(position) {
 				currentLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); //現在地のlatlngオブジェクトを取得
                 
                 if (typeof map === 'undefined') { // マップがまだ存在しない場合は新しく作成
@@ -67,7 +67,7 @@
                         bounds.extend(latLng); //矩形領域に各店舗の位置を追加
                     }
 
-                    bounds.extend(currentLatLng); //矩形領域に現在地を追加
+                  bounds.extend(currentLatLng); //矩形領域に現在地を追加
                     map.fitBounds(bounds); //マップに矩形領域を伝える
                 }
             }
@@ -105,9 +105,9 @@
             
             navigator.geolocation.watchPosition(success, fail, options); // 現在地が取得できればsuccessに位置情報、できなければfail関数にエラーを代入、optionsは各種設定
         }
-        
-        document.querySelectorAll('.btn').forEach(element => element.addEventListener('click', function(){calcRoute(this)})); // ルート検索ボタンに検索関数を結び付け
-        
+       
+     	document.querySelectorAll('.btn').forEach(element => element.addEventListener('click', function(){calcRoute(this)})); // ルート検索ボタンに検索関数を結び付け
+*/         
         function calcRoute(obj) {
             directionsRenderer.setMap(map); // レンダラに結びつける地図情報を与える
             
