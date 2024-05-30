@@ -33,7 +33,7 @@
 </head>
 <body>
 	<h3>検索欄</h3>
-	<form action="/chainstoremenus/search" method="get">
+	<form id="searchForm" action="/chainstoremenus/search" method="get">
 		<label>ブランド名：<input type="text" id="brandInput" name="keyword" placeholder="ブランド名を入力"></label>
 		<div class="dropdown"></div><br>
 		<label>場所：<input id="center" type="text" name="center" placeholder="駅名または「現在地」"></label>
@@ -50,6 +50,20 @@
 		<input type="submit" value="検索">
 	</form>
 	<div id="map"></div>
+	
+<!--	<h3>検索結果</h3>-->
+<!--    <div th:each="searchresult : ${searchresults}" th:object="${searchresult}">-->
+<!--        <div class="menuinfos">-->
+<!--            <span th:text="*{storeName}"></span>-->
+<!--            <span th:text="*{open_now} == true ? '営業中' : '営業時間外'"></span>-->
+<!--            <span th:text="*{distance}"></span>-->
+<!--            <span th:text="*{duration}"></span>-->
+<!--            <input class="hiddens" type="hidden" th:value="*{lat}" th:name="*{lng}">-->
+<!--            <button class="btn">ルート検索</button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <button id="button">一覧に戻る</button>-->
+<!--    <div id="map"></div>-->
 
 	<script>
 //		====== ブランド名の候補をドロップダウン ======
@@ -177,6 +191,50 @@
 			
 			navigator.geolocation.watchPosition(success, fail, options); //現在地が取得できればsuccessに位置情報、できなければfail関数にエラーを代入、optionsは各種設定
 		}
+		
+		// JSONデータを受け取って処理する関数
+//		function processData(data) {
+		    // JSONデータをパースしてJavaScriptのオブジェクトに変換
+//		    var jsonData = JSON.parse(data);
+		
+		    // オブジェクトのプロパティにアクセスして必要な情報を取得
+//		    var storeName = jsonData.storeName;
+//		    var distance = jsonData.distance;
+//		    var duration = jsonData.duration;
+//		    var openNow = jsonData.open_now;
+		
+		    // HTML要素にデータを表示する
+//		    document.getElementById('storeName').innerText = storeName;
+//		    document.getElementById('distance').innerText = distance;
+//		    document.getElementById('duration').innerText = duration;
+//		    document.getElementById('openNow').innerText = openNow ? '営業中' : '営業時間外';
+//		}
+		
+		$(function(){
+		    $('#searchForm').submit(function(e){
+		        e.preventDefault(); // フォームの通常の送信を停止
+		
+		        var formData = $(this).serialize(); // フォームデータをシリアライズ
+				console.log(formData);
+		
+				// Ajaxリクエストでデータを取得し、成功時にprocessData関数を呼び出す例
+				$.ajax({
+				    url: '/chainstoremenus/search',
+				    type: 'GET',
+				    success: function(response) {
+				        console.log(response);
+				    },
+				    error: function(xhr, status, error) {
+						// TODO: エラー時どうする
+						console.log(status);
+				        console.log(error);
+				    }
+				});
+		    });
+		});
+
+
+
 	</script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap&libraries=marker" async defer></script>
 </body>

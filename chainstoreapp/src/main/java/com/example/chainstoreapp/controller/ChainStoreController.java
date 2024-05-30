@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.chainstoreapp.entity.SearchRequirement;
 import com.example.chainstoreapp.entity.SearchResult;
@@ -16,6 +15,8 @@ import com.example.chainstoreapp.form.ChainStoreForm;
 import com.example.chainstoreapp.helper.ChainStoreHelper;
 import com.example.chainstoreapp.service.ChainStoreService;
 import com.example.chainstoreapp.service.StationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,22 +45,33 @@ public class ChainStoreController {
 	
 //	検索結果一覧画面の表示
 	@GetMapping("/search")
-	public String search(ChainStoreForm form, Model model, RedirectAttributes attributes){
+	@ResponseBody
+	public String search(ChainStoreForm form, Model model/*, RedirectAttributes attributes*/){
+		System.out.println("受信");
 		
 //		検索条件をフォームからエンティティへ変換
 		SearchRequirement searchReq = ChainStoreHelper.convertSearchReq(form);
 		
 //		サービスを用いてメニュー群を取得
 		List<SearchResult> searchResults = chainStoreService.searchMenu(searchReq);
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+	    try {
+	        String jsonString = objectMapper.writeValueAsString(searchResults);
+	        return jsonString;
+	    } catch (JsonProcessingException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
 
-		if(searchResults != null) {
-//			取得できればモデルに格納
-			model.addAttribute("searchresults", searchResults);
-		}else {
-//			できなければフラッシュメッセージを設定
-			attributes.addFlashAttribute("errorMessage", "対象データがありません");
-		}
-//		検索結果一覧画面を表示
-		return "chainstoremenu/result";
+//		if(searchResults != null) {
+////			取得できればモデルに格納
+//			model.addAttribute("searchresults", searchResults);
+//		}else {
+////			できなければフラッシュメッセージを設定
+//			attributes.addFlashAttribute("errorMessage", "対象データがありません");
+//		}
+////		検索結果一覧画面を表示
+//		return "chainstoremenu/result";
 	}
 }
