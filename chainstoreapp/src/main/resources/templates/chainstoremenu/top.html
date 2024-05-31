@@ -37,7 +37,7 @@
 		<label>ブランド名：<input type="text" id="brandInput" name="keyword" placeholder="ブランド名を入力"></label>
 		<div class="dropdown"></div><br>
 		<label>場所：<input id="center" type="text" name="center" placeholder="駅名または「現在地」"></label>
-		<button type="button" id="currentsearchbtn">現在地から検索</button><br>
+		<button type="button" id="currentSearchBtn">現在地から検索</button><br>
 		<label>範囲：
 			<select name="radius">
 				<option>--検索範囲を選んでください--</option>
@@ -46,14 +46,11 @@
 				<option value="800">800m</option>
 			</select>
 		</label><br>
-		<input id="nowlatlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
+		<input id="currentLatlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
 		<input type="submit" value="検索">
 	</form>
 	
-	<h3>検索結果</h3>
-	<div id="results"></div>
-    <button type="button" id="button">一覧に戻る</button>
-	
+	<div id="results"></div>	
 	<div id="map"></div>
 
 	<script>
@@ -104,7 +101,7 @@
 	   }
 	   
 //	   ====== 「現在地から検索」ボタン ======
-		$('#currentsearchbtn').on('click', function() {
+		$('#currentSearchBtn').on('click', function() {
 			$('#center').val('現在地');
 	    });
 					
@@ -142,9 +139,9 @@
 			directionsRenderer = new google.maps.DirectionsRenderer();
 			
 			function success(position) {
-				currentLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+				currentLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); // 現在地のlatlngオブジェクトを格納
 				
-				document.getElementById('nowlatlng').value = currentLatLng;  //店舗検索の中心として、フォームのhiddenで送る現在地の更新
+				document.getElementById('currentLatlng').value = currentLatLng;  //店舗検索の中心として、フォームのhiddenで送る現在地の更新
 				
 				if(typeof map === 'undefined'){
 					let mapOptions = {
@@ -152,6 +149,7 @@
 						center: currentLatLng,
 						mapId: "574de86c3981bebd"
 					};
+					// MEMO: mapoptionはmapIdだけでいい？
 					map = new google.maps.Map(document.getElementById('map'), mapOptions); 	// マップがまだ存在しない場合は新しく作成
 				}
 				
@@ -203,29 +201,32 @@
 				    },
 				    error: (xhr, status, error) => {
 						// TODO: エラー時どうする
-						console.log(status);
+						alert('通信に失敗しました。ステータス：' + status);
 				    }
 				});
 		    });
 		});
 		
 		function success(response) {
-		    let responseObj = JSON.parse(response); // JSONデータをパースしてJavaScriptのオブジェクトに変換
 			$('#results').empty(); // 以前の結果をクリア
 			markers.forEach(marker => {
             	marker.map = null; // 各店舗のマーカーを削除
             });
-			markers = []; // マーカーを初期化s
+			markers = []; // マーカーを初期化
+			directionsRenderer.setMap(null); // ルート案内を消すためにレンダラとマップの関連を削除
+			
 			bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域インスタンス生成
 			
+			let responseObj = JSON.parse(response); // JSONデータをパースしてJavaScriptのオブジェクトに変換
+			$('#results').append($('<h3>').text('検索結果'));
 			responseObj.forEach(obj => {
                 let resultDiv = $('<div>').addClass('menuinfos');
                 resultDiv.append($('<span>').text(obj.storeName));
                 resultDiv.append($('<span>').text(obj.open_now ? '営業中' : '営業時間外'));
                 resultDiv.append($('<span>').text(obj.distance));
                 resultDiv.append($('<span>').text(obj.duration));
-                resultDiv.append($('<input>').attr('type', 'hidden').addClass('hiddens').attr('name', obj.lng).val(obj.lat));
-                resultDiv.append($('<button>').addClass('btn').text('ルート検索'));
+                resultDiv.append($('<input>').addClass('hiddens').attr('type', 'hidden').val(obj.lat).attr('name', obj.lng));
+                resultDiv.append($('<button>').addClass('calcRouteBtn').text('ルート検索'));
 				$('#results').append(resultDiv);
 				
 				let marker = new google.maps.marker.AdvancedMarkerElement({ //各店舗のマーカーを生成
@@ -235,14 +236,15 @@
 				markers.push(marker); //マーカーを格納
 				bounds.extend({lat: obj.lat, lng: obj.lng}); //矩形領域に各店舗の位置を追加
             });
+			$('#results').append($('<button>').attr('id', 'backToListBtn').text('一覧に戻る'));
 			
 			if(currentLatLng !== 'undefined'){
 				bounds.extend(currentLatLng); //現在地が取得できていれば矩形領域に追加
 			}
 			map.fitBounds(bounds); //マップに矩形領域を伝える
 			
-            $('.btn').on('click', function(){calcRoute(this);}); // ルート検索ボタンにイベントを追加
-			$('#button').on('click', backToList);
+            $('.calcRouteBtn').on('click', function(){calcRoute(this);}); // ルート検索ボタンにイベントを追加
+			$('#backToListBtn').on('click', backToList);
 		}
 		
 //		====== ルート検索 ======
@@ -259,10 +261,10 @@
             
             new google.maps.DirectionsService().route(request, (result, status) => { // 第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
                 if (status === 'OK') {
-                    directionsRenderer.setDirections(result); // ルートをマップに表示
                     markers.forEach(marker => {
                     	marker.map = null; // 各店舗のマーカーを削除
                     });
+					directionsRenderer.setDirections(result); // ルートをマップに表示
                 } else {
                     alert(status);
                 }
