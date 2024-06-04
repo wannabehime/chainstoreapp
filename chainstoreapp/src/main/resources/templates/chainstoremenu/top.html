@@ -72,10 +72,8 @@
 					<option value="1000">1000</option>
 				</select>円以内
 			</label>
-			<button id="shuffleBtn">シャッフル</button>
 		</div>
-		<div class="menuResults"></div>
-		<div class="menuResults"></div>
+		<div id="menuResults"></div>
 	</div>
 	<div id="storeResults"></div>	
 	<div id="map"></div>
@@ -211,44 +209,9 @@
 			  maximumAge: 0, //キャッシュの位置情報の有効期限。期限内だと新たに取得せずキャッシュから返す
 			};
 			
-			navigator.geolocation.watchPosition(success, fail, options); //現在地が取得できればsuccessに位置情報、できなければfail関数にエラーを代入、optionsは各種設定
+			navigator.geolocation.watchPosition(success, fail, options); // 現在地が取得できればsuccessに位置情報、できなければfail関数にエラーを代入、optionsは各種設定
 		}
 		
-//		====== メニュー検索 ======
-		$('#priceLimit').change(shuffleMenu);
-		$('#shuffleBtn').on('click', shuffleMenu);
-		
-		function shuffleMenu(){
-	        let priceLimit = $('#priceLimit').val();
-			$.ajax({
-			    url: '/chainstoremenus/menusearch',
-			    type: 'GET',
-				dataType : 'json',
-				data: {'priceLimit': priceLimit},
-			    success: response => {
-			        menuSuccess(response);
-			    },
-			    error: (xhr, status, error) => {
-					// TODO: エラー時どうする
-					alert('通信に失敗しました。ステータス：' + status);
-			    }
-			});
-	    }
-		
-		function menuSuccess(response) {
-			$('.menuResults').empty(); //以前の結果をクリア
-			let priceCount = 0;
-			response.forEach(obj => {
-				let resultDiv = $('<div>').addClass('menus');
-				resultDiv.append($('<span>').text(obj.category));
-				resultDiv.append($('<span>').text(obj.name));
-				resultDiv.append($('<span>').text(obj.price + '円'));
-				$('.menuResults').append(resultDiv);
-				priceCount += parseInt(obj.price);
-			});
-			$('.menuResults').append($('<div>').text('計 ' + priceCount + '円'));
-		}
-
 //		====== 店舗検索 ======
 		$(function(){
 		    $('#searchForm').submit(function(e){
@@ -310,6 +273,54 @@
 			$('#backToListBtn').on('click', backToList);
 		}
 		
+//		====== メニュー検索 ======
+		// TODO: 「--予算を選んでください--」が選ばれてしまったらどうする。ホバーでドロップダウンの方がいいか
+		$('#priceLimit').change(initMenus); // 予算の上限が変更されたとき、最初のランダムなメニューを表示
+		
+		function initMenus() {
+		    $('#menuResults').empty(); // メニューの表示場所をクリア
+		    let firstMenuResultsDiv = $('<div>').addClass('menuResults'); // 1つ目のメニューの表示場所
+		    let secondMenuResultsDiv = $('<div>').addClass('menuResults'); // 2つ目のメニューの表示場所
+			let priceLimit = $('#priceLimit').val(); // shuffleAndDisplayMenuに渡す予算上限を取得
+			
+		    $('#menuResults').append(firstMenuResultsDiv, secondMenuResultsDiv);
+		    shuffleAndDisplayMenu(priceLimit, firstMenuResultsDiv);
+		    shuffleAndDisplayMenu(priceLimit, secondMenuResultsDiv);
+		}
+		
+		function shuffleAndDisplayMenu(priceLimit, menuResultsDiv) {
+		    $.ajax({ // メニューを取得
+		        url: '/chainstoremenus/menusearch',
+		        type: 'GET',
+		        dataType: 'json',
+		        data: { 'priceLimit': priceLimit },
+		        success: response => {
+		            displayMenu(response, menuResultsDiv, priceLimit); // メニューを表示
+		        },
+		        error: (xhr, status, error) => {
+		            alert('通信に失敗しました。ステータス：' + status);
+		        }
+		    });
+		}
+		
+		function displayMenu(response, menuResultsDiv, priceLimit) {
+		    menuResultsDiv.empty();
+		    let priceCount = 0; // 累計金額カウンター
+		    response.forEach(obj => {
+		        let resultDiv = $('<div>').addClass('menus');
+		        resultDiv.append($('<span>').text(obj.category));
+		        resultDiv.append($('<span>').text(obj.name));
+		        resultDiv.append($('<span>').text(obj.price + '円'));
+		        menuResultsDiv.append(resultDiv);
+		        priceCount += parseInt(obj.price);
+		    });
+		    menuResultsDiv.append($('<div>').text('計 ' + priceCount + '円'));
+		    let shuffleBtn = $('<button>').text('シャッフル').click(() => { // メニューをサイドシャッフルするボタン
+		        shuffleAndDisplayMenu(priceLimit, menuResultsDiv); // 予算上限とシャッフルするメニューの場所情報を渡す
+		    });
+		    menuResultsDiv.append(shuffleBtn);
+		}	
+			
 //		====== ルート検索 ======
 		function calcRoute(obj) {
             directionsRenderer.setMap(map); // レンダラに結びつける地図情報を与える
