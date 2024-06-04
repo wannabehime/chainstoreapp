@@ -10,3 +10,13 @@ CREATE TABLE stations(
 	longitude DOUBLE NOT NULL,
 	PRIMARY KEY (id)
 );
+
+DROP TABLE IF EXISTS matsuya_menus;
+
+CREATE TABLE matsuya_menus(
+	id INT NOT NULL AUTO_INCREMENT,
+	category VARCHAR(10) NOT NULL, 
+	name VARCHAR(30) NOT NULL,
+	price INT NOT NULL, 
+	PRIMARY KEY (id)
+);

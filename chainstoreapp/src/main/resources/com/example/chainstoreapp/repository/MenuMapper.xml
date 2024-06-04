@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.chainstoreapp.repository.MenuMapper">
+	<select id="selectWithinPriceLimit" resultType="com.example.chainstoreapp.entity.MatsuyaMenu">
+        -- テンポラリーテーブルを使用して一時的にデータを保存
+        DROP TEMPORARY TABLE IF EXISTS temp_main;
+        DROP TEMPORARY TABLE IF EXISTS temp_side_set;
+
+        -- categoryが「定食」「丼」「カレー」「牛めし」のいずれかであるレコードから1つランダムに選択
+        CREATE TEMPORARY TABLE temp_main AS
+        SELECT *
+        FROM matsuya_menus
+        WHERE category IN ('定食', '丼', 'カレー', '牛めし')
+          AND price <![CDATA[<=]]> #{priceLimit} -- 指定された上限を超えないように制限
+        ORDER BY RAND()
+        LIMIT 1;
+
+        -- mainの価格を取得
+        SET @main_price = (SELECT price FROM temp_main LIMIT 1);
+
+        -- categoryが「サイドメニュー」「セットメニュー」のいずれかであるレコードをランダムに選択し、priceの合計が指定された上限以下になるようにする
+        CREATE TEMPORARY TABLE temp_side_set AS
+        SELECT *
+        FROM matsuya_menus
+        WHERE category IN ('サイドメニュー', 'セットメニュー')
+        ORDER BY RAND();
+
+        -- 合計金額を計算しながら、条件に合うようにレコードを選択
+        SELECT id, category, name, price
+        FROM (
+            SELECT id, category, name, price, @sum := @sum + price AS cumulative_sum
+            FROM (
+                SELECT *, @sum := 0 FROM temp_side_set
+            ) t
+            WHERE @sum + price <![CDATA[<=]]> #{priceLimit} - @main_price
+        ) u
+        WHERE cumulative_sum <![CDATA[<=]]> #{priceLimit} - @main_price
+
+        UNION ALL
+
+        SELECT id, category, name, price
+        FROM temp_main;
+        
+        -- テンポラリーテーブルを削除
+	    DROP TEMPORARY TABLE IF EXISTS temp_main;
+	    DROP TEMPORARY TABLE IF EXISTS temp_side_set;
+    </select>
+</mapper>
