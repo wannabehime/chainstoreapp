@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.chainstoreapp.repository.MatsuyaMenuMapper">
+	
+    <update id="dropTempMainTable">
+        DROP TEMPORARY TABLE IF EXISTS temp_main;
+    </update>
+
+    <update id="dropTempSideSetTable">
+        DROP TEMPORARY TABLE IF EXISTS temp_side_set;
+    </update>
+
+    <update id="createTempMain">
+        CREATE TEMPORARY TABLE temp_main AS
+        SELECT *
+        FROM matsuya_menus
+        WHERE category IN ('定食', '丼', 'カレー', '牛めし')
+          AND price <![CDATA[<=]]> #{priceLimit}
+        ORDER BY RAND()
+        LIMIT 1;
+    </update>
+
+    <select id="selectMainPrice" resultType="int">
+        SELECT price
+        FROM temp_main
+        LIMIT 1;
+    </select>
+
+    <update id="createTempSideSet">
+        CREATE TEMPORARY TABLE temp_side_set AS
+        SELECT *
+        FROM matsuya_menus
+        WHERE category IN ('サイドメニュー', 'セットメニュー')
+        ORDER BY RAND();
+    </update>
+
+    <select id="selectWithinPriceLimit" resultType="com.example.chainstoreapp.entity.MatsuyaMenu">
+        SELECT id, category, name, price
+        FROM (
+            SELECT id, category, name, price, @sum := @sum + price AS cumulative_sum
+            FROM (
+                SELECT *, @sum := 0 FROM temp_side_set
+            ) t
+            WHERE @sum + price <![CDATA[<=]]> #{priceLimit} - #{mainPrice}
+        ) u
+        WHERE cumulative_sum <![CDATA[<=]]> #{priceLimit} - #{mainPrice}
+
+        UNION ALL
+
+        SELECT id, category, name, price
+        FROM temp_main;
+    </select>
+</mapper>

@@ -12,6 +12,7 @@ public class ChainStoreHelper {
 		searchReq.setCenter(form.getCenter());
 		searchReq.setNowLatLng(form.getNowLatLng());
 		searchReq.setRadius(form.getRadius());
+		searchReq.setPriceLimit(form.getPriceLimit());
 		return searchReq;
 	}
 	
@@ -22,6 +23,7 @@ public class ChainStoreHelper {
 		form.setCenter(searchReq.getCenter());
 		form.setNowLatLng(searchReq.getNowLatLng());
 		form.setRadius(searchReq.getRadius());
+		form.setPriceLimit(searchReq.getPriceLimit());
 		return form;
 	}
 }

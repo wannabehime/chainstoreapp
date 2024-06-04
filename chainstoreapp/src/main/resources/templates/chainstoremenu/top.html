@@ -4,6 +4,10 @@
 	<meta charset="UTF-8">
 	<title>ChainStore Menus</title>
 	<style>
+		#menuDefault{
+			display: none;
+		}
+		
 		#map {
 		  width: 800px;
 		  height: 600px;
@@ -49,15 +53,37 @@
 		<input id="currentLatlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
 		<input type="submit" value="検索">
 	</form>
-	
-	<div id="menuResults"></div>
+	<div id="menuDiv">
+		<div id="menuDefault">
+			<h3>メニュー</h3>
+			<label>予算：
+				<select id="priceLimit" name="priceLimit">
+					<option>--予算を選んでください--</option>
+					<option value="500">500</option>
+					<option value="550">550</option>
+					<option value="600">600</option>
+					<option value="650">650</option>
+					<option value="700">700</option>
+					<option value="750">750</option>
+					<option value="800">800</option>
+					<option value="850">850</option>
+					<option value="900">900</option>
+					<option value="950">950</option>
+					<option value="1000">1000</option>
+				</select>円以内
+			</label>
+			<button id="shuffleBtn">シャッフル</button>
+		</div>
+		<div class="menuResults"></div>
+		<div class="menuResults"></div>
+	</div>
 	<div id="storeResults"></div>	
 	<div id="map"></div>
 
 	<script>
 //		====== ブランド名候補のドロップダウン ======
 		// ブランド候補リスト
-	   const brands = ['松屋', 'マクドナルド', '星乃珈琲店'];
+	   const brands = ['松屋', 'すき家', '吉野家'];
 	
 	   // テキストボックスにマウスオーバーしたときの処理
 	   $('#brandInput').on('mouseenter', function() {
@@ -188,17 +214,52 @@
 			navigator.geolocation.watchPosition(success, fail, options); //現在地が取得できればsuccessに位置情報、できなければfail関数にエラーを代入、optionsは各種設定
 		}
 		
+//		====== メニュー検索 ======
+		$('#priceLimit').change(shuffleMenu);
+		$('#shuffleBtn').on('click', shuffleMenu);
+		
+		function shuffleMenu(){
+	        let priceLimit = $('#priceLimit').val();
+			$.ajax({
+			    url: '/chainstoremenus/menusearch',
+			    type: 'GET',
+				dataType : 'json',
+				data: {'priceLimit': priceLimit},
+			    success: response => {
+			        menuSuccess(response);
+			    },
+			    error: (xhr, status, error) => {
+					// TODO: エラー時どうする
+					alert('通信に失敗しました。ステータス：' + status);
+			    }
+			});
+	    }
+		
+		function menuSuccess(response) {
+			$('.menuResults').empty(); //以前の結果をクリア
+			let priceCount = 0;
+			response.forEach(obj => {
+				let resultDiv = $('<div>').addClass('menus');
+				resultDiv.append($('<span>').text(obj.category));
+				resultDiv.append($('<span>').text(obj.name));
+				resultDiv.append($('<span>').text(obj.price + '円'));
+				$('.menuResults').append(resultDiv);
+				priceCount += parseInt(obj.price);
+			});
+			$('.menuResults').append($('<div>').text('計 ' + priceCount + '円'));
+		}
+
 //		====== 店舗検索 ======
 		$(function(){
 		    $('#searchForm').submit(function(e){
 		        e.preventDefault(); // フォームの通常の送信を停止
-		        var request = $(this).serialize(); // フォームデータをシリアライズ
+		        let request = $(this).serialize(); // フォームデータをシリアライズ
 				$.ajax({
-				    url: '/chainstoremenus/search',
+				    url: '/chainstoremenus/storesearch',
 				    type: 'GET',
 					data: request,
 				    success: response => {
-				        success(response);
+				        storeSuccess(response);
 				    },
 				    error: (xhr, status, error) => {
 						// TODO: エラー時どうする
@@ -208,7 +269,7 @@
 		    });
 		});
 		
-		function success(response) {
+		function storeSuccess(response) {
 			$('#storeResults').empty(); // 以前の結果をクリア
 			markers.forEach(marker => {
             	marker.map = null; // 各店舗のマーカーを削除
@@ -238,6 +299,7 @@
 				bounds.extend({lat: obj.lat, lng: obj.lng}); //矩形領域に各店舗の位置を追加
             });
 			$('#storeResults').append($('<button>').attr('id', 'backToListBtn').text('一覧に戻る'));
+			$('#menuDefault').show(); //メニュー検索の予算設定セレクトボックスを表示
 			
 			if(currentLatLng !== 'undefined'){
 				bounds.extend(currentLatLng); //現在地が取得できていれば矩形領域に追加

@@ -20,4 +20,7 @@ public class SearchRequirement {
 	
 //	検索範囲
 	private int radius;
+	
+//	予算の上限
+	private int priceLimit;
 }
