@@ -76,9 +76,9 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 
 		ArrayList<SearchResult> searchResults = new ArrayList<>(); //returnするリストを用意
 		
-		String matchingName = switch (brandName) {
+		String matchedName = switch (brandName) {
 			case "松屋", "すき家", "吉野家", "はなまるうどん" -> brandName + ".*店";
-			case "丸亀製麺" -> "丸亀製麺.*";
+			case "丸亀製麺" -> brandName + ".*";
 			default -> throw new IllegalArgumentException("Unexpected value: " + searchReq.getKeyword());
 		};
 		
@@ -95,7 +95,7 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 				String name = nearbyResultNode.path("name").asText();
 				boolean open_now = nearbyResultNode.path("opening_hours").path("open_now").asBoolean();
 				
-				if(name.matches(matchingName) && open_now == true) {
+				if(name.matches(matchedName) && open_now == true) {
 					double lat = nearbyResultNode.path("geometry").path("location").path("lat").asDouble();
 					double lng = nearbyResultNode.path("geometry").path("location").path("lng").asDouble();
 					

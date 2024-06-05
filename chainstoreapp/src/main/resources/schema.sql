@@ -21,9 +21,39 @@ CREATE TABLE matsuya_menus(
 	PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS sukiya_menus;
+
+CREATE TABLE sukiya_menus(
+	id INT NOT NULL AUTO_INCREMENT,
+	category VARCHAR(5) NOT NULL, 
+	name VARCHAR(30) NOT NULL,
+	price INT NOT NULL, 
+	PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS yoshinoya_menus;
+
+CREATE TABLE yoshinoya_menus(
+	id INT NOT NULL AUTO_INCREMENT,
+	category VARCHAR(5) NOT NULL, 
+	name VARCHAR(30) NOT NULL,
+	price INT NOT NULL, 
+	PRIMARY KEY (id)
+);
+
 DROP TABLE IF EXISTS hanamaru_menus;
 
 CREATE TABLE hanamaru_menus(
+	id INT NOT NULL AUTO_INCREMENT,
+	category VARCHAR(5) NOT NULL, 
+	name VARCHAR(30) NOT NULL,
+	price INT NOT NULL, 
+	PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS marugame_menus;
+
+CREATE TABLE marugame_menus(
 	id INT NOT NULL AUTO_INCREMENT,
 	category VARCHAR(5) NOT NULL, 
 	name VARCHAR(30) NOT NULL,

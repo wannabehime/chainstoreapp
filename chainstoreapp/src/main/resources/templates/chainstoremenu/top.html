@@ -243,7 +243,7 @@
 			bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域インスタンス生成
 			
 			let responseObj = JSON.parse(response); // JSONデータをパースしてJavaScriptのオブジェクトに変換
-			$('#storeResults').append($('<h3>').text('検索結果'));
+			$('#storeResults').append($('<h3>').text('店舗マップ'));
 			responseObj.forEach(obj => {
                 let resultDiv = $('<div>').addClass('menuinfos');
                 resultDiv.append($('<span>').text(obj.storeName));

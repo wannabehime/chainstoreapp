@@ -22,7 +22,10 @@ public class MenuServiceImpl implements MenuService {
 		
 		String tableName = switch (brandName){
 			case "松屋" -> "matsuya_menus";
+			case "すき家" -> "sukiya_menus";
+			case "吉野家" -> "yoshinoya_menus";
 			case "はなまるうどん" -> "hanamaru_menus";
+			case "丸亀製麺" -> "marugame_menus";
 			default -> throw new IllegalArgumentException("Unexpected value: " + brandName);
 		};
 		
