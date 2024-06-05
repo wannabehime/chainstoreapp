@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 // 松屋メニューのエンティティ
-public class MatsuyaMenu {
+public class Menu {
 	
 //	ID
 	private int id;

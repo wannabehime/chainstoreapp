@@ -38,7 +38,7 @@
 <body>
 	<h3>検索欄</h3>
 	<form id="searchForm" action="/chainstoremenus/search" method="get">
-		<label>ブランド名：<input type="text" id="brandInput" name="keyword" placeholder="ブランド名を入力"></label>
+		<label>ブランド名：<input type="text" id="brandName" name="keyword" placeholder="ブランド名を入力"></label>
 		<div class="dropdown"></div><br>
 		<label>場所：<input id="center" type="text" name="center" placeholder="駅名または「現在地」"></label>
 		<button type="button" id="currentSearchBtn">現在地から検索</button><br>
@@ -81,10 +81,10 @@
 	<script>
 //		====== ブランド名候補のドロップダウン ======
 		// ブランド候補リスト
-	   const brands = ['松屋', 'すき家', '吉野家'];
+	   const brands = ['松屋', 'すき家', '吉野家', 'はなまるうどん'];
 	
 	   // テキストボックスにマウスオーバーしたときの処理
-	   $('#brandInput').on('mouseenter', function() {
+	   $('#brandName').on('mouseenter', function() {
 	     showDropdown();
 	   });
 	
@@ -96,15 +96,15 @@
 		 // ブランド候補をドロップダウンに追加
 		 brands.forEach(function(brand) {
 		   const div = $('<div>').text(brand).click(function() {
-		     $('#brandInput').val(brand);
+		     $('#brandName').val(brand);
 		     dropdown.hide();
 		   });
 		   dropdown.append(div);
 		 });
 		
 		 // ドロップダウンの位置を調整
-		 const inputOffset = $('#brandInput').offset();
-		 const inputHeight = $('#brandInput').outerHeight();
+		 const inputOffset = $('#brandName').offset();
+		 const inputHeight = $('#brandName').outerHeight();
 		 dropdown.css({
 		   left: inputOffset.left,
 		   top: inputOffset.top + inputHeight
@@ -119,7 +119,7 @@
 		
 		 // テキストボックスとドロップダウンの両方からマウスが離れたときの処理
 		 $(document).on('mouseover', function(e) {
-		   if (!$(e.target).closest('#brandInput, .dropdown').length) {
+		   if (!$(e.target).closest('#brandName, .dropdown').length) {
 		     dropdown.hide();
 		   }
 		 });
@@ -262,7 +262,8 @@
 				bounds.extend({lat: obj.lat, lng: obj.lng}); //矩形領域に各店舗の位置を追加
             });
 			$('#storeResults').append($('<button>').attr('id', 'backToListBtn').text('一覧に戻る'));
-			$('#menuDefault').show(); //メニュー検索の予算設定セレクトボックスを表示
+			$('#menuDefault').show(); // メニュー検索の予算設定セレクトボックスを表示
+			$('#menuResults').empty(); // メニュー表示をクリア
 			
 			if(currentLatLng !== 'undefined'){
 				bounds.extend(currentLatLng); //現在地が取得できていれば矩形領域に追加
@@ -281,21 +282,25 @@
 		    $('#menuResults').empty(); // メニューの表示場所をクリア
 		    let firstMenuResultsDiv = $('<div>').addClass('menuResults'); // 1つ目のメニューの表示場所
 		    let secondMenuResultsDiv = $('<div>').addClass('menuResults'); // 2つ目のメニューの表示場所
-			let priceLimit = $('#priceLimit').val(); // shuffleAndDisplayMenuに渡す予算上限を取得
+			let brandName = $('#brandName').val(); // shuffleAndDisplayMenuに渡すブランド名を取得
+			let priceLimit = $('#priceLimit').val(); // 同じく予算上限を取得
 			
 		    $('#menuResults').append(firstMenuResultsDiv, secondMenuResultsDiv);
-		    shuffleAndDisplayMenu(priceLimit, firstMenuResultsDiv);
-		    shuffleAndDisplayMenu(priceLimit, secondMenuResultsDiv);
+		    shuffleAndDisplayMenu(brandName, priceLimit, firstMenuResultsDiv);
+		    shuffleAndDisplayMenu(brandName, priceLimit, secondMenuResultsDiv);
 		}
 		
-		function shuffleAndDisplayMenu(priceLimit, menuResultsDiv) {
+		function shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv) {
 		    $.ajax({ // メニューを取得
 		        url: '/chainstoremenus/menusearch',
 		        type: 'GET',
 		        dataType: 'json',
-		        data: { 'priceLimit': priceLimit },
+		        data: {
+					'priceLimit': priceLimit,
+					'brandName' : brandName
+				},
 		        success: response => {
-		            displayMenu(response, menuResultsDiv, priceLimit); // メニューを表示
+		            displayMenu(response, menuResultsDiv, brandName, priceLimit); // メニューを表示
 		        },
 		        error: (xhr, status, error) => {
 		            alert('通信に失敗しました。ステータス：' + status);
@@ -303,7 +308,7 @@
 		    });
 		}
 		
-		function displayMenu(response, menuResultsDiv, priceLimit) {
+		function displayMenu(response, menuResultsDiv, brandName, priceLimit) {
 		    menuResultsDiv.empty();
 		    let priceCount = 0; // 累計金額カウンター
 		    response.forEach(obj => {
@@ -316,7 +321,7 @@
 		    });
 		    menuResultsDiv.append($('<div>').text('計 ' + priceCount + '円'));
 		    let shuffleBtn = $('<button>').text('シャッフル').click(() => { // メニューをサイドシャッフルするボタン
-		        shuffleAndDisplayMenu(priceLimit, menuResultsDiv); // 予算上限とシャッフルするメニューの場所情報を渡す
+		        shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv); // 予算上限とシャッフルするメニューの場所情報を渡す
 		    });
 		    menuResultsDiv.append(shuffleBtn);
 		}	
