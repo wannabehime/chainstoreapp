@@ -67,13 +67,20 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 
 //		店舗名・起点・範囲をパラメータにセット
 		Map<String, String> nearbyParams = new HashMap<>();
-		nearbyParams.put("keyword", searchReq.getKeyword());
+		String brandName = searchReq.getKeyword();
+		nearbyParams.put("keyword", brandName);
 		nearbyParams.put("location", location);
 		nearbyParams.put("radius", String.valueOf(searchReq.getRadius()));
 		
 		String nearbyBody = restTemplate.getForObject(nearbyUrl, String.class, nearbyParams); //APIから結果をJSON文字列で取得
 
 		ArrayList<SearchResult> searchResults = new ArrayList<>(); //returnするリストを用意
+		
+		String matchingName = switch (brandName) {
+			case "松屋", "すき家", "吉野家", "はなまるうどん" -> brandName + ".*店";
+			case "丸亀製麺" -> "丸亀製麺.*";
+			default -> throw new IllegalArgumentException("Unexpected value: " + searchReq.getKeyword());
+		};
 		
 //		JSONからエンティティへの変換
 		try {
@@ -88,8 +95,7 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 				String name = nearbyResultNode.path("name").asText();
 				boolean open_now = nearbyResultNode.path("opening_hours").path("open_now").asBoolean();
 				
-//				#TODO: 松屋の場合、名前が「松屋～店」のみをreturnするリストに格納
-				if(name.matches("松屋.*店") && open_now == true) {
+				if(name.matches(matchingName) && open_now == true) {
 					double lat = nearbyResultNode.path("geometry").path("location").path("lat").asDouble();
 					double lng = nearbyResultNode.path("geometry").path("location").path("lng").asDouble();
 					
