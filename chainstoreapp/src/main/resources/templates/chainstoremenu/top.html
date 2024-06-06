@@ -75,7 +75,6 @@
 		</div>
 		<div id="menuResults"></div>
 	</div>
-	<div id="storeResults"></div>	
 	<div id="map"></div>
 
 	<script>
@@ -233,7 +232,6 @@
 		});
 		
 		function storeSuccess(response) {
-			$('#storeResults').empty(); // 以前の結果をクリア
 			markers.forEach(marker => {
             	marker.map = null; // 各店舗のマーカーを削除
             });
@@ -243,25 +241,25 @@
 			bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域インスタンス生成
 			
 			let responseObj = JSON.parse(response); // JSONデータをパースしてJavaScriptのオブジェクトに変換
-			$('#storeResults').append($('<h3>').text('店舗マップ'));
 			responseObj.forEach(obj => {
-                let resultDiv = $('<div>').addClass('menuinfos');
-                resultDiv.append($('<span>').text(obj.storeName));
-                resultDiv.append($('<span>').text(obj.open_now ? '営業中' : '営業時間外'));
-                resultDiv.append($('<span>').text(obj.distance));
-                resultDiv.append($('<span>').text(obj.duration));
-                resultDiv.append($('<input>').addClass('hiddens').attr('type', 'hidden').val(obj.lat).attr('name', obj.lng));
-                resultDiv.append($('<button>').addClass('calcRouteBtn').text('ルート検索'));
-				$('#storeResults').append(resultDiv);
-				
 				let marker = new google.maps.marker.AdvancedMarkerElement({ //各店舗のマーカーを生成
                     position: {lat: obj.lat, lng: obj.lng},
                     map: map
                 });
+				
+				let infowindow = new google.maps.InfoWindow({
+		            content: `
+		                <strong>${obj.duration}</strong>
+						<input class='hiddens' type='hidden' value=${obj.lat} name='${obj.lng}'></input>
+						<button class='calcRouteBtn'>ルート</button>
+		            `
+		        });
+		        infowindow.open(map, marker);
+				
 				markers.push(marker); //マーカーを格納
 				bounds.extend({lat: obj.lat, lng: obj.lng}); //矩形領域に各店舗の位置を追加
             });
-			$('#storeResults').append($('<button>').attr('id', 'backToListBtn').text('一覧に戻る'));
+			$('#map').append($('<button>').attr('id', 'backToListBtn').text('一覧に戻る'));
 			$('#menuDefault').show(); // メニュー検索の予算設定セレクトボックスを表示
 			$('#menuResults').empty(); // メニュー表示をクリア
 			
@@ -270,7 +268,9 @@
 			}
 			map.fitBounds(bounds); //マップに矩形領域を伝える
 			
-            $('.calcRouteBtn').on('click', function(){calcRoute(this);}); // ルート検索ボタンにイベントを追加
+			$(document).on('click', '.calcRouteBtn', function() {
+		        calcRoute(this);
+		    }); // ルート検索ボタンにイベントを追加
 			$('#backToListBtn').on('click', backToList);
 		}
 		

@@ -110,12 +110,9 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 					String duration = directionNode.path("duration").path("text").asText();
 					
 					SearchResult searchRes = new SearchResult();
-					searchRes.setStoreName(name);
 					searchRes.setLat(lat);
 					searchRes.setLng(lng);
-					searchRes.setDistance(distance);
 					searchRes.setDuration(duration);
-					searchRes.setOpen_now(open_now);
 					searchResults.add(i, searchRes);
 				}
 			}

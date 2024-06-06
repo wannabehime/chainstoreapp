@@ -9,21 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SearchResult {
 	
-//	店舗名
-	private String storeName;
-	
 //	緯度
 	private double lat;
 //	経度
 	private double lng;
 	
-//	距離（単位：メートル）
-	private String distance;
-	
 //	所要時間
 	private String duration;
-	
-//	営業中か否か（true: 営業中）
-	private boolean open_now;
 	
 }
