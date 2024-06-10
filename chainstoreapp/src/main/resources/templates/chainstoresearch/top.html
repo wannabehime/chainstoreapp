@@ -37,7 +37,7 @@
 </head>
 <body>
 	<h3>検索欄</h3>
-	<form id="searchForm" action="/chainstoremenus/search" method="get">
+	<form id="searchForm" action="/chainstoresearch/search" method="get">
 		<label>ブランド名：<input type="text" id="brandName" name="keyword" placeholder="ブランド名を入力"></label>
 		<div class="dropdown"></div><br>
 		<label>場所：<input id="center" type="text" name="center" placeholder="駅名または「現在地」"></label>
@@ -134,7 +134,7 @@
 			$('#center').autocomplete({
 			    source: function(request, response) {
 			        $.ajax({
-			            url: "/chainstoremenus/getstationnames",
+			            url: "/chainstoresearch/getstationnames",
 			            dataType: "json",
 			            data: {
 			                term: request.term
@@ -217,7 +217,7 @@
 		        e.preventDefault(); // フォームの通常の送信を停止
 		        let request = $(this).serialize(); // フォームデータをシリアライズ
 				$.ajax({
-				    url: '/chainstoremenus/storesearch',
+				    url: '/chainstoresearch/storesearch',
 				    type: 'GET',
 					data: request,
 				    success: response => {
@@ -292,7 +292,7 @@
 		
 		function shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv) {
 		    $.ajax({ // メニューを取得
-		        url: '/chainstoremenus/menusearch',
+		        url: '/chainstoresearch/menusearch',
 		        type: 'GET',
 		        dataType: 'json',
 		        data: {

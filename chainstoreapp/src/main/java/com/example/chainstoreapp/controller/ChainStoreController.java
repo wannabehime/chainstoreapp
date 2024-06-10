@@ -19,7 +19,7 @@ import com.example.chainstoreapp.service.StationService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/chainstoremenus")
+@RequestMapping("/chainstoresearch")
 @RequiredArgsConstructor
 public class ChainStoreController {
 	
@@ -31,7 +31,7 @@ public class ChainStoreController {
 //	トップ検索画面の表示
 	@GetMapping
 	public String top() {
-		return "chainstoremenu/top";
+		return "chainstoresearch/top";
 	}
 	
 //	駅名の一部から、候補となる駅名リストを返す
