@@ -259,7 +259,7 @@
 				markers.push(marker); //マーカーを格納
 				bounds.extend({lat: obj.lat, lng: obj.lng}); //矩形領域に各店舗の位置を追加
             });
-			$('#map').append($('<button>').attr('id', 'backToListBtn').text('一覧に戻る'));
+			$('#menuDiv').append($('<button>').attr('id', 'backToListBtn').text('一覧に戻る'));
 			$('#menuDefault').show(); // メニュー検索の予算設定セレクトボックスを表示
 			$('#menuResults').empty(); // メニュー表示をクリア
 			
