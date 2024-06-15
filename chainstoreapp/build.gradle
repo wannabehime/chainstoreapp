@@ -36,10 +36,9 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 //	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	// TODO: エラー出てる
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.17.1'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.1'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.17.1'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.17.1'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.1'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.17.1'
 }
 
 tasks.named('test') {
