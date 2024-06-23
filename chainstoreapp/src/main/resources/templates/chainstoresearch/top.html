@@ -4,14 +4,146 @@
 	<meta charset="UTF-8">
 	<title>ChainStore Menus</title>
 	<style>
-		#menuDefault{
-			display: none;
+		body {
+		    font-family: Arial, sans-serif;
+		    background-color: #f2f2f2; /* 全体の背景色 */
+		    margin: 0;
+		    padding: 0;
 		}
 		
+		#search-form {
+		    display: flex;
+		    flex-wrap: wrap;
+		    justify-content: space-between;
+			width: 99%; /* フォームの幅を適宜調整 */
+			height: 60px;
+		    background-color: rgba(255, 255, 255); /* フォームの背景色（透過） */
+			border: 2px solid #ccc; /* フォームの枠線 */
+			margin: 0 auto; /* 中央揃え */
+		    box-sizing: border-box;
+		    border-radius: 10px;
+		    position: absolute;
+		    top: 10px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    z-index: 1000; /* 地図の上に表示するために高いz-indexを設定 */
+		}
+		
+		#search-form input[type="text"],
+		#search-form input[type="search"],
+		#search-form select,
+		#search-form button,
+		#search-form input[type="submit"] {
+			padding: 10px; /* テキストボックスとセレクトボックスの内側の余白 */
+		    border: none; /* ボーダーを除去 */
+		}
+		
+		#search-form input[type="text"],
+		#search-form input[type="search"],
+		#search-form select {
+		    flex: 1; /* ボタン以外の要素を均等に伸ばす */
+		    width: calc(33% - 10px); /* 幅を全体の1/3にする */
+		}
+		
+		#search-form button,
+		#search-form input[type="submit"] {
+		    /* ボタンのスタイル */
+		    flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
+		    padding: 10px; /* ボタンの内側の余白 */
+		}
+		
+		#search-form input[type="submit"] {
+			margin-left: 10px; /* ボタン間のマージン */
+		}
+		
+		#menuDefault{
+			display: none;
+			position: absolute;
+		    top: 100px; /* 地図の上部からの位置を調整 */
+		    left: 10px; /* 地図の左端からの位置を調整 */
+		    width: 500px; /* 必要に応じて幅を調整 */
+		    background-color: rgba(255, 255, 255, 0.9); /* メニューの背景色（透過） */
+		    border: 2px solid #ccc; /* メニュー全体の枠線 */
+		    padding: 20px;
+		    box-sizing: border-box;
+		    border-radius: 10px;
+		    z-index: 1000; /* 地図の上に表示するために高いz-indexを設定 */
+		}
+		
+		/* メニュー表示の親コンテナを横並びにする */
+	    #menuResults {
+	        display: flex;
+			flex-direction: column;
+			align-items: center;
+	    }
+		
+		/* 各メニュー項目の親コンテナ */
+		.menuResults {
+		    width: 100%;
+		    max-width: 600px;
+		    margin: 10px 0;
+		    display: flex;
+		    flex-direction: column;
+		}
+		
+		/* メニュー項目の行を横並びにし、幅を揃える */
+	    .menus {
+	        display: flex;
+			justify-content: flex-start;
+	        margin-bottom: 5px;
+			gap: 10px; /* 各項目間の隙間を追加 */
+			align-items: flex-end; /* 下揃えにする */
+	    }
+	
+		/* 各メニュー項目のスタイル */
+	    .menus span {
+			flex: 0 1 auto; /* コンテンツのサイズに合わせて幅を調整 */
+	        text-align: center;
+	    }
+		
+		/* メニュー項目のスタイル */
+		.menus .price {
+		    flex: 0 0 80px; /* コンテンツのサイズに合わせて幅を調整 */
+		    /*text-align: left; /* 左寄せに設定 */
+		}
+		
+		/* name と price のスタイルを大きくする */
+		.menus .name, .menus .price {
+		    font-size: 1.5em; /* フォントサイズを1.2倍に */
+		}
+		
+		/* category のスタイル */
+		.menus .category {
+		    font-size: 1em; /* フォントサイズを通常に */
+		}
+		
+		/* "円" のスタイル */
+		.menus .yen {
+		    font-size: 1em; /* フォントサイズを通常に */
+		}		
+	
+	    /* シャッフルボタンのスタイル */
+	    .menuResults button {
+	        margin-top: 10px;
+	        border: none;
+	        padding: 10px;
+	        background-color: #ccc;
+	        color: white;
+	        cursor: pointer;
+	    }
+	
+	    /* シャッフルボタンのホバー時のスタイル */
+	    .menuResults button:hover {
+	        background-color: #ccc;
+	    }
+		
 		#map {
-		  width: 800px;
-		  height: 600px;
-		  border: 1px solid #999;
+			position: absolute;
+		    top: 0;
+		    left: 0;
+		    width: 100vw; /* 画面の横幅いっぱい */
+		    height: 100vh; /* 画面の縦幅いっぱい */
+		    background-color: #e0e0e0; /* 地図の背景色 */
 		}
 		
 		.dropdown {
@@ -36,44 +168,38 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script> 	<!--jQuery UIを読み込み-->
 </head>
 <body>
-	<h3>検索欄</h3>
-	<form id="searchForm" action="/chainstoresearch/search" method="get">
-		<label>ブランド名：<input type="text" id="brandName" name="keyword" placeholder="ブランド名を入力"></label>
+	<form id="search-form" action="/chainstoresearch/search" method="get">
+		<input type="text" id="brandName" name="keyword" placeholder="ブランド名を入力">
 		<div class="dropdown"></div><br>
-		<label>場所：<input id="center" type="text" name="center" placeholder="駅名または「現在地」"></label>
+		<input id="center" type="text" name="center" placeholder="駅名を入力、または「現在地から検索」を選択">
 		<button type="button" id="currentSearchBtn">現在地から検索</button><br>
-		<label>範囲：
-			<select name="radius">
-				<option>--検索範囲を選んでください--</option>
-				<option value="300">300m</option>
-				<option value="500">500m</option>
-				<option value="800">800m</option>
-			</select>
-		</label><br>
+		<select name="radius">
+			<option>--検索範囲を選んでください--</option>
+			<option value="300">300m</option>
+			<option value="500">500m</option>
+			<option value="800">800m</option>
+		</select>
 		<input id="currentLatlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
 		<input type="submit" value="検索">
 	</form>
 	<div id="menuDiv">
 		<div id="menuDefault">
-			<h3>メニュー</h3>
-			<label>予算：
-				<select id="priceLimit" name="priceLimit">
-					<option>--予算を選んでください--</option>
-					<option value="500">500</option>
-					<option value="550">550</option>
-					<option value="600">600</option>
-					<option value="650">650</option>
-					<option value="700">700</option>
-					<option value="750">750</option>
-					<option value="800">800</option>
-					<option value="850">850</option>
-					<option value="900">900</option>
-					<option value="950">950</option>
-					<option value="1000">1000</option>
-				</select>円以内
-			</label>
+			<select id="priceLimit" name="priceLimit">
+				<option>予算</option>
+				<option value="500">500</option>
+				<option value="550">550</option>
+				<option value="600">600</option>
+				<option value="650">650</option>
+				<option value="700">700</option>
+				<option value="750">750</option>
+				<option value="800">800</option>
+				<option value="850">850</option>
+				<option value="900">900</option>
+				<option value="950">950</option>
+				<option value="1000">1000</option>
+			</select>円以内
+			<div id="menuResults"></div>
 		</div>
-		<div id="menuResults"></div>
 	</div>
 	<div id="map"></div>
 
@@ -213,7 +339,7 @@
 		
 //		====== 店舗検索 ======
 		$(function(){
-		    $('#searchForm').submit(function(e){
+		    $('#search-form').submit(function(e){
 		        e.preventDefault(); // フォームの通常の送信を停止
 		        let request = $(this).serialize(); // フォームデータをシリアライズ
 				$.ajax({
@@ -259,6 +385,7 @@
 				markers.push(marker); //マーカーを格納
 				bounds.extend({lat: obj.lat, lng: obj.lng}); //矩形領域に各店舗の位置を追加
             });
+			$('#backToListBtn').remove(); // 既存のボタンを削除
 			$('#menuDiv').append($('<button>').attr('id', 'backToListBtn').text('一覧に戻る'));
 			$('#menuDefault').show(); // メニュー検索の予算設定セレクトボックスを表示
 			$('#menuResults').empty(); // メニュー表示をクリア
@@ -313,14 +440,15 @@
 		    let priceCount = 0; // 累計金額カウンター
 		    response.forEach(obj => {
 		        let resultDiv = $('<div>').addClass('menus');
-		        resultDiv.append($('<span>').text(obj.category));
-		        resultDiv.append($('<span>').text(obj.name));
-		        resultDiv.append($('<span>').text(obj.price + '円'));
+		        resultDiv.append($('<span>').addClass('category').text(obj.category));
+		        resultDiv.append($('<span>').addClass('name').text(obj.name));
+		        resultDiv.append($('<span>').addClass('price').text(obj.price));
+				resultDiv.append($('<span>').addClass('yen').text('円'));
 		        menuResultsDiv.append(resultDiv);
 		        priceCount += parseInt(obj.price);
 		    });
 		    menuResultsDiv.append($('<div>').text('計 ' + priceCount + '円'));
-		    let shuffleBtn = $('<button>').text('シャッフル').click(() => { // メニューをサイドシャッフルするボタン
+		    let shuffleBtn = $('<button>').text('シャッフル').css('border', 'none').click(() => { // メニューをサイドシャッフルするボタン
 		        shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv); // 予算上限とシャッフルするメニューの場所情報を渡す
 		    });
 		    menuResultsDiv.append(shuffleBtn);

@@ -35,7 +35,7 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 			location = searchReq.getNowLatLng().replaceAll("[()]", ""); //()を除いている
 		}else {										//指定されていなければ、ユーザーが入力した駅名から経緯度へ変換
 //			urlのテンプレート
-			String geocodeUrl = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&language=ja&components=country:JP&address={address}";
+			String geocodeUrl = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyCV8QwXKedqprb4umRvDzUS8qXuRN9eCU8&language=ja&components=country:JP&address={address}";
 			
 			Map<String, String> geocodeParams = new HashMap<>(); //テンプレートに代入する検索条件を作成
 			geocodeParams.put("address", searchReq.getCenter());
@@ -63,7 +63,7 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 		
 //		=== ここから店舗検索 ===
 //		指定した起点から、同心円状の範囲にある店舗を検索するためのAPIのURL
-		String nearbyUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&language=ja&keyword={keyword}&location={location}&radius={radius}";
+		String nearbyUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyCV8QwXKedqprb4umRvDzUS8qXuRN9eCU8&language=ja&keyword={keyword}&location={location}&radius={radius}";
 
 //		店舗名・起点・範囲をパラメータにセット
 		Map<String, String> nearbyParams = new HashMap<>();
@@ -86,7 +86,7 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 		try {
 //			現在地から各店舗までの距離・時間を取得するAPIのURL
 //			TODO: 現在地取得できなかったらどうする
-			String directionUrl = "https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&language=ja&mode=walking&destination={destination}&origin={origin}";
+			String directionUrl = "https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyCV8QwXKedqprb4umRvDzUS8qXuRN9eCU8&language=ja&mode=walking&destination={destination}&origin={origin}";
 			String origin = searchReq.getNowLatLng().replaceAll("[()]", ""); //起点となる現在地の経緯度を取得
 			
 			JsonNode neabyNode = mapper.readTree(nearbyBody).path("results");
