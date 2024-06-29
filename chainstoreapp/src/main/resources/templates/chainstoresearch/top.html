@@ -23,8 +23,8 @@
 			top: 10px;			
 			position: absolute;
 			z-index: 100; /* positonとセット。値が大きいほど前面に表示 */
-		    background-color: rgba(255, 255, 255);
-			border: 2px solid #ccc;			
+		    background-color: rgb(254, 252, 218);
+			border: 2px solid #f0e68c;			
 			border-radius: 10px;
 			/*margin: 0 auto; /* 中央揃え */
 		    /*left: 50%;*/
@@ -43,6 +43,7 @@
 		#search-form select {
 		    flex: 1; /* ボタン以外の要素を均等に伸ばす。[どれくらい広げるか][どれくらい縮ませるか][絶対的な幅]の順で指定できる。今回は値1つで[どれくらい広げるか]が指定されている */
 		    width: 33.3%;
+			background-color: rgb(254, 252, 218);
 		}
 		
 		#search-form button,
@@ -56,6 +57,8 @@
 		
 		#priceLimit {
 		   height: 25px;
+		   background-color: rgb(254, 252, 218);
+		   border: none;
 		}
 		
 		#priceLimit-container {
@@ -71,8 +74,8 @@
 			left: 10px;
 			position: absolute;
 			z-index: 100;
-		    background-color: rgba(255, 255, 255, 0.9);
-		    border: 2px solid #ccc;		
+		    background-color: rgb(254, 252, 218);
+		    border: 2px solid #f0e68c;		
 			border-radius: 10px;
 		}
 		
@@ -92,31 +95,72 @@
 		}
 		
 		/* 各メニュー項目 */
-	    .menus {
+	    .menus, .total {
 	        display: flex;
 			flex-direction: row;
-			/*justify-content: space-between;	/* 両端揃えで均等に配置 */
 	        /*margin-bottom: 5px;*/
-			/*gap: 10px; /* 各項目間の隙間を追加 */
-			align-items: flex-end; /* 下揃え */
+			align-items: center;
+			/*justify-content: flex-start; /* 左寄せに変更 */
+		    gap: 10px;
+			text-align: left;
 	    }
 	
 		/* 各メニュー項目のスタイル */
-	    .menus span {
+	    /*.menus span {
 			/*flex: 0 1 auto; /* コンテンツのサイズに合わせて幅を調整 */
-	        text-align: left;
-	    }
+	        /*text-align: left;
+	    }*/
+		
+		.menus .category {
+		    flex: 1; /* 各項目の幅を均等に設定 */
+		}
+		
+		.menus .name {
+		    flex: 3; /* 名前の項目の幅を広く設定 */
+			font-size: 1.5em;
+		}
+		
+		.menus .price {
+		    flex: 1; /* 価格の項目の幅を均等に設定 */
+			font-size: 1.5em;
+		}
+		
+		.total .total-simbol {
+		    flex: 1; /* 各項目の幅を均等に設定 */
+			font-size: 1.5em;
+		}
+		
+		.total .total-blank {
+			flex: 3;
+		}
+		
+		.total .total-price {
+		    flex: 1; /* 価格の項目の幅を均等に設定 */
+			font-size: 2em;
+		}
+		
+		.menus-yellow {
+		    background-color: rgb(254, 250, 207); /* 黄色系統 */
+		}
+		
+		.menus-orange {
+		    background-color: rgb(244, 240, 198);
+		}
+		
+		.total {
+			background-color: rgb(234, 226, 214);
+		}
 		
 		/* メニュー項目のスタイル */
-		.menus .price {
+		/*.menus .price {
 		    /*flex: 0 0 80px; /* コンテンツのサイズに合わせて幅を調整 */
 		    /*text-align: left; /* 左寄せに設定 */
-		}
+		/*}
 		
 		/* name と price のスタイルを大きくする */
-		.menus .name, .menus .price {
+		/*.menus .name, .menus .price {
 		    font-size: 1.5em; /* フォントサイズを1.2倍に */
-		}
+		/*}
 		
 		/* category のスタイル */
 		/*.menus .category {
@@ -446,16 +490,25 @@
 		function displayMenu(response, menuResultsDiv, brandName, priceLimit) {
 		    menuResultsDiv.empty();
 		    let priceCount = 0; // 累計金額カウンター
+			let isBright = true; // 背景色のフラグ
+			
 		    response.forEach(obj => {
 		        let resultDiv = $('<div>').addClass('menus');
+				resultDiv.addClass(isBright ? 'menus-yellow' : 'menus-orange');
 		        resultDiv.append($('<span>').addClass('category').text(obj.category));
 		        resultDiv.append($('<span>').addClass('name').text(obj.name));
 		        resultDiv.append($('<span>').addClass('price').text(obj.price));
 				resultDiv.append($('<span>').addClass('yen').text('円'));
 		        menuResultsDiv.append(resultDiv);
 		        priceCount += parseInt(obj.price);
+				isBright = !isBright;				
 		    });
-		    menuResultsDiv.append($('<div>').text('計 ' + priceCount + '円'));
+			let totalDiv = $('<div>').addClass('total');
+			totalDiv.append($('<span>').addClass('total-simbol').text('計'));
+			totalDiv.append($('<span>').addClass('total-blank').text(''));
+			totalDiv.append($('<span>').addClass('total-price').text(priceCount));
+			totalDiv.append($('<span>').addClass('total-yen').text('円'));
+			menuResultsDiv.append(totalDiv);
 		    let shuffleBtn = $('<button>').text('シャッフル').css('border', 'none').click(() => { // メニューをサイドシャッフルするボタン
 		        shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv); // 予算上限とシャッフルするメニューの場所情報を渡す
 		    });
