@@ -23,15 +23,16 @@
 			top: 10px;			
 			position: absolute;
 			z-index: 100; /* positonとセット。値が大きいほど前面に表示 */
-		    background-color: rgb(254, 252, 218);
-			border: 2px solid #f0e68c;			
+		    background-color: rgb(254, 255, 255);
+			border: none;			
 			border-radius: 10px;
+			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
 			/*margin: 0 auto; /* 中央揃え */
 		    /*left: 50%;*/
 		    /*transform: translateX(-50%);*/
 		}
 		
-		#search-form input[type="text"],
+		#center,
 		#search-form select,
 		#search-form button,
 		#search-form input[type="submit"] {
@@ -39,16 +40,33 @@
 		    border: none; /* 枠線を除去 */
 		}
 		
+		#brandName {
+			padding: 10px;
+			border-right: 1px #ccc;
+			border-style: none solid none none;
+		}
+		
 		#search-form input[type="text"],
 		#search-form select {
 		    flex: 1; /* ボタン以外の要素を均等に伸ばす。[どれくらい広げるか][どれくらい縮ませるか][絶対的な幅]の順で指定できる。今回は値1つで[どれくらい広げるか]が指定されている */
 		    width: 33.3%;
-			background-color: rgb(254, 252, 218);
+			background-color: rgb(254, 255, 255);
+			font-size: 0.9rem;
 		}
 		
 		#search-form button,
 		#search-form input[type="submit"] {
 		    flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
+			color: #ffffff;
+			background-color: #ffa600;
+			font-size: 0.9em;
+			font-weight: bold;
+			transition: 1s;
+		}
+		
+		#search-form button:hover,
+		#search-form input[type="submit"]:hover {
+			background-image: linear-gradient(180deg, rgba(209, 209, 209, 1), rgba(255, 255, 255, 1));
 		}
 		
 		#search-form input[type="submit"] {
