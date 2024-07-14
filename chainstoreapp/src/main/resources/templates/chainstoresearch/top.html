@@ -18,24 +18,24 @@
 		    display: flex;
 		    /*flex-wrap: wrap;*/
 		    /*justify-content: space-between;*/
-			width: 99%;
+			width: 40%;
 			height: 60px;
 			top: 10px;			
 			position: absolute;
 			z-index: 100; /* positonとセット。値が大きいほど前面に表示 */
 		    background-color: rgb(254, 255, 255);
 			border: none;			
-			border-radius: 10px;
+			border-radius: 20px;
 			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
+			left: 50%; /* 追加: 左端から50%の位置に */
+			transform: translateX(-50%);
 			/*margin: 0 auto; /* 中央揃え */
 		    /*left: 50%;*/
 		    /*transform: translateX(-50%);*/
 		}
 		
 		#center,
-		#search-form select,
-		#search-form button,
-		#search-form input[type="submit"] {
+		#submit-btn {
 			padding: 10px;
 		    border: none; /* 枠線を除去 */
 		}
@@ -44,33 +44,49 @@
 			padding: 10px;
 			border-right: 1px #ccc;
 			border-style: none solid none none;
+			border-top-left-radius: 10px;
+			border-bottom-left-radius: 10px;
+			flex: 1; /* ボタン以外の要素を均等に伸ばす。[どれくらい広げるか][どれくらい縮ませるか][絶対的な幅]の順で指定できる。今回は値1つで[どれくらい広げるか]が指定されている */
 		}
 		
-		#search-form input[type="text"],
-		#search-form select {
-		    flex: 1; /* ボタン以外の要素を均等に伸ばす。[どれくらい広げるか][どれくらい縮ませるか][絶対的な幅]の順で指定できる。今回は値1つで[どれくらい広げるか]が指定されている */
+		#center {
+			flex: 0 0 0.4;
+		}
+		
+		#brandName,
+		#center {
 		    width: 33.3%;
 			background-color: rgb(254, 255, 255);
 			font-size: 0.9rem;
+			outline: none;
 		}
 		
-		#search-form button,
-		#search-form input[type="submit"] {
-		    flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
+		#currentSearchBtn:hover,
+		#submit-btn:hover {
+			opacity: 0.6;
+			transition: 0.5s;
+		}
+		
+		#currentSearchBtn {
+			flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
+			/*color: #ffffff;*/
+			background-color: white;
+			font-size: 0.9em;
+			border: solid 1px #ccc;
+			border-radius: 10px;
+			margin: 15px 10px;
+			/*font-weight: bold;*/
+		}
+		
+		#submit-btn {
+			flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
 			color: #ffffff;
 			background-color: #ffa600;
 			font-size: 0.9em;
 			font-weight: bold;
-			transition: 1s;
-		}
-		
-		#search-form button:hover,
-		#search-form input[type="submit"]:hover {
-			background-image: linear-gradient(180deg, rgba(209, 209, 209, 1), rgba(255, 255, 255, 1));
-		}
-		
-		#search-form input[type="submit"] {
 			margin-left: 10px; /* 「検索」ボタンのみ他の部品より少し離す */
+			border-top-right-radius: 10px;
+			border-bottom-right-radius: 10px;
 		}
 		
 		#priceLimit {
@@ -239,16 +255,11 @@
 	<form id="search-form" action="/chainstoresearch/search" method="get">
 		<input type="text" id="brandName" name="keyword" placeholder="ブランド名を入力">
 		<div class="dropdown"></div><br>
-		<input type="text" id="center" name="center" placeholder="駅名を入力、または「現在地から検索」を選択">
-		<button type="button" id="currentSearchBtn">現在地から検索</button><br>
-		<select name="radius">
-			<option>--検索範囲を選んでください--</option>
-			<option value="300">300m</option>
-			<option value="500">500m</option>
-			<option value="800">800m</option>
-		</select>
+		<input type="text" id="center" name="center" placeholder="駅名を入力、または">
+		<button type="button" id="currentSearchBtn">現在地を指定</button><br>
+		<input type="hidden" name="radius" value="500">
 		<input id="currentLatlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
-		<input type="submit" value="検索">
+		<input id="submit-btn" type="submit" value="検索">
 	</form>
 	<div id="menuDiv">
 		<div id="menuDefault">
