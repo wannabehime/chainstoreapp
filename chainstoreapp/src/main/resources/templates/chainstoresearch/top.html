@@ -4,20 +4,12 @@
 	<meta charset="UTF-8">
 	<title>ChainStore Menus</title>
 	<style>
-		/*body {
-		    font-family: Arial, sans-serif;
-		    margin: 0;
-		    padding: 0;
-		}*/
-		
 		* {
 			box-sizing: border-box;
 		}
 		
 		#search-form {
 		    display: flex;
-		    /*flex-wrap: wrap;*/
-		    /*justify-content: space-between;*/
 			width: 40%;
 			height: 60px;
 			top: 10px;			
@@ -29,36 +21,33 @@
 			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
 			left: 50%; /* 追加: 左端から50%の位置に */
 			transform: translateX(-50%);
-			/*margin: 0 auto; /* 中央揃え */
-		    /*left: 50%;*/
-		    /*transform: translateX(-50%);*/
+		}
+		
+		#brandName {
+			flex: 0 0 33.3%;
+			padding: 10px;
+			border-right: 1px #ccc;
+			border-style: none solid none none;
+			border-top-left-radius: 10px;
+			border-bottom-left-radius: 10px;
+			/*flex: 0 0 auto; /* ボタン以外の要素を均等に伸ばす。[どれくらい広げるか][どれくらい縮ませるか][絶対的な幅]の順で指定できる。今回は値1つで[どれくらい広げるか]が指定されている */
+		}
+		
+		#center {
+			flex: 0 0 15%;
+		}
+		
+		#brandName,
+		#center {
+			background-color: rgb(254, 255, 255);
+			font-size: 0.9rem;
+			outline: none;
 		}
 		
 		#center,
 		#submit-btn {
 			padding: 10px;
 		    border: none; /* 枠線を除去 */
-		}
-		
-		#brandName {
-			padding: 10px;
-			border-right: 1px #ccc;
-			border-style: none solid none none;
-			border-top-left-radius: 10px;
-			border-bottom-left-radius: 10px;
-			flex: 1; /* ボタン以外の要素を均等に伸ばす。[どれくらい広げるか][どれくらい縮ませるか][絶対的な幅]の順で指定できる。今回は値1つで[どれくらい広げるか]が指定されている */
-		}
-		
-		#center {
-			flex: 0 0 0.4;
-		}
-		
-		#brandName,
-		#center {
-		    width: 33.3%;
-			background-color: rgb(254, 255, 255);
-			font-size: 0.9rem;
-			outline: none;
 		}
 		
 		#currentSearchBtn:hover,
@@ -69,13 +58,12 @@
 		
 		#currentSearchBtn {
 			flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
-			/*color: #ffffff;*/
 			background-color: white;
-			font-size: 0.9em;
+			font-size: 0.9rem;
 			border: solid 1px #ccc;
 			border-radius: 10px;
-			margin: 15px 10px;
-			/*font-weight: bold;*/
+			margin: 10px 10px 10px 0px;
+			padding: 0px 5px;
 		}
 		
 		#submit-btn {
@@ -84,10 +72,12 @@
 			background-color: #ffa600;
 			font-size: 0.9em;
 			font-weight: bold;
-			margin-left: 10px; /* 「検索」ボタンのみ他の部品より少し離す */
+			/*margin-left: 10px; /* 「検索」ボタンのみ他の部品より少し離す */
 			border-top-right-radius: 10px;
 			border-bottom-right-radius: 10px;
 		}
+		
+		/* ------------ */
 		
 		#priceLimit {
 		   height: 25px;
@@ -116,7 +106,6 @@
 	    #menuResults {
 	        display: flex;
 			flex-direction: column;
-			/*align-items: center;*/
 	    }
 		
 		/* 各メニュー項目の親コンテナ */
@@ -124,7 +113,6 @@
 			display: flex;
 		    flex-direction: column;
 		    width: 100%;
-		    /*max-width: 600px;*/
 		    margin: 10px 0;
 		}
 		
@@ -132,19 +120,11 @@
 	    .menus, .total {
 	        display: flex;
 			flex-direction: row;
-	        /*margin-bottom: 5px;*/
 			align-items: center;
-			/*justify-content: flex-start; /* 左寄せに変更 */
 		    gap: 10px;
 			text-align: left;
 	    }
-	
-		/* 各メニュー項目のスタイル */
-	    /*.menus span {
-			/*flex: 0 1 auto; /* コンテンツのサイズに合わせて幅を調整 */
-	        /*text-align: left;
-	    }*/
-		
+
 		.menus .category {
 		    flex: 1; /* 各項目の幅を均等に設定 */
 		}
@@ -184,28 +164,7 @@
 		.total {
 			background-color: rgb(234, 226, 214);
 		}
-		
-		/* メニュー項目のスタイル */
-		/*.menus .price {
-		    /*flex: 0 0 80px; /* コンテンツのサイズに合わせて幅を調整 */
-		    /*text-align: left; /* 左寄せに設定 */
-		/*}
-		
-		/* name と price のスタイルを大きくする */
-		/*.menus .name, .menus .price {
-		    font-size: 1.5em; /* フォントサイズを1.2倍に */
-		/*}
-		
-		/* category のスタイル */
-		/*.menus .category {
-		    font-size: 1em; /* フォントサイズを通常に */
-		/*}
-		
-		/* "円" のスタイル */
-		/*.menus .yen {
-		    font-size: 1em; /* フォントサイズを通常に */
-		/*}
-	
+
 	    /* シャッフルボタンのスタイル */
 	    .menuResults button {
 	        margin-top: 10px;
@@ -215,11 +174,6 @@
 			border: none;
 	        cursor: pointer;
 	    }
-	
-	    /* シャッフルボタンのホバー時のスタイル */
-	    /*.menuResults button:hover {
-	        background-color: #ccc;
-	    }*/
 		
 		#map {
 			position: absolute;
@@ -227,7 +181,6 @@
 		    left: 0;
 		    width: 100vw; /* 画面の横幅いっぱい */
 		    height: 100vh; /* 画面の縦幅いっぱい */
-		    /*background-color: #e0e0e0; /* 地図の背景色 */
 		}
 		
 		.dropdown {
