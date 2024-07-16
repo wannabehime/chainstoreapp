@@ -10,44 +10,52 @@
 		
 		#search-form {
 		    display: flex;
-			width: 40%;
+			min-width: 500px;
 			height: 60px;
 			top: 10px;			
 			position: absolute;
 			z-index: 100; /* positonとセット。値が大きいほど前面に表示 */
-		    background-color: rgb(254, 255, 255);
+		    background-color: white;
 			border: none;			
-			border-radius: 20px;
+			border-radius: 10px;
 			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
-			left: 50%; /* 追加: 左端から50%の位置に */
+			left: 50%;
 			transform: translateX(-50%);
 		}
 		
 		#brandName {
-			flex: 0 0 33.3%;
+			flex: 0 0 auto;
 			padding: 10px;
-			border-right: 1px #ccc;
-			border-style: none solid none none;
+			border-style: none;
 			border-top-left-radius: 10px;
 			border-bottom-left-radius: 10px;
-			/*flex: 0 0 auto; /* ボタン以外の要素を均等に伸ばす。[どれくらい広げるか][どれくらい縮ませるか][絶対的な幅]の順で指定できる。今回は値1つで[どれくらい広げるか]が指定されている */
+			color: rgb(126, 127, 123);
 		}
 		
 		#center {
-			flex: 0 0 15%;
+			flex: 0 0 auto;
+			border-left: 1px #ccc;
+			border-style: none none none solid;
+			margin-left: 10px;
+			padding: 10px;
+		}
+		
+		#brandName::placeholder,
+		#center::placeholder {
+			color: rgb(126, 127, 123);
+			text-align: center;
 		}
 		
 		#brandName,
 		#center {
-			background-color: rgb(254, 255, 255);
+			background-color: white;
 			font-size: 0.9rem;
 			outline: none;
 		}
 		
-		#center,
 		#submit-btn {
 			padding: 10px;
-		    border: none; /* 枠線を除去 */
+		    border: none;
 		}
 		
 		#currentSearchBtn:hover,
@@ -59,20 +67,20 @@
 		#currentSearchBtn {
 			flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
 			background-color: white;
+			color: rgb(126, 127, 123);
 			font-size: 0.9rem;
-			border: solid 1px #ccc;
+			border: solid 1px;
 			border-radius: 10px;
-			margin: 10px 10px 10px 0px;
-			padding: 0px 5px;
+			margin: 15px 15px 15px 0px;
+			min-width: 0;
 		}
 		
 		#submit-btn {
 			flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
-			color: #ffffff;
+			color: white;
 			background-color: #ffa600;
 			font-size: 0.9em;
 			font-weight: bold;
-			/*margin-left: 10px; /* 「検索」ボタンのみ他の部品より少し離す */
 			border-top-right-radius: 10px;
 			border-bottom-right-radius: 10px;
 		}
@@ -81,13 +89,12 @@
 		
 		#priceLimit {
 		   height: 25px;
-		   background-color: rgb(254, 252, 218);
 		   border: none;
 		}
 		
 		#priceLimit-container {
 			text-align: center;
-			font-size: 1.5em;
+			font-size: 1.5rem;
 		}
 		
 		#menuDefault{
@@ -95,12 +102,13 @@
 			padding: 20px;
 		    width: 500px;			
 			top: 100px;
-			left: 10px;
+			left: 30px;
 			position: absolute;
 			z-index: 100;
-		    background-color: rgb(254, 252, 218);
-		    border: 2px solid #f0e68c;		
+		    background-color: white;
+		    border: none;		
 			border-radius: 10px;
+			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
 		}
 		
 	    #menuResults {
@@ -152,25 +160,13 @@
 		    flex: 1; /* 価格の項目の幅を均等に設定 */
 			font-size: 2em;
 		}
-		
-		.menus-yellow {
-		    background-color: rgb(254, 250, 207); /* 黄色系統 */
-		}
-		
-		.menus-orange {
-		    background-color: rgb(244, 240, 198);
-		}
-		
-		.total {
-			background-color: rgb(234, 226, 214);
-		}
 
 	    /* シャッフルボタンのスタイル */
 	    .menuResults button {
 	        margin-top: 10px;
 			padding: 10px;			
 			color: white;			
-	        background-color: #ccc;
+	        background-color:#ffa600;
 			border: none;
 	        cursor: pointer;
 	    }
@@ -183,7 +179,7 @@
 		    height: 100vh; /* 画面の縦幅いっぱい */
 		}
 		
-		.dropdown {
+/*		.dropdown {
 		   display: none;
 		   position: absolute;
 		   background-color: #f9f9f9;
@@ -199,14 +195,21 @@
 		
 		 .dropdown div:hover {
 		   background-color: #f1f1f1;
-		 }
+		 }*/
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 	<!--jQueryを読み込み-->
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script> 	<!--jQuery UIを読み込み-->
 </head>
 <body>
 	<form id="search-form" action="/chainstoresearch/search" method="get">
-		<input type="text" id="brandName" name="keyword" placeholder="ブランド名を入力">
+		<select id="brandName" name="keyword">
+			<option class="brandname-default" value="ブランド名を選択">ブランド名を選択</option>
+			<option value="松屋">松屋</option>
+			<option value="すき家">すき家</option>
+			<option value="吉野家">吉野家</option>
+			<option value="はなまるうどん">はなまるうどん</option>
+			<option value="丸亀製麺">	丸亀製麺</option>
+		</select>
 		<div class="dropdown"></div><br>
 		<input type="text" id="center" name="center" placeholder="駅名を入力、または">
 		<button type="button" id="currentSearchBtn">現在地を指定</button><br>
@@ -240,7 +243,7 @@
 	<script>
 //		====== ブランド名候補のドロップダウン ======
 		// ブランド候補リスト
-	   const brands = ['松屋', 'すき家', '吉野家', 'はなまるうどん', '丸亀製麺'];
+/*	   const brands = ['松屋', 'すき家', '吉野家', 'はなまるうどん', '丸亀製麺'];
 	
 	   // テキストボックスにマウスオーバーしたときの処理
 	   $('#brandName').on('mouseenter', function() {
@@ -283,10 +286,24 @@
 		   }
 		 });
 	   }
-	   
+*/	   
+
+//		====== ブランド名セレクトボックスのテキストの色変更 ======
+		document.getElementById('brandName').addEventListener('change', function(){
+			colorChange(this);
+		});
+ 		function colorChange(obj){
+			if(obj.value === 'ブランド名を選択'){
+			 	obj.style.color = 'rgb(126, 127, 123)';
+			}else{
+				console.log(obj);
+				obj.style.color = '#000000';
+			}		
+		}
+				
 //	   ====== 「現在地から検索」ボタン ======
-		$('#currentSearchBtn').on('click', function() {
-			$('#center').val('現在地');
+		document.getElementById('currentSearchBtn').addEventListener('click', function() {
+			document.getElementById('center').value = '現在地';
 	    });
 					
 //		====== 検索の中心のオートコンプリート ======
@@ -472,18 +489,15 @@
 		function displayMenu(response, menuResultsDiv, brandName, priceLimit) {
 		    menuResultsDiv.empty();
 		    let priceCount = 0; // 累計金額カウンター
-			let isBright = true; // 背景色のフラグ
 			
 		    response.forEach(obj => {
 		        let resultDiv = $('<div>').addClass('menus');
-				resultDiv.addClass(isBright ? 'menus-yellow' : 'menus-orange');
 		        resultDiv.append($('<span>').addClass('category').text(obj.category));
 		        resultDiv.append($('<span>').addClass('name').text(obj.name));
 		        resultDiv.append($('<span>').addClass('price').text(obj.price));
 				resultDiv.append($('<span>').addClass('yen').text('円'));
 		        menuResultsDiv.append(resultDiv);
 		        priceCount += parseInt(obj.price);
-				isBright = !isBright;				
 		    });
 			let totalDiv = $('<div>').addClass('total');
 			totalDiv.append($('<span>').addClass('total-simbol').text('計'));
