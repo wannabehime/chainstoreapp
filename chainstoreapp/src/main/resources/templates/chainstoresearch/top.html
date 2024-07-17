@@ -53,11 +53,6 @@
 			outline: none;
 		}
 		
-		#submit-btn {
-			padding: 10px;
-		    border: none;
-		}
-		
 		#currentSearchBtn:hover,
 		#submit-btn:hover {
 			opacity: 0.6;
@@ -83,23 +78,25 @@
 			font-weight: bold;
 			border-top-right-radius: 10px;
 			border-bottom-right-radius: 10px;
+			padding: 10px;
+		    border: none;
 		}
 		
 		/* ------------ */
-		
-		#priceLimit {
-		   height: 25px;
-		   border: none;
-		}
-		
 		#priceLimit-container {
 			text-align: center;
-			font-size: 1.5rem;
+			font-size: 1.5rem;			
+			border-bottom: solid 2px #ffa600;
+		}
+		
+		#priceLimit {
+		   border: none;
+		   outline: none;
 		}
 		
 		#menuDefault{
 			display: none;			
-			padding: 20px;
+			padding: 30px;
 		    width: 500px;			
 			top: 100px;
 			left: 30px;
@@ -125,50 +122,57 @@
 		}
 		
 		/* 各メニュー項目 */
+		.menus {
+			background-color:#FFF6E6;
+			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
+		}
+		
+/*		.total {
+			justify-content: flex-end;
+		}*/
+		
 	    .menus, .total {
 	        display: flex;
 			flex-direction: row;
 			align-items: center;
-		    gap: 10px;
-			text-align: left;
+			text-align: left;			
+			margin: 5px;
 	    }
-
-		.menus .category {
-		    flex: 1; /* 各項目の幅を均等に設定 */
-		}
 		
 		.menus .name {
-		    flex: 3; /* 名前の項目の幅を広く設定 */
-			font-size: 1.5em;
+		    flex: 5;
+			font-size: 1.25em;
+			text-align: center;
+			padding: 5px;
 		}
 		
 		.menus .price {
-		    flex: 1; /* 価格の項目の幅を均等に設定 */
-			font-size: 1.5em;
+		    flex: 1;
+			text-align: right;
 		}
 		
 		.total .total-simbol {
-		    flex: 1; /* 各項目の幅を均等に設定 */
-			font-size: 1.5em;
-		}
-		
-		.total .total-blank {
-			flex: 3;
+			flex: 1;
+			text-align: right;
 		}
 		
 		.total .total-price {
-		    flex: 1; /* 価格の項目の幅を均等に設定 */
-			font-size: 2em;
+			flex: 1;
+			font-size: 1.5em;
+			text-align: left;
+			margin-left: 5px;
 		}
 
 	    /* シャッフルボタンのスタイル */
-	    .menuResults button {
-	        margin-top: 10px;
+	    .shuffle-btn {
 			padding: 10px;			
 			color: white;			
 	        background-color:#ffa600;
 			border: none;
 	        cursor: pointer;
+			border-radius: 10px;
+			font-weight: bold;
+			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
 	    }
 		
 		#map {
@@ -492,20 +496,16 @@
 			
 		    response.forEach(obj => {
 		        let resultDiv = $('<div>').addClass('menus');
-		        resultDiv.append($('<span>').addClass('category').text(obj.category));
 		        resultDiv.append($('<span>').addClass('name').text(obj.name));
-		        resultDiv.append($('<span>').addClass('price').text(obj.price));
-				resultDiv.append($('<span>').addClass('yen').text('円'));
+		        resultDiv.append($('<span>').addClass('price').text(obj.price + ' 円'));
 		        menuResultsDiv.append(resultDiv);
 		        priceCount += parseInt(obj.price);
 		    });
 			let totalDiv = $('<div>').addClass('total');
-			totalDiv.append($('<span>').addClass('total-simbol').text('計'));
-			totalDiv.append($('<span>').addClass('total-blank').text(''));
-			totalDiv.append($('<span>').addClass('total-price').text(priceCount));
-			totalDiv.append($('<span>').addClass('total-yen').text('円'));
+			totalDiv.append($('<span>').addClass('total-simbol').text('合計'));
+			totalDiv.append($('<span>').addClass('total-price').text(priceCount + ' 円'));
 			menuResultsDiv.append(totalDiv);
-		    let shuffleBtn = $('<button>').text('シャッフル').css('border', 'none').click(() => { // メニューをサイドシャッフルするボタン
+		    let shuffleBtn = $('<button>').text('シャッフル').addClass('shuffle-btn').click(() => { // メニューをサイドシャッフルするボタン
 		        shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv); // 予算上限とシャッフルするメニューの場所情報を渡す
 		    });
 		    menuResultsDiv.append(shuffleBtn);
