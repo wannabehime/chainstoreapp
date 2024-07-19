@@ -39,8 +39,7 @@
 			margin-left: 10px;
 			padding: 10px;
 		}
-		
-		#brandName::placeholder,
+
 		#center::placeholder {
 			color: rgb(126, 127, 123);
 			text-align: center;
@@ -53,8 +52,7 @@
 			outline: none;
 		}
 		
-		#currentSearchBtn:hover,
-		#submit-btn:hover {
+		#currentSearchBtn:hover, #submit-btn:hover, .shuffle-btn:hover {
 			opacity: 0.6;
 			transition: 0.5s;
 		}
@@ -85,13 +83,20 @@
 		/* ------------ */
 		#priceLimit-container {
 			text-align: center;
-			font-size: 1.5rem;			
-			border-bottom: solid 2px #ffa600;
+			font-size: 1.5rem;
+			background-color:#FFF6E6;
+			border-radius: 10px;
+			box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.42);
+			
 		}
 		
 		#priceLimit {
-		   border: none;
-		   outline: none;
+			 border: none;
+			 outline: none;
+			 font-size: 1.5rem;
+			 color: rgb(126, 127, 123);
+			 direction: rtl;
+			 background-color:#FFF6E6;
 		}
 		
 		#menuDefault{
@@ -118,49 +123,65 @@
 			display: flex;
 		    flex-direction: column;
 		    width: 100%;
-		    margin: 10px 0;
+		    margin: 15px 0;
+			border-radius: 10px;
+			box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.42);
+			padding: 10px;
+		}
+		
+		.menu-containers {
+			display: flex;
+			flex-direction: row;
+			align-items: center;		
+		}
+		
+		.menu-wrappers {
+			flex: 1;
 		}
 		
 		/* 各メニュー項目 */
 		.menus {
 			background-color:#FFF6E6;
-			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
+			box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
+			border-radius: 10px;
+			padding: 10px;
 		}
-		
-/*		.total {
-			justify-content: flex-end;
-		}*/
 		
 	    .menus, .total {
 	        display: flex;
 			flex-direction: row;
-			align-items: center;
-			text-align: left;			
+			align-items: center;			
 			margin: 5px;
 	    }
 		
 		.menus .name {
-		    flex: 5;
+		    flex: 1;
 			font-size: 1.25em;
 			text-align: center;
 			padding: 5px;
 		}
 		
 		.menus .price {
-		    flex: 1;
+		    flex-basis: 50px;
 			text-align: right;
+			font-size: 0.9rem;
 		}
 		
-		.total .total-simbol {
-			flex: 1;
-			text-align: right;
+		.total-value {
+			display: flex;
+			flex-direction: column;
+			background-color:#FFF6E6;
+			box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
+			border-radius: 10px;
+			padding: 10px;
 		}
 		
-		.total .total-price {
-			flex: 1;
-			font-size: 1.5em;
-			text-align: left;
-			margin-left: 5px;
+		.total-value .total-simbol {
+			font-size: 0.9rem;
+		}
+		
+		.total-value .total-price {
+			font-size: 1.5rem;
 		}
 
 	    /* シャッフルボタンのスタイル */
@@ -172,7 +193,7 @@
 	        cursor: pointer;
 			border-radius: 10px;
 			font-weight: bold;
-			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
+			box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
 	    }
 		
 		#map {
@@ -224,20 +245,23 @@
 	<div id="menuDiv">
 		<div id="menuDefault">
 			<div id="priceLimit-container">
-				<select id="priceLimit" name="priceLimit">
-					<option>予算</option>
-					<option value="500">500</option>
-					<option value="550">550</option>
-					<option value="600">600</option>
-					<option value="650">650</option>
-					<option value="700">700</option>
-					<option value="750">750</option>
-					<option value="800">800</option>
-					<option value="850">850</option>
-					<option value="900">900</option>
-					<option value="950">950</option>
-					<option value="1000">1000</option>
-				</select>円以内
+				<span class="pricelimit-wrapper">
+					<select id="priceLimit" name="priceLimit">
+						<option	class="pricelimit-default" value="予算を選択">予算を選択</option>
+						<option value="500">500</option>
+						<option value="550">550</option>
+						<option value="600">600</option>
+						<option value="650">650</option>
+						<option value="700">700</option>
+						<option value="750">750</option>
+						<option value="800">800</option>
+						<option value="850">850</option>
+						<option value="900">900</option>
+						<option value="950">950</option>
+						<option value="1000">1000</option>
+					</select>
+					<span class="pricelimit-simbol">円以内</span>					
+				</span>
 			</div>
 			<div id="menuResults"></div>
 		</div>
@@ -296,11 +320,13 @@
 		document.getElementById('brandName').addEventListener('change', function(){
 			colorChange(this);
 		});
+		document.getElementById('priceLimit').addEventListener('change', function(){
+			colorChange(this);
+		});
  		function colorChange(obj){
-			if(obj.value === 'ブランド名を選択'){
+			if(['ブランド名を選択', '予算を選択'].includes(obj.value)){
 			 	obj.style.color = 'rgb(126, 127, 123)';
 			}else{
-				console.log(obj);
 				obj.style.color = '#000000';
 			}		
 		}
@@ -494,17 +520,24 @@
 		    menuResultsDiv.empty();
 		    let priceCount = 0; // 累計金額カウンター
 			
+			const menuContainer = $('<div>').addClass('menu-containers');
+			const menuWrapper = $('<div>').addClass('menu-wrappers');
 		    response.forEach(obj => {
 		        let resultDiv = $('<div>').addClass('menus');
 		        resultDiv.append($('<span>').addClass('name').text(obj.name));
-		        resultDiv.append($('<span>').addClass('price').text(obj.price + ' 円'));
-		        menuResultsDiv.append(resultDiv);
+		        resultDiv.append($('<span>').addClass('price').text(obj.price + '円'));
+		        menuWrapper.append(resultDiv);
 		        priceCount += parseInt(obj.price);
 		    });
+			menuContainer.append(menuWrapper);
+
 			let totalDiv = $('<div>').addClass('total');
-			totalDiv.append($('<span>').addClass('total-simbol').text('合計'));
-			totalDiv.append($('<span>').addClass('total-price').text(priceCount + ' 円'));
-			menuResultsDiv.append(totalDiv);
+			const totalValueDiv = $('<span>').addClass('total-value');
+			totalValueDiv.append($('<span>').addClass('total-simbol').text('合計'));
+			totalValueDiv.append($('<span>').addClass('total-price').text(priceCount + '円'));
+			totalDiv.append(totalValueDiv);
+			menuContainer.append(totalDiv);
+			menuResultsDiv.append(menuContainer);			
 		    let shuffleBtn = $('<button>').text('シャッフル').addClass('shuffle-btn').click(() => { // メニューをサイドシャッフルするボタン
 		        shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv); // 予算上限とシャッフルするメニューの場所情報を渡す
 		    });
