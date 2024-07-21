@@ -50,6 +50,7 @@
 			background-color: white;
 			font-size: 0.9rem;
 			outline: none;
+			color: #443D3A;
 		}
 		
 		#currentSearchBtn:hover, #submit-btn:hover, .shuffle-btn:hover {
@@ -87,7 +88,7 @@
 			background-color:#FFF6E6;
 			border-radius: 10px;
 			box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.42);
-			
+			color: #443D3A;
 		}
 		
 		#priceLimit {
@@ -95,8 +96,9 @@
 			 outline: none;
 			 font-size: 1.5rem;
 			 color: rgb(126, 127, 123);
-			 direction: rtl;
+/*			 direction: rtl;*/
 			 background-color:#FFF6E6;
+			 color: #443D3A;
 		}
 		
 		#menuDefault{
@@ -107,10 +109,11 @@
 			left: 30px;
 			position: absolute;
 			z-index: 100;
-		    background-color: white;
-		    border: none;		
+		    border: none /*solid 2px #ffa600*/;
 			border-radius: 10px;
 			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
+			background: rgba(255, 255, 255, 0.5);
+			/*background-color:#ffa600;*/
 		}
 		
 	    #menuResults {
@@ -127,16 +130,19 @@
 			border-radius: 10px;
 			box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.42);
 			padding: 10px;
+			background-color:white;
 		}
 		
 		.menu-containers {
 			display: flex;
 			flex-direction: row;
-			align-items: center;		
+			align-items: center;
+			margin-bottom: 5px;	
 		}
 		
 		.menu-wrappers {
 			flex: 1;
+			border-right: dashed 2px #ffa600;
 		}
 		
 		/* 各メニュー項目 */
@@ -152,11 +158,13 @@
 			flex-direction: row;
 			align-items: center;			
 			margin: 5px;
+			color: #443D3A;
 	    }
 		
 		.menus .name {
 		    flex: 1;
 			font-size: 1.25em;
+			font-weight: bold;
 			text-align: center;
 			padding: 5px;
 		}
@@ -182,6 +190,7 @@
 		
 		.total-value .total-price {
 			font-size: 1.5rem;
+			font-weight: bold;
 		}
 
 	    /* シャッフルボタンのスタイル */
@@ -247,7 +256,7 @@
 			<div id="priceLimit-container">
 				<span class="pricelimit-wrapper">
 					<select id="priceLimit" name="priceLimit">
-						<option	class="pricelimit-default" value="予算を選択">予算を選択</option>
+						<option	class="pricelimit-default" value="予算を選択">---</option>
 						<option value="500">500</option>
 						<option value="550">550</option>
 						<option value="600">600</option>
