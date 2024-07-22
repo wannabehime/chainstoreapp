@@ -8,6 +8,14 @@
 			box-sizing: border-box;
 		}
 		
+		#map {
+			position: absolute;
+		    top: 0;
+		    left: 0;
+		    width: 100vw; /* 画面の横幅いっぱい */
+		    height: 100vh; /* 画面の縦幅いっぱい */
+		}
+		
 		#search-form {
 		    display: flex;
 			min-width: 500px;
@@ -38,9 +46,10 @@
 			border-style: none none none solid;
 			margin-left: 10px;
 			padding: 10px;
+			color: #443D3A;
 		}
 
-		#center::placeholder {
+		#center::placeholder, #pricelimit::placeholder {
 			color: rgb(126, 127, 123);
 			text-align: center;
 		}
@@ -50,7 +59,6 @@
 			background-color: white;
 			font-size: 0.9rem;
 			outline: none;
-			color: #443D3A;
 		}
 		
 		#currentSearchBtn:hover, #submit-btn:hover, .shuffle-btn:hover {
@@ -80,40 +88,64 @@
 			padding: 10px;
 		    border: none;
 		}
+		/* ------------ */
+		
+		.back-to-list-btn {
+			display: none;
+			position: absolute;
+			z-index: 100;		
+		}
 		
 		/* ------------ */
-		#priceLimit-container {
+		.pricelimit-container {
 			text-align: center;
-			font-size: 1.5rem;
-			background-color:#FFF6E6;
+			margin-bottom: 15px;
+		}
+		
+		.pricelimit-wrapper {
 			border-radius: 10px;
 			box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.42);
 			color: #443D3A;
+			font-size: 1.5rem;
+			padding: 15px;
+			background-color: white;
 		}
 		
 		#priceLimit {
-			 border: none;
+			 border: solid 1px #ccc;
+			 border-radius: 10px;
 			 outline: none;
 			 font-size: 1.5rem;
+			 font-weight: bold;
 			 color: rgb(126, 127, 123);
-/*			 direction: rtl;*/
-			 background-color:#FFF6E6;
-			 color: #443D3A;
 		}
 		
-		#menuDefault{
+		.menu-board-container {		
 			display: none;			
 			padding: 30px;
-		    width: 500px;			
+			width: 500px;			
 			top: 100px;
 			left: 30px;
 			position: absolute;
 			z-index: 100;
-		    border: none /*solid 2px #ffa600*/;
 			border-radius: 10px;
 			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
-			background: rgba(255, 255, 255, 0.5);
-			/*background-color:#ffa600;*/
+			background: rgba(255, 255, 255, 0.5);	
+			max-height: calc(100vh - 130px);
+		    overflow: auto;
+		}
+		
+		.menu-board-container::-webkit-scrollbar {
+		    width: 7px;
+		}
+		
+		.menu-board-container::-webkit-scrollbar-thumb {
+		    background: rgb(205, 205, 205);
+		    border-radius: 10px;
+		}
+		
+		.menu-board-container::-webkit-scrollbar-thumb:hover {
+		    background: rgb(177, 177, 177);
 		}
 		
 	    #menuResults {
@@ -126,11 +158,11 @@
 			display: flex;
 		    flex-direction: column;
 		    width: 100%;
-		    margin: 15px 0;
+		    margin-top: 15px;
 			border-radius: 10px;
 			box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.42);
 			padding: 10px;
-			background-color:white;
+			background:rgba(255, 255, 255, 0.5);
 		}
 		
 		.menu-containers {
@@ -204,32 +236,6 @@
 			font-weight: bold;
 			box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
 	    }
-		
-		#map {
-			position: absolute;
-		    top: 0;
-		    left: 0;
-		    width: 100vw; /* 画面の横幅いっぱい */
-		    height: 100vh; /* 画面の縦幅いっぱい */
-		}
-		
-/*		.dropdown {
-		   display: none;
-		   position: absolute;
-		   background-color: #f9f9f9;
-		   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-		   padding: 12px 16px;
-		   z-index: 100;
-		 }
-		
-		 .dropdown div {
-		   cursor: pointer;
-		   padding: 8px;
-		 }
-		
-		 .dropdown div:hover {
-		   background-color: #f1f1f1;
-		 }*/
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 	<!--jQueryを読み込み-->
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script> 	<!--jQuery UIを読み込み-->
@@ -251,10 +257,12 @@
 		<input id="currentLatlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
 		<input id="submit-btn" type="submit" value="検索">
 	</form>
-	<div id="menuDiv">
-		<div id="menuDefault">
-			<div id="priceLimit-container">
+	<button class="back-to-list-btn">一覧に戻る</button>
+	<div class="menu-board-container">
+		<div class="menu-board-wrapper">
+			<div class="pricelimit-container">
 				<span class="pricelimit-wrapper">
+					<span class="pricelimit-presimbol">予算</span>	
 					<select id="priceLimit" name="priceLimit">
 						<option	class="pricelimit-default" value="予算を選択">---</option>
 						<option value="500">500</option>
@@ -269,7 +277,7 @@
 						<option value="950">950</option>
 						<option value="1000">1000</option>
 					</select>
-					<span class="pricelimit-simbol">円以内</span>					
+					<span class="pricelimit-postsimbol">円</span>					
 				</span>
 			</div>
 			<div id="menuResults"></div>
@@ -278,53 +286,6 @@
 	<div id="map"></div>
 
 	<script>
-//		====== ブランド名候補のドロップダウン ======
-		// ブランド候補リスト
-/*	   const brands = ['松屋', 'すき家', '吉野家', 'はなまるうどん', '丸亀製麺'];
-	
-	   // テキストボックスにマウスオーバーしたときの処理
-	   $('#brandName').on('mouseenter', function() {
-	     showDropdown();
-	   });
-	
-	   // ドロップダウンの表示処理
-	   function showDropdown() {
-		 const dropdown = $('.dropdown');
-		 dropdown.empty(); // ドロップダウンをクリア
-		
-		 // ブランド候補をドロップダウンに追加
-		 brands.forEach(function(brand) {
-		   const div = $('<div>').text(brand).click(function() {
-		     $('#brandName').val(brand);
-		     dropdown.hide();
-		   });
-		   dropdown.append(div);
-		 });
-		
-		 // ドロップダウンの位置を調整
-		 const inputOffset = $('#brandName').offset();
-		 const inputHeight = $('#brandName').outerHeight();
-		 dropdown.css({
-		   left: inputOffset.left,
-		   top: inputOffset.top + inputHeight
-		 });
-		
-		 dropdown.show();
-		
-		 // ドロップダウンにマウスオーバーしたときの処理
-		 dropdown.on('mouseenter', function() {
-		   dropdown.show();
-		 });
-		
-		 // テキストボックスとドロップダウンの両方からマウスが離れたときの処理
-		 $(document).on('mouseover', function(e) {
-		   if (!$(e.target).closest('#brandName, .dropdown').length) {
-		     dropdown.hide();
-		   }
-		 });
-	   }
-*/	   
-
 //		====== ブランド名セレクトボックスのテキストの色変更 ======
 		document.getElementById('brandName').addEventListener('change', function(){
 			colorChange(this);
@@ -333,10 +294,10 @@
 			colorChange(this);
 		});
  		function colorChange(obj){
-			if(['ブランド名を選択', '予算を選択'].includes(obj.value)){
+			if(['ブランド名を選択', '---'].includes(obj.value)){
 			 	obj.style.color = 'rgb(126, 127, 123)';
 			}else{
-				obj.style.color = '#000000';
+				obj.style.color = '#443D3A';
 			}		
 		}
 				
@@ -476,8 +437,7 @@
 				bounds.extend({lat: obj.lat, lng: obj.lng}); //矩形領域に各店舗の位置を追加
             });
 			$('#backToListBtn').remove(); // 既存のボタンを削除
-			$('#menuDiv').append($('<button>').attr('id', 'backToListBtn').text('一覧に戻る'));
-			$('#menuDefault').show(); // メニュー検索の予算設定セレクトボックスを表示
+			$('.menu-board-container').show(); // メニュー検索の予算設定セレクトボックスを表示
 			$('#menuResults').empty(); // メニュー表示をクリア
 			
 			if(currentLatLng !== 'undefined'){
@@ -571,6 +531,7 @@
                     	marker.map = null; // 各店舗のマーカーを削除
                     });
 					directionsRenderer.setDirections(result); // ルートをマップに表示
+					document.querySelector('back-to-list-btn').style.display = 'block';
                 } else {
                     alert(status);
                 }
