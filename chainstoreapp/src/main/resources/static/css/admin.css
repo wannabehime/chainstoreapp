@@ -1,0 +1,234 @@
+@charset "UTF-8";
+
+* {
+	box-sizing: border-box;
+}
+
+#map {
+	position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw; /* 画面の横幅いっぱい */
+    height: 100vh; /* 画面の縦幅いっぱい */
+}
+
+#search-form {
+    display: flex;
+	min-width: 500px;
+	height: 60px;
+	top: 10px;			
+	position: absolute;
+	z-index: 100; /* positonとセット。値が大きいほど前面に表示 */
+    background-color: white;
+	border: none;			
+	border-radius: 10px;
+	box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+#brandName {
+	flex: 0 0 auto;
+	padding: 10px;
+	border-style: none;
+	border-top-left-radius: 10px;
+	border-bottom-left-radius: 10px;
+	color: rgb(126, 127, 123);
+}
+
+#center {
+	flex: 0 0 auto;
+	border-left: 1px #ccc;
+	border-style: none none none solid;
+	margin-left: 10px;
+	padding: 10px;
+	color: #443D3A;
+}
+
+#center::placeholder, #pricelimit::placeholder {
+	color: rgb(126, 127, 123);
+	text-align: center;
+}
+
+#brandName,
+#center {
+	background-color: white;
+	font-size: 0.9rem;
+	outline: none;
+}
+
+#currentSearchBtn:hover, #submit-btn:hover, .shuffle-btn:hover {
+	opacity: 0.6;
+	transition: 0.5s;
+}
+
+#currentSearchBtn {
+	flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
+	background-color: white;
+	color: rgb(126, 127, 123);
+	font-size: 0.9rem;
+	border: solid 1px;
+	border-radius: 10px;
+	margin: 15px 15px 15px 0px;
+	min-width: 0;
+}
+
+#submit-btn {
+	flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
+	color: white;
+	background-color: #ffa600;
+	font-size: 0.9em;
+	font-weight: bold;
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+	padding: 10px;
+    border: none;
+}
+/* ------------ */
+
+.back-to-list-btn {
+	display: none;
+	position: absolute;
+	z-index: 100;		
+}
+
+/* ------------ */
+.pricelimit-container {
+	text-align: center;
+	margin-bottom: 15px;
+}
+
+.pricelimit-wrapper {
+	border-radius: 10px;
+	box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.42);
+	color: #443D3A;
+	font-size: 1.5rem;
+	padding: 15px;
+	background-color: white;
+}
+
+#priceLimit {
+	 border: solid 1px #ccc;
+	 border-radius: 10px;
+	 outline: none;
+	 font-size: 1.5rem;
+	 font-weight: bold;
+	 color: rgb(126, 127, 123);
+}
+
+.menu-board-container {		
+	display: none;			
+	padding: 30px;
+	width: 500px;			
+	top: 100px;
+	left: 30px;
+	position: absolute;
+	z-index: 100;
+	border-radius: 10px;
+	box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
+	background: rgba(255, 255, 255, 0.5);	
+	max-height: calc(100vh - 130px);
+    overflow: auto;
+}
+
+.menu-board-container::-webkit-scrollbar {
+    width: 7px;
+}
+
+.menu-board-container::-webkit-scrollbar-thumb {
+    background: rgb(205, 205, 205);
+    border-radius: 10px;
+}
+
+.menu-board-container::-webkit-scrollbar-thumb:hover {
+    background: rgb(177, 177, 177);
+}
+
+#menuResults {
+    display: flex;
+	flex-direction: column;
+}
+
+/* 各メニュー項目の親コンテナ */
+.menuResults {
+	display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 15px;
+	border-radius: 10px;
+	box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.42);
+	padding: 10px;
+	background:rgba(255, 255, 255, 0.5);
+}
+
+.menu-containers {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-bottom: 5px;	
+}
+
+.menu-wrappers {
+	flex: 1;
+	border-right: dashed 2px #ffa600;
+}
+
+/* 各メニュー項目 */
+.menus {
+	background-color:#FFF6E6;
+	box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
+	border-radius: 10px;
+	padding: 10px;
+}
+
+.menus, .total {
+    display: flex;
+	flex-direction: row;
+	align-items: center;			
+	margin: 5px;
+	color: #443D3A;
+}
+
+.menus .name {
+    flex: 1;
+	font-size: 1.25em;
+	font-weight: bold;
+	text-align: center;
+	padding: 5px;
+}
+
+.menus .price {
+    flex-basis: 50px;
+	text-align: right;
+	font-size: 0.9rem;
+}
+
+.total-value {
+	display: flex;
+	flex-direction: column;
+	background-color:#FFF6E6;
+	box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
+	border-radius: 10px;
+	padding: 10px;
+}
+
+.total-value .total-simbol {
+	font-size: 0.9rem;
+}
+
+.total-value .total-price {
+	font-size: 1.5rem;
+	font-weight: bold;
+}
+
+/* シャッフルボタンのスタイル */
+.shuffle-btn {
+	padding: 10px;			
+	color: white;			
+    background-color:#ffa600;
+	border: none;
+    cursor: pointer;
+	border-radius: 10px;
+	font-weight: bold;
+	box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
+}

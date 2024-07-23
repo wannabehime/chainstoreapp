@@ -3,242 +3,9 @@
 <head>
 	<meta charset="UTF-8">
 	<title>ChainStore Menus</title>
-	<style>
-		* {
-			box-sizing: border-box;
-		}
-		
-		#map {
-			position: absolute;
-		    top: 0;
-		    left: 0;
-		    width: 100vw; /* 画面の横幅いっぱい */
-		    height: 100vh; /* 画面の縦幅いっぱい */
-		}
-		
-		#search-form {
-		    display: flex;
-			min-width: 500px;
-			height: 60px;
-			top: 10px;			
-			position: absolute;
-			z-index: 100; /* positonとセット。値が大きいほど前面に表示 */
-		    background-color: white;
-			border: none;			
-			border-radius: 10px;
-			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
-			left: 50%;
-			transform: translateX(-50%);
-		}
-		
-		#brandName {
-			flex: 0 0 auto;
-			padding: 10px;
-			border-style: none;
-			border-top-left-radius: 10px;
-			border-bottom-left-radius: 10px;
-			color: rgb(126, 127, 123);
-		}
-		
-		#center {
-			flex: 0 0 auto;
-			border-left: 1px #ccc;
-			border-style: none none none solid;
-			margin-left: 10px;
-			padding: 10px;
-			color: #443D3A;
-		}
-
-		#center::placeholder, #pricelimit::placeholder {
-			color: rgb(126, 127, 123);
-			text-align: center;
-		}
-		
-		#brandName,
-		#center {
-			background-color: white;
-			font-size: 0.9rem;
-			outline: none;
-		}
-		
-		#currentSearchBtn:hover, #submit-btn:hover, .shuffle-btn:hover {
-			opacity: 0.6;
-			transition: 0.5s;
-		}
-		
-		#currentSearchBtn {
-			flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
-			background-color: white;
-			color: rgb(126, 127, 123);
-			font-size: 0.9rem;
-			border: solid 1px;
-			border-radius: 10px;
-			margin: 15px 15px 15px 0px;
-			min-width: 0;
-		}
-		
-		#submit-btn {
-			flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
-			color: white;
-			background-color: #ffa600;
-			font-size: 0.9em;
-			font-weight: bold;
-			border-top-right-radius: 10px;
-			border-bottom-right-radius: 10px;
-			padding: 10px;
-		    border: none;
-		}
-		/* ------------ */
-		
-		.back-to-list-btn {
-			display: none;
-			position: absolute;
-			z-index: 100;		
-		}
-		
-		/* ------------ */
-		.pricelimit-container {
-			text-align: center;
-			margin-bottom: 15px;
-		}
-		
-		.pricelimit-wrapper {
-			border-radius: 10px;
-			box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.42);
-			color: #443D3A;
-			font-size: 1.5rem;
-			padding: 15px;
-			background-color: white;
-		}
-		
-		#priceLimit {
-			 border: solid 1px #ccc;
-			 border-radius: 10px;
-			 outline: none;
-			 font-size: 1.5rem;
-			 font-weight: bold;
-			 color: rgb(126, 127, 123);
-		}
-		
-		.menu-board-container {		
-			display: none;			
-			padding: 30px;
-			width: 500px;			
-			top: 100px;
-			left: 30px;
-			position: absolute;
-			z-index: 100;
-			border-radius: 10px;
-			box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
-			background: rgba(255, 255, 255, 0.5);	
-			max-height: calc(100vh - 130px);
-		    overflow: auto;
-		}
-		
-		.menu-board-container::-webkit-scrollbar {
-		    width: 7px;
-		}
-		
-		.menu-board-container::-webkit-scrollbar-thumb {
-		    background: rgb(205, 205, 205);
-		    border-radius: 10px;
-		}
-		
-		.menu-board-container::-webkit-scrollbar-thumb:hover {
-		    background: rgb(177, 177, 177);
-		}
-		
-	    #menuResults {
-	        display: flex;
-			flex-direction: column;
-	    }
-		
-		/* 各メニュー項目の親コンテナ */
-		.menuResults {
-			display: flex;
-		    flex-direction: column;
-		    width: 100%;
-		    margin-top: 15px;
-			border-radius: 10px;
-			box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.42);
-			padding: 10px;
-			background:rgba(255, 255, 255, 0.5);
-		}
-		
-		.menu-containers {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			margin-bottom: 5px;	
-		}
-		
-		.menu-wrappers {
-			flex: 1;
-			border-right: dashed 2px #ffa600;
-		}
-		
-		/* 各メニュー項目 */
-		.menus {
-			background-color:#FFF6E6;
-			box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
-			border-radius: 10px;
-			padding: 10px;
-		}
-		
-	    .menus, .total {
-	        display: flex;
-			flex-direction: row;
-			align-items: center;			
-			margin: 5px;
-			color: #443D3A;
-	    }
-		
-		.menus .name {
-		    flex: 1;
-			font-size: 1.25em;
-			font-weight: bold;
-			text-align: center;
-			padding: 5px;
-		}
-		
-		.menus .price {
-		    flex-basis: 50px;
-			text-align: right;
-			font-size: 0.9rem;
-		}
-		
-		.total-value {
-			display: flex;
-			flex-direction: column;
-			background-color:#FFF6E6;
-			box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
-			border-radius: 10px;
-			padding: 10px;
-		}
-		
-		.total-value .total-simbol {
-			font-size: 0.9rem;
-		}
-		
-		.total-value .total-price {
-			font-size: 1.5rem;
-			font-weight: bold;
-		}
-
-	    /* シャッフルボタンのスタイル */
-	    .shuffle-btn {
-			padding: 10px;			
-			color: white;			
-	        background-color:#ffa600;
-			border: none;
-	        cursor: pointer;
-			border-radius: 10px;
-			font-weight: bold;
-			box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
-	    }
-	</style>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 	<!--jQueryを読み込み-->
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script> 	<!--jQuery UIを読み込み-->
+	<link th:href="@{/css/admin.css}" rel="stylesheet" type="text/css">
+	<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 	<!--jQueryを読み込み-->
+	<!--<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script> 	<!--jQuery UIを読み込み-->
 </head>
 <body>
 	<form id="search-form" action="/chainstoresearch/search" method="get">
@@ -252,6 +19,7 @@
 		</select>
 		<div class="dropdown"></div><br>
 		<input type="text" id="center" name="center" placeholder="駅名を入力、または">
+		<datalist id="stationnames"></datalist>
 		<button type="button" id="currentSearchBtn">現在地を指定</button><br>
 		<input type="hidden" name="radius" value="500">
 		<input id="currentLatlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
@@ -307,25 +75,30 @@
 	    });
 					
 //		====== 検索の中心のオートコンプリート ======
-		$(function(){
-			$('#center').autocomplete({
-			    source: function(request, response) {
-			        $.ajax({
-			            url: "/chainstoresearch/getstationnames",
-			            dataType: "json",
-			            data: {
-			                term: request.term
-			            },
-			            success: function(data) {
-			                response(data);
-			            },
-						error: function(request, status, error) {
-			             // TODO: エラー時どうする
-			            }
-			        });
-			    },
-			    minLength: 2
-			});
+		document.addEventListener('DOMContentLoaded', function() {
+		    const centerInput = document.getElementById('center');
+		    centerInput.addEventListener('input', function() {
+		        if (centerInput.value.length >= 2) {
+		            fetch(`/chainstoresearch/getstationnames?term=${centerInput.value}`)
+		                .then(response => response.json())
+		                .then(data => {
+		                    // Add autocomplete logic here using the `data` received
+		                    // For example: use a custom autocomplete library or native datalist element
+		                    // Example with datalist (you need to add a <datalist id="stationnames"></datalist> in HTML):
+		                    const datalist = document.getElementById('stationnames');
+		                    datalist.innerHTML = '';
+		                    data.forEach(item => {
+		                        const option = document.createElement('option');
+		                        option.value = item;
+		                        datalist.appendChild(option);
+		                    });
+		                    centerInput.setAttribute('list', 'stationnames');
+		                })
+		                .catch(error => {
+		                    // TODO: エラー時どうする
+		                });
+		        }
+		    });
 		});
 		
 //		====== 地図の初期化 ======
@@ -353,12 +126,32 @@
 					// TODO: mapoptionはmapIdだけでいい？
 					map = new google.maps.Map(document.getElementById('map'), mapOptions); 	// マップがまだ存在しない場合は新しく作成
 				}
-				
+						
 				if (typeof currentMarker === 'undefined') { // マーカーがまだ存在しない場合は新しく作成
-					currentMarker = new google.maps.marker.AdvancedMarkerElement({
-		                position: currentLatLng,
-		                map: map,
+					const iconDiv = document.createElement('div');
+					iconDiv.style.backgroundColor = '#115EC3';
+					iconDiv.style.border = '2px solid white';
+					iconDiv.style.borderRadius = '50%';
+					iconDiv.style.width = '18px';
+					iconDiv.style.height = '18px';
+					iconDiv.style.boxShadow = '0 0 6px rgba(0, 0, 0, 0.5)';
+					
+					currentMarker = new google.maps.marker.AdvancedMarkerView({
+		                map,
+						position: currentLatLng,
+						content: iconDiv,
             		});
+					
+					new google.maps.Circle({
+			            strokeColor: '#115EC3',
+			            strokeOpacity: 0.2,
+			            strokeWeight: 1,
+			            fillColor: '#115EC3',
+			            fillOpacity: 0.2,
+			            map: map,
+			            center: currentLatLng,
+			            radius: 40
+			        });   
         		} else { 							// マーカーが存在する場合は位置を更新
 					currentMarker.position = currentLatLng;
         		}
@@ -389,22 +182,20 @@
 		}
 		
 //		====== 店舗検索 ======
-		$(function(){
-		    $('#search-form').submit(function(e){
-		        e.preventDefault(); // フォームの通常の送信を停止
-		        let request = $(this).serialize(); // フォームデータをシリアライズ
-				$.ajax({
-				    url: '/chainstoresearch/storesearch',
-				    type: 'GET',
-					data: request,
-				    success: response => {
-				        storeSuccess(response);
-				    },
-				    error: (xhr, status, error) => {
+		document.addEventListener('DOMContentLoaded', function() {
+		    const searchForm = document.getElementById('search-form');
+		    searchForm.addEventListener('submit', function(e) {
+		        e.preventDefault();
+		        const request = new URLSearchParams(new FormData(searchForm)).toString();
+		        fetch(`/chainstoresearch/storesearch?${request}`)
+		            .then(response => response.text())
+		            .then(response => {
+		                storeSuccess(response);
+		            })
+		            .catch(error => {
 						// TODO: エラー時どうする
-						alert('通信に失敗しました。ステータス：' + status);
-				    }
-				});
+		                alert('通信に失敗しました。ステータス：' + error);
+		            });
 		    });
 		});
 		
@@ -436,81 +227,117 @@
 				markers.push(marker); //マーカーを格納
 				bounds.extend({lat: obj.lat, lng: obj.lng}); //矩形領域に各店舗の位置を追加
             });
-			$('#backToListBtn').remove(); // 既存のボタンを削除
-			$('.menu-board-container').show(); // メニュー検索の予算設定セレクトボックスを表示
-			$('#menuResults').empty(); // メニュー表示をクリア
+			//document.querySelector('back-to-list-btn').remove(); // 既存のボタンを削除
+			document.querySelector('.menu-board-container').style.display = "block"; // メニュー検索の予算設定セレクトボックスを表示
+			let element = document.getElementById("menuResults");
+			while (element.firstChild) {
+			  element.removeChild(element.firstChild);
+			}
 			
 			if(currentLatLng !== 'undefined'){
 				bounds.extend(currentLatLng); //現在地が取得できていれば矩形領域に追加
 			}
 			map.fitBounds(bounds); //マップに矩形領域を伝える
 			
-			$(document).on('click', '.calcRouteBtn', function() {
-		        calcRoute(this);
-		    }); // ルート検索ボタンにイベントを追加
-			$('#backToListBtn').on('click', backToList);
+			//document.querySelector('.calcRouteBtn').addEventListener('click', function() {
+		    //    calcRoute(this);
+		    //}); // ルート検索ボタンにイベントを追加
+			//document.getElementById('backToListBtn').addEventListener('click', backToList);
 		}
 		
 //		====== メニュー検索 ======
 		// TODO: 「--予算を選んでください--」が選ばれてしまったらどうする。ホバーでドロップダウンの方がいいか
-		$('#priceLimit').change(initMenus); // 予算の上限が変更されたとき、最初のランダムなメニューを表示
+		document.getElementById('priceLimit').addEventListener('change', initMenus); // 予算の上限が変更されたとき、最初のランダムなメニューを表示
 		
 		function initMenus() {
-		    $('#menuResults').empty(); // メニューの表示場所をクリア
-		    let firstMenuResultsDiv = $('<div>').addClass('menuResults'); // 1つ目のメニューの表示場所
-		    let secondMenuResultsDiv = $('<div>').addClass('menuResults'); // 2つ目のメニューの表示場所
-			let brandName = $('#brandName').val(); // shuffleAndDisplayMenuに渡すブランド名を取得
-			let priceLimit = $('#priceLimit').val(); // 同じく予算上限を取得
+			const element = document.getElementById("menuResults");
+			while (element.firstChild) { // メニューの表示場所をクリア
+				element.removeChild(element.firstChild);
+			}
 			
-		    $('#menuResults').append(firstMenuResultsDiv, secondMenuResultsDiv);
+			const firstMenuResultsDiv = document.createElement('div');
+			firstMenuResultsDiv.className = 'menuResults';
+			const secondMenuResultsDiv = document.createElement('div');
+			secondMenuResultsDiv.className = 'menuResults';
+			
+			const brandName = document.getElementById('brandName').value;
+			const priceLimit = document.getElementById('priceLimit').value;
+			
+			menuResults.appendChild(firstMenuResultsDiv);
+			menuResults.appendChild(secondMenuResultsDiv);
 		    shuffleAndDisplayMenu(brandName, priceLimit, firstMenuResultsDiv);
 		    shuffleAndDisplayMenu(brandName, priceLimit, secondMenuResultsDiv);
 		}
 		
 		function shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv) {
-		    $.ajax({ // メニューを取得
-		        url: '/chainstoresearch/menusearch',
-		        type: 'GET',
-		        dataType: 'json',
-		        data: {
-					'priceLimit': priceLimit,
-					'brandName' : brandName
-				},
-		        success: response => {
-		            displayMenu(response, menuResultsDiv, brandName, priceLimit); // メニューを表示
-		        },
-		        error: (xhr, status, error) => {
-		            alert('通信に失敗しました。ステータス：' + status);
-		        }
-		    });
+		    fetch(`/chainstoresearch/menusearch?priceLimit=${priceLimit}&brandName=${brandName}`)
+		        .then(response => response.json())
+		        .then(response => {
+		            displayMenu(response, menuResultsDiv, brandName, priceLimit);
+		        })
+		        .catch(error => {
+		            alert('通信に失敗しました。ステータス：' + error);
+		        });
 		}
 		
 		function displayMenu(response, menuResultsDiv, brandName, priceLimit) {
-		    menuResultsDiv.empty();
+			while (menuResultsDiv.firstChild) { // メニューの表示場所をクリア
+				menuResultsDiv.removeChild(menuResultsDiv.firstChild);
+			}
 		    let priceCount = 0; // 累計金額カウンター
 			
-			const menuContainer = $('<div>').addClass('menu-containers');
-			const menuWrapper = $('<div>').addClass('menu-wrappers');
+			const menuContainer = document.createElement('div');
+			menuContainer.className = 'menu-containers';
+			const menuWrapper = document.createElement('div');
+			menuWrapper.className = 'menu-wrappers';
+
 		    response.forEach(obj => {
-		        let resultDiv = $('<div>').addClass('menus');
-		        resultDiv.append($('<span>').addClass('name').text(obj.name));
-		        resultDiv.append($('<span>').addClass('price').text(obj.price + '円'));
-		        menuWrapper.append(resultDiv);
+				const resultDiv = document.createElement('div');
+				resultDiv.className = 'menus';
+				
+				const nameSpan = document.createElement('span');
+				nameSpan.className = 'name';
+				nameSpan.textContent = obj.name;
+				const priceSpan = document.createElement('span');
+				priceSpan.className = 'price';
+				priceSpan.textContent = obj.price + '円';
+				
+				resultDiv.appendChild(nameSpan);
+				resultDiv.appendChild(priceSpan);
+				menuWrapper.appendChild(resultDiv);
 		        priceCount += parseInt(obj.price);
 		    });
-			menuContainer.append(menuWrapper);
+			menuContainer.appendChild(menuWrapper);
 
-			let totalDiv = $('<div>').addClass('total');
-			const totalValueDiv = $('<span>').addClass('total-value');
-			totalValueDiv.append($('<span>').addClass('total-simbol').text('合計'));
-			totalValueDiv.append($('<span>').addClass('total-price').text(priceCount + '円'));
-			totalDiv.append(totalValueDiv);
-			menuContainer.append(totalDiv);
-			menuResultsDiv.append(menuContainer);			
-		    let shuffleBtn = $('<button>').text('シャッフル').addClass('shuffle-btn').click(() => { // メニューをサイドシャッフルするボタン
-		        shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv); // 予算上限とシャッフルするメニューの場所情報を渡す
-		    });
-		    menuResultsDiv.append(shuffleBtn);
+			const totalDiv = document.createElement('div');
+			totalDiv.className = 'total';
+			
+			const totalValueDiv = document.createElement('span');
+			totalValueDiv.className = 'total-value';
+			
+			const totalSimbolSpan = document.createElement('span');
+			totalSimbolSpan.className = 'total-simbol';
+			totalSimbolSpan.textContent = '合計';
+			
+			const totalPriceSpan = document.createElement('span');
+			totalPriceSpan.className = 'total-price';
+			totalPriceSpan.textContent = priceCount + '円';
+			
+			totalValueDiv.appendChild(totalSimbolSpan);
+			totalValueDiv.appendChild(totalPriceSpan);
+			totalDiv.appendChild(totalValueDiv);
+			
+			menuContainer.appendChild(totalDiv);
+			menuResultsDiv.appendChild(menuContainer);
+			
+			const shuffleBtn = document.createElement('button');
+			shuffleBtn.textContent = 'シャッフル';
+			shuffleBtn.className = 'shuffle-btn';
+			shuffleBtn.addEventListener('click', function() {
+			    shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv);
+			});
+			
+			menuResultsDiv.appendChild(shuffleBtn);
 		}	
 			
 //		====== ルート検索 ======
@@ -531,7 +358,7 @@
                     	marker.map = null; // 各店舗のマーカーを削除
                     });
 					directionsRenderer.setDirections(result); // ルートをマップに表示
-					document.querySelector('back-to-list-btn').style.display = 'block';
+					document.querySelector('.back-to-list-btn').style.display = 'block';
                 } else {
                     alert(status);
                 }
@@ -551,6 +378,6 @@
             map.fitBounds(bounds); // マップに矩形領域を伝える
         }
 	</script>
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&callback=initMap&libraries=marker" async defer></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&v=beta&callback=initMap&libraries=marker" async defer></script>
 </body>
 </html>
