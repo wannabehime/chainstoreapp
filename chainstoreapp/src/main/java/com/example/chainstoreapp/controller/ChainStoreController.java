@@ -41,19 +41,19 @@ public class ChainStoreController {
 		List<String> stationNames = stationService.getStationNames(term);
 		return stationNames;
 	}
-
-//	検索結果一覧画面の表示
-	@GetMapping("/menusearch")
-	@ResponseBody
-	public List<Menu> searchMenus(@RequestParam String brandName, @RequestParam Integer priceLimit){
-		return menuService.shuffleMenus(brandName, priceLimit); // サービスを用いてメニュー群を取得
-	}
-
+	
 //	検索結果一覧画面の表示
 	@GetMapping("/storesearch")
 	@ResponseBody
 	public String searchStores(ChainStoreForm form){
 		SearchRequirement searchReq = ChainStoreHelper.convertSearchReq(form); // 検索条件をフォームからエンティティへ変換
 		return chainStoreService.searchMenu(searchReq); // サービスを用いてメニュー群を取得
+	}
+
+//	検索結果一覧画面の表示
+	@GetMapping("/menusearch")
+	@ResponseBody
+	public List<Menu> searchMenus(@RequestParam String brandName, @RequestParam Integer priceLimit){
+		return menuService.shuffleMenus(brandName, priceLimit); // サービスを用いてメニュー群を取得
 	}
 }
