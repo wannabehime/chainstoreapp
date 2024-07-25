@@ -37,8 +37,8 @@ public class ChainStoreController {
 //	駅名の一部から、候補となる駅名リストを返す
 	@GetMapping("/getstationnames")
 	@ResponseBody
-	public List<String> getStationNames(@RequestParam String term){
-		List<String> stationNames = stationService.getStationNames(term);
+	public List<String> getStationNames(@RequestParam String input){
+		List<String> stationNames = stationService.getStationNames(input);
 		return stationNames;
 	}
 	

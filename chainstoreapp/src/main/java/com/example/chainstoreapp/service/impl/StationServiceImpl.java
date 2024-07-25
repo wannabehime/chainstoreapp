@@ -21,9 +21,9 @@ public class StationServiceImpl implements StationService {
 	
 	@Override
 //	駅名データベースから、駅名の一部を手掛かりに駅名リストを取得
-	public ArrayList<String> getStationNames(String term) {
+	public ArrayList<String> getStationNames(String input) {
 		
-		ArrayList<Station> stations = stationMapper.selectByStation_Name("%" + term + "%", term + "駅", term + "%");
+		ArrayList<Station> stations = stationMapper.selectByStation_Name("%" + input + "%", input + "駅", input + "%");
 		
 		ArrayList<String> stationNames = new ArrayList<>();
 		for(Station station : stations) {

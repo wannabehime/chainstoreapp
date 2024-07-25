@@ -1,4 +1,4 @@
-//		====== ブランド名セレクトボックスのテキストの色変更 ======
+//		====== ブランド名・予算セレクトボックスのテキストの色変更 ======
 document.getElementById('brand-name').addEventListener('change', function(){
 	colorChange(this);
 });
@@ -7,43 +7,41 @@ document.getElementById('price-limit').addEventListener('change', function(){
 });
 function colorChange(obj){
 	if(['ブランド名を選択', '---'].includes(obj.value)){
-	 	obj.style.color = 'rgb(126, 127, 123)';
+	 	obj.style.color = '#7e7f7b';
 	}else{
 		obj.style.color = '#443D3A';
 	}		
 }
 				
 //	   ====== 「現在地から検索」ボタン ======
-document.getElementById('set-current-location-button').addEventListener('click', function() {
+document.getElementById('set-current-location-button').addEventListener('click', function(){
 	document.getElementById('center').value = '現在地';
 });
 					
 //		====== 検索の中心のオートコンプリート ======
-document.addEventListener('DOMContentLoaded', function() {
-    const centerInput = document.getElementById('center');
-    centerInput.addEventListener('input', function() {
-        if (centerInput.value.length >= 2) {
-            fetch(`/chainstoresearch/getstationnames?term=${centerInput.value}`)
+document.addEventListener('DOMContentLoaded', suggestStaionNames);
+function suggestStaionNames(){
+	const center = document.getElementById('center');
+    center.addEventListener('input', function() {
+        if (center.value.length >= 2) {
+            fetch(`/chainstoresearch/getstationnames?input=${center.value}`)
                 .then(response => response.json())
                 .then(data => {
-                    // Add autocomplete logic here using the `data` received
-                    // For example: use a custom autocomplete library or native datalist element
-                    // Example with datalist (you need to add a <datalist id="stationnames"></datalist> in HTML):
-                    const datalist = document.getElementById('station-name-list');
-                    datalist.innerHTML = '';
+                    const stationNameslist = document.getElementById('station-name-list');
+                    stationNameslist.innerHTML = '';
                     data.forEach(item => {
                         const option = document.createElement('option');
                         option.value = item;
-                        datalist.appendChild(option);
+                        stationNameslist.appendChild(option);
                     });
-                    centerInput.setAttribute('list', 'station-name-list');
+                    center.setAttribute('list', 'station-name-list');
                 })
                 .catch(error => {
                     // TODO: エラー時どうする
                 });
         }
     });
-});
+}
 		
 //		====== 地図の初期化 ======
 var directionsRenderer;
