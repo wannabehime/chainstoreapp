@@ -6,9 +6,11 @@
 	<link th:href="@{/css/admin.css}" rel="stylesheet" type="text/css">
 </head>
 <body>
-	<form id="search-form" action="/chainstoresearch/search" method="get">
-		<select id="brandName" name="keyword">
-			<option class="brandname-default" value="ブランド名を選択">ブランド名を選択</option>
+	<div id="map"></div>
+	
+	<form id="search-form-container" action="/chainstoresearch/search" method="get">
+		<select id="brand-name" name="keyword">
+			<option>ブランド名を選択</option>
 			<option value="松屋">松屋</option>
 			<option value="すき家">すき家</option>
 			<option value="吉野家">吉野家</option>
@@ -16,37 +18,37 @@
 			<option value="丸亀製麺">	丸亀製麺</option>
 		</select>
 		<input type="text" id="center" name="center" placeholder="駅名を入力、または">
-		<datalist id="stationnames"></datalist>
-		<button type="button" id="currentSearchBtn">現在地を指定</button>
+		<datalist id="station-name-list"></datalist>
+		<button type="button" id="set-current-location-button">現在地を指定</button>
 		<input type="hidden" name="radius" value="500">
-		<input id="currentLatlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
-		<input id="submit-btn" type="submit" value="検索">
+		<input id="current-latlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
+		<input id="submit-button" type="submit" value="検索">
 	</form>
 	<button class="back-to-list-btn">一覧に戻る</button>
+	
 	<div id="menu-board-container">
-			<div id="price-limit-container">
-				<span id="price-limit-group">
-					<span id="price-limit-presimbol">予算</span>	
-					<select id="priceLimit" name="priceLimit">
-						<option	class="pricelimit-default" value="予算を選択">---</option>
-						<option value="500">500</option>
-						<option value="550">550</option>
-						<option value="600">600</option>
-						<option value="650">650</option>
-						<option value="700">700</option>
-						<option value="750">750</option>
-						<option value="800">800</option>
-						<option value="850">850</option>
-						<option value="900">900</option>
-						<option value="950">950</option>
-						<option value="1000">1000</option>
-					</select>
-					<span class="pricelimit-postsimbol">円</span>					
-				</span>
-			</div>
-			<div id="menuResults"></div>
+		<div id="price-limit-container">
+			<span id="price-limit-group">
+				予算	
+				<select id="price-limit" name="priceLimit">
+					<option>---</option>
+					<option value="500">500</option>
+					<option value="550">550</option>
+					<option value="600">600</option>
+					<option value="650">650</option>
+					<option value="700">700</option>
+					<option value="750">750</option>
+					<option value="800">800</option>
+					<option value="850">850</option>
+					<option value="900">900</option>
+					<option value="950">950</option>
+					<option value="1000">1000</option>
+				</select>
+				円
+			</span>
+		</div>
+		<div id="menu-result-container"></div>
 	</div>
-	<div id="map"></div>
 	<script th:src="@{/js/admin.js}"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&v=beta&callback=initMap&libraries=marker" async defer></script>
 </body>

@@ -12,7 +12,7 @@
     height: 100vh; /* 画面の縦幅いっぱい */
 }
 
-#search-form {
+#search-form-container {
     display: flex;
 	min-width: 500px;
 	height: 60px;
@@ -27,7 +27,13 @@
 	transform: translateX(-50%);
 }
 
-#brandName {
+#brand-name, #center {
+	background-color: white;
+	font-size: 0.9rem;
+	outline: none;
+}
+
+#brand-name {
 	flex: 0 0 auto;
 	padding: 10px;
 	border-style: none;
@@ -45,23 +51,12 @@
 	color: #443D3A;
 }
 
-#center::placeholder, #pricelimit::placeholder {
+#center::placeholder, #price-limit::placeholder {
 	color: rgb(126, 127, 123);
 	text-align: center;
 }
 
-#brandName, #center {
-	background-color: white;
-	font-size: 0.9rem;
-	outline: none;
-}
-
-#currentSearchBtn:hover, #submit-btn:hover, .shuffle-btn:hover {
-	opacity: 0.6;
-	transition: 0.5s;
-}
-
-#currentSearchBtn {
+#set-current-location-button {
 	flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
 	background-color: white;
 	color: rgb(126, 127, 123);
@@ -72,7 +67,7 @@
 	min-width: 0;
 }
 
-#submit-btn {
+#submit-button {
 	flex: 0 0 auto; /* サイズを固定して伸縮しないようにする */
 	color: white;
 	background-color: #ffa600;
@@ -83,9 +78,14 @@
 	padding: 10px;
     border: none;
 }
+
+#set-current-location-button:hover, #submit-button:hover, .shuffle-button:hover {
+	opacity: 0.6;
+	transition: 0.5s;
+}
 /* ------------ */
 
-.back-to-list-btn {
+#back-to-list-button {
 	display: none;
 	position: absolute;
 	z-index: 100;		
@@ -134,7 +134,7 @@
 	background-color: white;
 }
 
-#priceLimit {
+#price-limit {
 	 border: solid 1px #ccc;
 	 border-radius: 10px;
 	 outline: none;
@@ -143,13 +143,12 @@
 	 color: rgb(126, 127, 123);
 }
 
-#menuResults {
+#menu-result-container {
     display: flex;
 	flex-direction: column;
 }
 
-/* 各メニュー項目の親コンテナ */
-.menuResults {
+.menu-result-wrapper {
 	display: flex;
     flex-direction: column;
     width: 100%;
@@ -160,27 +159,19 @@
 	background:rgba(255, 255, 255, 0.5);
 }
 
-.menu-containers {
+.menu-result-group {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	margin-bottom: 5px;	
 }
 
-.menu-wrappers {
+.menu-box {
 	flex: 1;
 	border-right: dashed 2px #ffa600;
 }
 
-/* 各メニュー項目 */
-.menus {
-	background-color:#FFF6E6;
-	box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
-	border-radius: 10px;
-	padding: 10px;
-}
-
-.menus, .total {
+.menu, .total-price-box {
     display: flex;
 	flex-direction: row;
 	align-items: center;			
@@ -188,7 +179,14 @@
 	color: #443D3A;
 }
 
-.menus .name {
+.menu {
+	background-color:#FFF6E6;
+	box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
+	border-radius: 10px;
+	padding: 10px;
+}
+
+.menu-name {
     flex: 1;
 	font-size: 1.25em;
 	font-weight: bold;
@@ -196,13 +194,13 @@
 	padding: 5px;
 }
 
-.menus .price {
+.menu-price {
     flex-basis: 50px;
 	text-align: right;
 	font-size: 0.9rem;
 }
 
-.total-value {
+.total-price {
 	display: flex;
 	flex-direction: column;
 	background-color:#FFF6E6;
@@ -211,17 +209,16 @@
 	padding: 10px;
 }
 
-.total-value .total-simbol {
+.total-price-simbol {
 	font-size: 0.9rem;
 }
 
-.total-value .total-price {
+.total-price-value {
 	font-size: 1.5rem;
 	font-weight: bold;
 }
 
-/* シャッフルボタンのスタイル */
-.shuffle-btn {
+.shuffle-button {
 	padding: 10px;			
 	color: white;			
     background-color:#ffa600;

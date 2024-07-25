@@ -1,8 +1,8 @@
 //		====== ブランド名セレクトボックスのテキストの色変更 ======
-document.getElementById('brandName').addEventListener('change', function(){
+document.getElementById('brand-name').addEventListener('change', function(){
 	colorChange(this);
 });
-document.getElementById('priceLimit').addEventListener('change', function(){
+document.getElementById('price-limit').addEventListener('change', function(){
 	colorChange(this);
 });
 function colorChange(obj){
@@ -14,7 +14,7 @@ function colorChange(obj){
 }
 				
 //	   ====== 「現在地から検索」ボタン ======
-document.getElementById('currentSearchBtn').addEventListener('click', function() {
+document.getElementById('set-current-location-button').addEventListener('click', function() {
 	document.getElementById('center').value = '現在地';
 });
 					
@@ -29,14 +29,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Add autocomplete logic here using the `data` received
                     // For example: use a custom autocomplete library or native datalist element
                     // Example with datalist (you need to add a <datalist id="stationnames"></datalist> in HTML):
-                    const datalist = document.getElementById('stationnames');
+                    const datalist = document.getElementById('station-name-list');
                     datalist.innerHTML = '';
                     data.forEach(item => {
                         const option = document.createElement('option');
                         option.value = item;
                         datalist.appendChild(option);
                     });
-                    centerInput.setAttribute('list', 'stationnames');
+                    centerInput.setAttribute('list', 'station-name-list');
                 })
                 .catch(error => {
                     // TODO: エラー時どうする
@@ -59,7 +59,7 @@ function initMap() {
 	function success(position) {
 		currentLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); // 現在地のlatlngオブジェクトを格納
 		
-		document.getElementById('currentLatlng').value = currentLatLng;  //店舗検索の中心として、フォームのhiddenで送る現在地の更新
+		document.getElementById('current-latlng').value = currentLatLng;  //店舗検索の中心として、フォームのhiddenで送る現在地の更新
 		
 		if(typeof map === 'undefined'){
 			let mapOptions = {
@@ -127,7 +127,7 @@ function initMap() {
 		
 //		====== 店舗検索 ======
 document.addEventListener('DOMContentLoaded', function() {
-    const searchForm = document.getElementById('search-form');
+    const searchForm = document.getElementById('search-form-container');
     searchForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const request = new URLSearchParams(new FormData(searchForm)).toString();
@@ -171,11 +171,11 @@ function storeSuccess(response) {
 		markers.push(marker); //マーカーを格納
 		bounds.extend({lat: obj.lat, lng: obj.lng}); //矩形領域に各店舗の位置を追加
     });
-	//document.querySelector('back-to-list-btn').remove(); // 既存のボタンを削除
+	//document.getElementById('back-to-list-btn').remove(); // 既存のボタンを削除
 	document.querySelector('#menu-board-container').style.display = "block"; // メニュー検索の予算設定セレクトボックスを表示
-	let element = document.getElementById("menuResults");
-	while (element.firstChild) {
-	  element.removeChild(element.firstChild);
+	let menuResultContainer = document.getElementById('menu-result-container');
+	while (menuResultContainer.firstChild) {
+	  menuResultContainer.removeChild(menuResultContainer.firstChild);
 	}
 	
 	if(currentLatLng !== 'undefined'){
@@ -186,29 +186,29 @@ function storeSuccess(response) {
 	document.getElementById('calc-route-btn').addEventListener('click', function() {
         calcRoute(this);
     }); // ルート検索ボタンにイベントを追加
-	//document.getElementById('backToListBtn').addEventListener('click', backToList);
+	//document.getElementById('back-to-list-button').addEventListener('click', backToList);
 }
 		
 //		====== メニュー検索 ======
 // TODO: 「--予算を選んでください--」が選ばれてしまったらどうする。ホバーでドロップダウンの方がいいか
-document.getElementById('priceLimit').addEventListener('change', initMenus); // 予算の上限が変更されたとき、最初のランダムなメニューを表示
+document.getElementById('price-limit').addEventListener('change', initMenus); // 予算の上限が変更されたとき、最初のランダムなメニューを表示
 
 function initMenus() {
-	const element = document.getElementById("menuResults");
-	while (element.firstChild) { // メニューの表示場所をクリア
-		element.removeChild(element.firstChild);
+	const menuResultContainer = document.getElementById('menu-result-container');
+	while (menuResultContainer.firstChild) { // メニューの表示場所をクリア
+		menuResultContainer.removeChild(menuResultContainer.firstChild);
 	}
 	
 	const firstMenuResultsDiv = document.createElement('div');
-	firstMenuResultsDiv.className = 'menuResults';
+	firstMenuResultsDiv.className = 'menu-result-wrapper';
 	const secondMenuResultsDiv = document.createElement('div');
-	secondMenuResultsDiv.className = 'menuResults';
+	secondMenuResultsDiv.className = 'menu-result-wrapper';
 	
-	const brandName = document.getElementById('brandName').value;
-	const priceLimit = document.getElementById('priceLimit').value;
+	const brandName = document.getElementById('brand-name').value;
+	const priceLimit = document.getElementById('price-limit').value;
 	
-	menuResults.appendChild(firstMenuResultsDiv);
-	menuResults.appendChild(secondMenuResultsDiv);
+	menuResultContainer.appendChild(firstMenuResultsDiv);
+	menuResultContainer.appendChild(secondMenuResultsDiv);
     shuffleAndDisplayMenu(brandName, priceLimit, firstMenuResultsDiv);
     shuffleAndDisplayMenu(brandName, priceLimit, secondMenuResultsDiv);
 }
@@ -231,19 +231,19 @@ function displayMenu(response, menuResultsDiv, brandName, priceLimit) {
     let priceCount = 0; // 累計金額カウンター
 	
 	const menuContainer = document.createElement('div');
-	menuContainer.className = 'menu-containers';
+	menuContainer.className = 'menu-result-group';
 	const menuWrapper = document.createElement('div');
-	menuWrapper.className = 'menu-wrappers';
+	menuWrapper.className = 'menu-box';
 
     response.forEach(obj => {
 		const resultDiv = document.createElement('div');
-		resultDiv.className = 'menus';
+		resultDiv.className = 'menu';
 		
 		const nameSpan = document.createElement('span');
-		nameSpan.className = 'name';
+		nameSpan.className = 'menu-name';
 		nameSpan.textContent = obj.name;
 		const priceSpan = document.createElement('span');
-		priceSpan.className = 'price';
+		priceSpan.className = 'menu-price';
 		priceSpan.textContent = obj.price + '円';
 		
 		resultDiv.appendChild(nameSpan);
@@ -253,35 +253,35 @@ function displayMenu(response, menuResultsDiv, brandName, priceLimit) {
     });
 	menuContainer.appendChild(menuWrapper);
 
-	const totalDiv = document.createElement('div');
-	totalDiv.className = 'total';
+	const totalPriceBox = document.createElement('div');
+	totalPriceBox.className = 'total-price-box';
 	
-	const totalValueDiv = document.createElement('span');
-	totalValueDiv.className = 'total-value';
+	const totalPrice = document.createElement('span');
+	totalPrice.className = 'total-price';
 	
-	const totalSimbolSpan = document.createElement('span');
-	totalSimbolSpan.className = 'total-simbol';
-	totalSimbolSpan.textContent = '合計';
+	const totalPriceSimbol = document.createElement('span');
+	totalPriceSimbol.className = 'total-price-simbol';
+	totalPriceSimbol.textContent = '合計';
 	
-	const totalPriceSpan = document.createElement('span');
-	totalPriceSpan.className = 'total-price';
-	totalPriceSpan.textContent = priceCount + '円';
+	const totalPriceValue = document.createElement('span');
+	totalPriceValue.className = 'total-price-value';
+	totalPriceValue.textContent = priceCount + '円';
 	
-	totalValueDiv.appendChild(totalSimbolSpan);
-	totalValueDiv.appendChild(totalPriceSpan);
-	totalDiv.appendChild(totalValueDiv);
+	totalPrice.appendChild(totalPriceSimbol);
+	totalPrice.appendChild(totalPriceValue);
+	totalPriceBox.appendChild(totalPrice);
 	
-	menuContainer.appendChild(totalDiv);
+	menuContainer.appendChild(totalPriceBox);
 	menuResultsDiv.appendChild(menuContainer);
 	
-	const shuffleBtn = document.createElement('button');
-	shuffleBtn.textContent = 'シャッフル';
-	shuffleBtn.className = 'shuffle-btn';
-	shuffleBtn.addEventListener('click', function() {
+	const shuffleButton = document.createElement('button');
+	shuffleButton.textContent = 'シャッフル';
+	shuffleButton.className = 'shuffle-button';
+	shuffleButton.addEventListener('click', function() {
 	    shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv);
 	});
 	
-	menuResultsDiv.appendChild(shuffleBtn);
+	menuResultsDiv.appendChild(shuffleButton);
 }	
 			
 //		====== ルート検索 ======
@@ -302,7 +302,7 @@ function calcRoute(obj) {
             	marker.map = null; // 各店舗のマーカーを削除
             });
 			directionsRenderer.setDirections(result); // ルートをマップに表示
-			document.querySelector('.back-to-list-btn').style.display = 'block';
+			document.getElementById('back-to-list-button').style.display = 'block';
         } else {
             alert(status);
         }
