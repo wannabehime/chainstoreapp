@@ -51,6 +51,10 @@
 	color: #443D3A;
 }
 
+#center::-webkit-calendar-picker-indicator {
+	opacity: 0;
+}
+
 #center::placeholder, #price-limit::placeholder {
 	color: rgb(126, 127, 123);
 	text-align: center;

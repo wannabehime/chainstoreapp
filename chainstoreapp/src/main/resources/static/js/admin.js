@@ -1,48 +1,3 @@
-//		====== ブランド名・予算セレクトボックスのテキストの色変更 ======
-document.getElementById('brand-name').addEventListener('change', function(){
-	colorChange(this);
-});
-document.getElementById('price-limit').addEventListener('change', function(){
-	colorChange(this);
-});
-function colorChange(obj){
-	if(['ブランド名を選択', '---'].includes(obj.value)){
-	 	obj.style.color = '#7e7f7b';
-	}else{
-		obj.style.color = '#443D3A';
-	}		
-}
-				
-//	   ====== 「現在地から検索」ボタン ======
-document.getElementById('set-current-location-button').addEventListener('click', function(){
-	document.getElementById('center').value = '現在地';
-});
-					
-//		====== 検索の中心のオートコンプリート ======
-document.addEventListener('DOMContentLoaded', suggestStaionNames);
-function suggestStaionNames(){
-	const center = document.getElementById('center');
-    center.addEventListener('input', function() {
-        if (center.value.length >= 2) {
-            fetch(`/chainstoresearch/getstationnames?input=${center.value}`)
-                .then(response => response.json())
-                .then(data => {
-                    const stationNameslist = document.getElementById('station-name-list');
-                    stationNameslist.innerHTML = '';
-                    data.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item;
-                        stationNameslist.appendChild(option);
-                    });
-                    center.setAttribute('list', 'station-name-list');
-                })
-                .catch(error => {
-                    // TODO: エラー時どうする
-                });
-        }
-    });
-}
-		
 //		====== 地図の初期化 ======
 var directionsRenderer;
 let currentLatLng;		
@@ -122,8 +77,54 @@ function initMap() {
 	
 	navigator.geolocation.watchPosition(success, fail, options); // 現在地が取得できればsuccessに位置情報、できなければfail関数にエラーを代入、optionsは各種設定
 }
+
+//		====== 検索フォーム ======
+//		------ ブランド名・予算セレクトボックスのテキストの色変更 ------
+document.getElementById('brand-name').addEventListener('change', function(){
+	colorChange(this);
+});
+document.getElementById('price-limit').addEventListener('change', function(){
+	colorChange(this);
+});
+function colorChange(obj){
+	if(['ブランド名を選択', '---'].includes(obj.value)){
+	 	obj.style.color = '#7e7f7b'; //薄い灰色
+	}else{
+		obj.style.color = '#443D3A'; //ほぼ黒に近い茶色
+	}		
+}
+
+//		------ 店舗検索の中心地のサジェスト ------
+const centerInput = document.getElementById('center');
+centerInput.addEventListener('input', function(){
+	fetch(`/chainstoresearch/getstationnames?input=${centerInput.value}`)
+        .then(response => { //fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
+			if(!response.ok){
+				throw new Error(); //Promiseオブジェクトがrejectになるのはネットワークエラーなので、リクエスト失敗時にcatchで捕捉できるよう例外を投げる
+			}
+			return response.json(); //アロー関数の略記ではreturnしないと次のthenに値を渡せない
+		})
+        .then(stationNames => { //json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
+        	const staionNamesDataList = document.getElementById('station-name-list');
+			staionNamesDataList.innerHTML = '';
+            stationNames.forEach(stationName => {
+                const option = document.createElement('option');
+                option.value = stationName;
+                staionNamesDataList.appendChild(option);
+            });
+            centerInput.setAttribute('list', 'station-name-list');
+		})
+        .catch(error => {
+            console.log(error); //ユーザーには知らせる必要がないので、コンソールに表示
+        });
+});
+				
+//		------ 「現在地を指定」ボタン ------
+document.getElementById('set-current-location-button').addEventListener('click', function(){
+	document.getElementById('center').value = '現在地';
+});
 		
-//		====== 店舗検索 ======
+//		------ 店舗検索 ------
 document.addEventListener('DOMContentLoaded', function() {
     const searchForm = document.getElementById('search-form-container');
     searchForm.addEventListener('submit', function(e) {
@@ -185,6 +186,44 @@ function storeSuccess(response) {
         calcRoute(this);
     }); // ルート検索ボタンにイベントを追加
 	//document.getElementById('back-to-list-button').addEventListener('click', backToList);
+}
+
+//		====== ルート検索 ======
+function calcRoute(obj) {
+    directionsRenderer.setMap(map); // レンダラに結びつける地図情報を与える
+    
+    let preSibling = obj.previousElementSibling;
+    let desLatLng = new google.maps.LatLng(preSibling.value, preSibling.getAttribute('name')); // hiddenにある目的地の経緯度を取得
+    let request = {
+        origin: currentLatLng, // 現在地の経緯度
+        destination: desLatLng,
+        travelMode: 'WALKING'
+    };
+    
+    new google.maps.DirectionsService().route(request, (result, status) => { // 第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
+        if (status === 'OK') {
+            markers.forEach(marker => {
+            	marker.map = null; // 各店舗のマーカーを削除
+            });
+			directionsRenderer.setDirections(result); // ルートをマップに表示
+			document.getElementById('back-to-list-button').style.display = 'block';
+        } else {
+            alert(status);
+        }
+    });
+}
+		
+//		====== 一覧に戻る ======
+function backToList(){
+	directionsRenderer.setMap(null); // ルート案内を消すためにレンダラとマップの関連を削除
+	
+    bounds = new google.maps.LatLngBounds(); // 最新の現在地のみを保持するために矩形領域をリセット
+    bounds.extend(currentLatLng); // 最新の現在地を追加
+    markers.forEach(marker => {
+        marker.map = map; // 各店舗のマーカーを再表示
+		bounds.extend(marker.position); //各店舗の位置を再追加
+    });
+    map.fitBounds(bounds); // マップに矩形領域を伝える
 }
 		
 //		====== メニュー検索 ======
@@ -280,42 +319,4 @@ function displayMenu(response, menuResultsDiv, brandName, priceLimit) {
 	});
 	
 	menuResultsDiv.appendChild(shuffleButton);
-}	
-			
-//		====== ルート検索 ======
-function calcRoute(obj) {
-    directionsRenderer.setMap(map); // レンダラに結びつける地図情報を与える
-    
-    let preSibling = obj.previousElementSibling;
-    let desLatLng = new google.maps.LatLng(preSibling.value, preSibling.getAttribute('name')); // hiddenにある目的地の経緯度を取得
-    let request = {
-        origin: currentLatLng, // 現在地の経緯度
-        destination: desLatLng,
-        travelMode: 'WALKING'
-    };
-    
-    new google.maps.DirectionsService().route(request, (result, status) => { // 第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
-        if (status === 'OK') {
-            markers.forEach(marker => {
-            	marker.map = null; // 各店舗のマーカーを削除
-            });
-			directionsRenderer.setDirections(result); // ルートをマップに表示
-			document.getElementById('back-to-list-button').style.display = 'block';
-        } else {
-            alert(status);
-        }
-    });
-}
-		
-//		====== 一覧に戻る ======
-function backToList(){
-	directionsRenderer.setMap(null); // ルート案内を消すためにレンダラとマップの関連を削除
-	
-    bounds = new google.maps.LatLngBounds(); // 最新の現在地のみを保持するために矩形領域をリセット
-    bounds.extend(currentLatLng); // 最新の現在地を追加
-    markers.forEach(marker => {
-        marker.map = map; // 各店舗のマーカーを再表示
-		bounds.extend(marker.position); //各店舗の位置を再追加
-    });
-    map.fitBounds(bounds); // マップに矩形領域を伝える
 }
