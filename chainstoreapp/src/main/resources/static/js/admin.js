@@ -1,42 +1,48 @@
-//		====== 地図の初期化 ======
 var directionsRenderer;
-let currentLatlng;		
+let currentLatlng;
 let map;
-let markers = [];
-let bounds;
+const currentLocationInfoStatusDiv = document.getElementById('current-location-information-status');
 let currentLocationMarker;
 let currentLocationCircle;
-const currentLocationInfoStatusDiv = document.getElementById('current-location-information-status');
+let markers = [];
+let bounds;
 
+//		====== 地図の初期化 ======
+// 地図の読み込み時に実行される関数
 function initMap() {
-	directionsRenderer = new google.maps.DirectionsRenderer();
-	navigator.geolocation.watchPosition(success, fail, options); // 現在地が取得できればsuccessに位置情報、できなければfail関数にエラーを代入、optionsは各種設定
+	directionsRenderer = new google.maps.DirectionsRenderer(); //ルートをレンダリングするためのオブジェクトを生成
+	const watchPositionOptions = {
+	  enableHighAccuracy: true, //精度（trueだと良い）
+	  timeout: 5000, //現在地取得の制限時間
+	  maximumAge: 0, //キャッシュの位置情報の有効期限。期限内だと新たに取得せずキャッシュから返す
+	};
+	navigator.geolocation.watchPosition(watchPositionSuccess, watchPositionFail, watchPositionOptions); // 現在地が取得できればsuccessに位置情報、できなければfailにエラーを渡す、optionsは各種設定
 }
 
-function success(position) {
+// watchPositionの成功時コールバック関数
+function watchPositionSuccess(position) {
 	currentLatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); // 現在地のlatlngオブジェクトを更新
 	document.getElementById('current-latlng').value = currentLatlng;  //店舗検索の中心地として、フォームのhiddenで送る現在地の更新
-	currentLocationInfoStatusDiv.style.display = 'none';
+	currentLocationInfoStatusDiv.style.display = 'none'; //「位置情報を取得中...」の表示を消去
 	
-	if(typeof map === 'undefined'){
+	if(typeof map === 'undefined'){	// マップがまだ存在しない場合は新しく作成
 		const mapOptions = {
 			zoom: 18,
 			center: currentLatlng,
 			mapId: "574de86c3981bebd"
 		};
-		map = new google.maps.Map(document.getElementById('map'), mapOptions); 	// マップがまだ存在しない場合は新しく作成
+		map = new google.maps.Map(document.getElementById('map'), mapOptions); 
 	}
 	
 	if (typeof currentLocationMarker === 'undefined') { // マーカーがまだ存在しない場合は新しく作成
 		const currentLocationMarkerDiv = document.createElement('div');
-		currentLocationMarkerDiv.id = 'current-location-marker';
+		currentLocationMarkerDiv.id = 'current-location-marker'; //cssで装飾する現在地マーカー
 		currentLocationMarker = new google.maps.marker.AdvancedMarkerView({
             map,
 			position: currentLatlng,
 			content: currentLocationMarkerDiv,
 		});
-		
-		currentLocationCircle = new google.maps.Circle({
+		currentLocationCircle = new google.maps.Circle({ //現在地マーカーの周りに誤差を表示する円
 			//stroke:ライン
             strokeColor: '#115EC3', //青
             strokeOpacity: 0.2,
@@ -48,32 +54,25 @@ function success(position) {
             center: currentLatlng,
             radius: 40
         });
-	} else { 							// マーカーが存在する場合は位置を更新
+	} else { 											// マーカーが存在する場合は位置を更新
 		currentLocationMarker.position = currentLatlng;
 		currentLocationCircle.setCenter(currentLatlng);
-		currentLocationCircle.setVisible = true;
 	}
 }
-	
-function fail(error) {
+
+// watchPositionの失敗時コールバック関数
+function watchPositionFail(error) {
 	currentLocationInfoStatusDiv.style.display = 'block';
-	currentLocationCircle.setVisible = false;
 	if(typeof map === 'undefined'){
-		const tokyoStationLatLng = new google.maps.LatLng(35.6812405, 139.7649361); //東京駅
+		const tokyoStationLatLng = new google.maps.LatLng(35.6812405, 139.7649361); //初期状態を東京駅とする
 		const mapOptions = {
 			zoom: 15,
 			center: tokyoStationLatLng,
 			mapId: "574de86c3981bebd"
 		};
-		map = new google.maps.Map(document.getElementById('map'), mapOptions); 	// マップがまだ存在しない場合は新しく作成
+		map = new google.maps.Map(document.getElementById('map'), mapOptions); 
 	}
 }
-
-const options = {
-  enableHighAccuracy: true, //精度（trueだと良い）
-  timeout: 5000, //制限時間
-  maximumAge: 0, //キャッシュの位置情報の有効期限。期限内だと新たに取得せずキャッシュから返す
-};
 
 //		====== 検索フォーム ======
 //		------ ブランド名・予算セレクトボックスのテキストの色変更 ------
