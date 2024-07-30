@@ -162,11 +162,18 @@ function searchStoresSuccess(response) {
             content: `
                 <strong>${storesInfo.duration}</strong>
 				<input type='hidden' value=${storesInfo.lat} name='${storesInfo.lng}'></input>
-				<button id='calc-route-button'>ルート</button>
+				<button class='calc-route-button'>ルート</button>
             `
         });
         infoWindow.open(map, marker);
-		
+		infoWindow.addListener('domready', function() {
+	        document.querySelectorAll('.calc-route-button').forEach(calcRouteButton => {
+	            calcRouteButton.addEventListener('click', function() {
+	                calcRoute(this);
+	            });
+	        });
+        });
+
 		markers.push(marker); //マーカーを格納
 		bounds.extend({lat: storesInfo.lat, lng: storesInfo.lng}); //矩形領域に各店舗の位置を追加
     });
@@ -181,11 +188,7 @@ function searchStoresSuccess(response) {
 		bounds.extend(currentLatLng); //現在地が取得できていれば矩形領域に追加
 	}
 	map.fitBounds(bounds); //マップに矩形領域を伝える
-	
-	document.getElementById('calc-route-button').addEventListener('click', function() {
-        calcRoute(this);
-    }); // ルート検索ボタンにイベントを追加
-	//document.getElementById('back-to-list-button').addEventListener('click', backToList);
+	//document.querySelectorAll('.back-to-list-button').addEventListener('click', backToList);
 }
 
 //		====== ルート検索 ======
