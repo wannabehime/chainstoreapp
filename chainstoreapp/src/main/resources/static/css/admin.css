@@ -92,7 +92,10 @@
     border: none;
 }
 
-#set-current-location-button:hover, #submit-button:hover, .shuffle-button:hover {
+#set-current-location-button:hover,
+#submit-button:hover,
+.calc-route-button:hover,
+.shuffle-button:hover {
 	opacity: 0.6;
 	transition: 0.5s;
 }
@@ -115,6 +118,44 @@
 	box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
 	left: 50%;
 	transform: translateX(-50%);
+}
+
+/* ------------ */
+.store-info-group {
+    display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.gm-style-iw.gm-style-iw-c {
+	padding: 10px !important;
+}
+
+.gm-style-iw-chr { /* infoWindowの閉じるボタン */
+	display: none;
+}
+
+.gm-style-iw-d {
+    overflow: hidden !important;
+}
+
+.duration {
+	font-size: 1rem;
+	color: #443D3A;
+	font-weight: bold;
+	margin-right: 10px;
+}
+
+.calc-route-button {
+	background-color: white;
+	border: none;
+	padding: 0;
+	width: 30px;
+	height: 30px;
+}
+
+.calc-route-icon {
+	height: 100%;
 }
 
 /* ------------ */
@@ -208,7 +249,7 @@
 .menu, .total-price-box {
     display: flex;
 	flex-direction: row;
-	align-items: center;			
+	align-items: center;
 	margin: 5px;
 	color: #443D3A;
 }
@@ -243,7 +284,7 @@
 	padding: 10px;
 }
 
-.total-price-simbol {
+.total-price-symbol {
 	font-size: 0.9rem;
 }
 

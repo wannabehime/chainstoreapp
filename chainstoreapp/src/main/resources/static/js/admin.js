@@ -123,7 +123,7 @@ document.getElementById('set-current-location-button').addEventListener('click',
 //		------ 店舗検索 ------
 const searchFormContainerDiv = document.getElementById('search-form-container');
 searchFormContainerDiv.addEventListener('submit', function(e){
-    e.preventDefault();
+    e.preventDefault(); //フォームの本来のリクエストを阻止
     const request = new URLSearchParams(new FormData(searchFormContainerDiv)).toString(); //FormData:フォームの内容をキーと値で格納, URLSearchParams:クエリ文字列を生成
     fetch(`/chainstoresearch/storesearch?${request}`)
         .then(response => {
@@ -142,48 +142,53 @@ searchFormContainerDiv.addEventListener('submit', function(e){
 });
 
 function searchStoresSuccess(storesInfo){
-	initMarkers();
-	setMarkers(storesInfo);
-	displayMenuResultsContainer();
+	initMarkersAndButton(); //マーカーとボタンの初期化
+	setMarkersAndInfoWindows(storesInfo); //マーカーと情報ウィンドウを生成
+	displayMenuResultsContainer(); //メニューを表示するコンテナを表示
 }
 
-function initMarkers(){
+function initMarkersAndButton(){
 	directionsRenderer.setMap(null); // ルート案内を消すためにレンダラとマップの関連を削除
 	markers.forEach(marker => {
     	marker.map = null; // 各店舗のマーカーを削除
     });
-	markers = []; // マーカーを初期化
-	document.getElementById('back-to-list-button').style.display = 'none'; // 既存のボタンを非表示
-	bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域インスタンス生成	
+	markers = []; // マーカーリストを初期化
+	bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域のインスタンスを生成
+	document.getElementById('back-to-list-button').style.display = 'none';
 }
 
-function setMarkers(storesInfo){
-	JSON.parse(storesInfo).forEach(storesInfo => { // JSONデータをJavaScriptのオブジェクトに変換
-		const marker = new google.maps.marker.AdvancedMarkerElement({ //各店舗のマーカーを生成
+function setMarkersAndInfoWindows(storesInfo){
+	JSON.parse(storesInfo).forEach(storeInfo => { // JSONデータをJavaScriptのオブジェクトに変換
+	
+		//	------各店舗のマーカーを生成------
+		const marker = new google.maps.marker.AdvancedMarkerElement({
 			map,
-            position: {lat: storesInfo.lat, lng: storesInfo.lng},
+            position: {lat: storeInfo.lat, lng: storeInfo.lng},
         });
-		markers.push(marker); //マーカーを格納
+		markers.push(marker); //マーカーをリストに格納
+		bounds.extend({lat: storeInfo.lat, lng: storeInfo.lng}); //矩形領域に各店舗の位置を追加
 		
+		//	------各店舗の所要時間とルート検索ボタンを表示する、情報ウィンドウを生成------
 		const infoWindow = new google.maps.InfoWindow({
+			//ルート検索で送信するために、hiddenで経緯度を送信
             content: `
-                <strong>${storesInfo.duration}</strong>
-				<input type='hidden' value=${storesInfo.lat} name='${storesInfo.lng}'></input>
-				<button class='calc-route-button'>ルート</button>
+            	<div class='store-info-group'>
+	                <span class='duration'>徒歩 ${storeInfo.duration}</span>
+					<input type='hidden' value=${storeInfo.lat} name='${storeInfo.lng}'></input>
+					<button class='calc-route-button'><img class='calc-route-icon' src='/img/calc-route-icon.png' alt='route'/></button>
+				</div>
             `
-            // TODO: ボタンの装飾
         });
-        infoWindow.open(map, marker);
-		infoWindow.addListener('domready', function(){
+        infoWindow.open(map, marker); //ウィンドウを表示
+		infoWindow.addListener('domready', function(){ //domが読み込んでからでないと、ルート検索ボタンへのリスナーを追加できない
 	        document.querySelectorAll('.calc-route-button').forEach(calcRouteButton => {
 	            calcRouteButton.addEventListener('click', function(){
 	                calcRoute(this);
 	            });
 	        });
         });
-
-		bounds.extend({lat: storesInfo.lat, lng: storesInfo.lng}); //矩形領域に各店舗の位置を追加
     });
+    
    	if(currentLatLng !== 'undefined'){
 		bounds.extend(currentLatLng); //現在地が取得できていれば矩形領域に追加
 	}
@@ -191,11 +196,11 @@ function setMarkers(storesInfo){
 }
 
 function displayMenuResultsContainer(){
-	document.getElementById('menu-board-container').style.display = 'block'; // メニュー検索の予算設定セレクトボックスを表示
-	document.getElementById('price-limit').options[0].selected = true;
+	document.getElementById('menu-board-container').style.display = 'block';
+	document.getElementById('price-limit').options[0].selected = true; //予算設定を初期値に戻す
 	let menuResultsContainerDiv = document.getElementById('menu-result-container');
 	while (menuResultsContainerDiv.firstChild){
-	  menuResultsContainerDiv.removeChild(menuResultsContainerDiv.firstChild);
+	  menuResultsContainerDiv.removeChild(menuResultsContainerDiv.firstChild); //メニュー表示を全消去して初期化
 	}	
 }
 
@@ -309,15 +314,15 @@ function displayMenu(response, menuResultsDiv, brandName, priceLimit){
 	const totalPrice = document.createElement('span');
 	totalPrice.className = 'total-price';
 	
-	const totalPriceSimbol = document.createElement('span');
-	totalPriceSimbol.className = 'total-price-simbol';
-	totalPriceSimbol.textContent = '合計';
+	const totalPriceSymbol = document.createElement('span');
+	totalPriceSymbol.className = 'total-price-symbol';
+	totalPriceSymbol.textContent = '合計';
 	
 	const totalPriceValue = document.createElement('span');
 	totalPriceValue.className = 'total-price-value';
 	totalPriceValue.textContent = priceCount + '円';
 	
-	totalPrice.appendChild(totalPriceSimbol);
+	totalPrice.appendChild(totalPriceSymbol);
 	totalPrice.appendChild(totalPriceValue);
 	totalPriceBox.appendChild(totalPrice);
 	
