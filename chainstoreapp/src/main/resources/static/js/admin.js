@@ -9,7 +9,7 @@ let bounds;
 
 //		====== 地図の初期化 ======
 // 地図の読み込み時に実行される関数
-function initMap() {
+function initMap(){
 	directionsRenderer = new google.maps.DirectionsRenderer(); //ルートをレンダリングするためのオブジェクトを生成
 	const watchPositionOptions = {
 	  enableHighAccuracy: true, //精度（trueだと良い）
@@ -20,7 +20,7 @@ function initMap() {
 }
 
 // watchPositionの成功時コールバック関数
-function watchPositionSuccess(position) {
+function watchPositionSuccess(position){
 	currentLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); // 現在地のlatlngオブジェクトを更新
 	document.getElementById('current-latlng').value = currentLatLng;  //店舗検索の中心地として、フォームのhiddenで送る現在地の更新
 	currentLocationInfoStatusDiv.style.display = 'none'; //「位置情報を取得中...」の表示を消去
@@ -34,7 +34,7 @@ function watchPositionSuccess(position) {
 		map = new google.maps.Map(document.getElementById('map'), mapOptions); 
 	}
 	
-	if (typeof currentLocationMarker === 'undefined') { // マーカーがまだ存在しない場合は新しく作成
+	if (typeof currentLocationMarker === 'undefined'){ // マーカーがまだ存在しない場合は新しく作成
 		const currentLocationMarkerDiv = document.createElement('div');
 		currentLocationMarkerDiv.id = 'current-location-marker'; //cssで装飾する現在地マーカー
 		currentLocationMarker = new google.maps.marker.AdvancedMarkerView({
@@ -61,7 +61,7 @@ function watchPositionSuccess(position) {
 }
 
 // watchPositionの失敗時コールバック関数
-function watchPositionFail(error) {
+function watchPositionFail(error){
 	currentLocationInfoStatusDiv.style.display = 'block';
 	if(typeof map === 'undefined'){
 		const tokyoStationLatLng = new google.maps.LatLng(35.6812405, 139.7649361); //初期状態を東京駅とする
@@ -83,7 +83,7 @@ document.getElementById('price-limit').addEventListener('change', function(){
 	colorChange(this);
 });
 function colorChange(obj){
-	if(['ブランド名を選択', '---'].includes(obj.value)){
+	if(obj.value === 'ブランド名を選択'){
 	 	obj.style.color = '#7e7f7b'; //薄い灰色
 	}else{
 		obj.style.color = '#443D3A'; //ほぼ黒に近い茶色
@@ -121,42 +121,49 @@ document.getElementById('set-current-location-button').addEventListener('click',
 });
 		
 //		------ 店舗検索 ------
-document.addEventListener('DOMContentLoaded', function() {
-    const searchFormContainerDiv = document.getElementById('search-form-container');
-    searchFormContainerDiv.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const request = new URLSearchParams(new FormData(searchFormContainerDiv)).toString(); //FormData:フォームの内容をキーと値で格納, URLSearchParams:クエリ文字列を生成
-        fetch(`/chainstoresearch/storesearch?${request}`)
-            .then(response => {
-				if(!response.ok){
-					throw new Error();
-				}
-				return response.text();
-			})
-            .then(response => {
-                searchStoresSuccess(response);
-            })
-            .catch(error => {
-				// TODO: エラー時どうする
-                alert('通信に失敗しました。ステータス：' + error);
-            });
-    });
+const searchFormContainerDiv = document.getElementById('search-form-container');
+searchFormContainerDiv.addEventListener('submit', function(e){
+    e.preventDefault();
+    const request = new URLSearchParams(new FormData(searchFormContainerDiv)).toString(); //FormData:フォームの内容をキーと値で格納, URLSearchParams:クエリ文字列を生成
+    fetch(`/chainstoresearch/storesearch?${request}`)
+        .then(response => {
+			if(!response.ok){
+				throw new Error();
+			}
+			return response.text();
+		})
+        .then(storesInfo => {
+            searchStoresSuccess(storesInfo);
+        })
+        .catch(error => {
+			// TODO: エラー時どうする
+            alert('通信に失敗しました。ステータス：' + error);
+        });
 });
 
-function searchStoresSuccess(response) {
+function searchStoresSuccess(storesInfo){
+	initMarkers();
+	setMarkers(storesInfo);
+	displayMenuResultsContainer();
+}
+
+function initMarkers(){
+	directionsRenderer.setMap(null); // ルート案内を消すためにレンダラとマップの関連を削除
 	markers.forEach(marker => {
     	marker.map = null; // 各店舗のマーカーを削除
     });
 	markers = []; // マーカーを初期化
-	directionsRenderer.setMap(null); // ルート案内を消すためにレンダラとマップの関連を削除
-	
-	bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域インスタンス生成
-	
-	JSON.parse(response).forEach(storesInfo => { // JSONデータをJavaScriptのオブジェクトに変換
+	document.getElementById('back-to-list-button').style.display = 'none'; // 既存のボタンを非表示
+	bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域インスタンス生成	
+}
+
+function setMarkers(storesInfo){
+	JSON.parse(storesInfo).forEach(storesInfo => { // JSONデータをJavaScriptのオブジェクトに変換
 		const marker = new google.maps.marker.AdvancedMarkerElement({ //各店舗のマーカーを生成
 			map,
             position: {lat: storesInfo.lat, lng: storesInfo.lng},
         });
+		markers.push(marker); //マーカーを格納
 		
 		const infoWindow = new google.maps.InfoWindow({
             content: `
@@ -164,35 +171,36 @@ function searchStoresSuccess(response) {
 				<input type='hidden' value=${storesInfo.lat} name='${storesInfo.lng}'></input>
 				<button class='calc-route-button'>ルート</button>
             `
+            // TODO: ボタンの装飾
         });
         infoWindow.open(map, marker);
-		infoWindow.addListener('domready', function() {
+		infoWindow.addListener('domready', function(){
 	        document.querySelectorAll('.calc-route-button').forEach(calcRouteButton => {
-	            calcRouteButton.addEventListener('click', function() {
+	            calcRouteButton.addEventListener('click', function(){
 	                calcRoute(this);
 	            });
 	        });
         });
 
-		markers.push(marker); //マーカーを格納
 		bounds.extend({lat: storesInfo.lat, lng: storesInfo.lng}); //矩形領域に各店舗の位置を追加
     });
-	//document.getElementById('back-to-list-button').remove(); // 既存のボタンを削除
-	document.getElementById('menu-board-container').style.display = 'block'; // メニュー検索の予算設定セレクトボックスを表示
-	let menuResultContainerDiv = document.getElementById('menu-result-container');
-	while (menuResultContainerDiv.firstChild) {
-	  menuResultContainerDiv.removeChild(menuResultContainerDiv.firstChild);
-	}
-	
-	if(currentLatLng !== 'undefined'){
+   	if(currentLatLng !== 'undefined'){
 		bounds.extend(currentLatLng); //現在地が取得できていれば矩形領域に追加
 	}
 	map.fitBounds(bounds); //マップに矩形領域を伝える
-	//document.querySelectorAll('.back-to-list-button').addEventListener('click', backToList);
+}
+
+function displayMenuResultsContainer(){
+	document.getElementById('menu-board-container').style.display = 'block'; // メニュー検索の予算設定セレクトボックスを表示
+	document.getElementById('price-limit').options[0].selected = true;
+	let menuResultsContainerDiv = document.getElementById('menu-result-container');
+	while (menuResultsContainerDiv.firstChild){
+	  menuResultsContainerDiv.removeChild(menuResultsContainerDiv.firstChild);
+	}	
 }
 
 //		====== ルート検索 ======
-function calcRoute(obj) {
+function calcRoute(obj){
     directionsRenderer.setMap(map); // レンダラに結びつける地図情報を与える
     
     let preSibling = obj.previousElementSibling;
@@ -204,12 +212,14 @@ function calcRoute(obj) {
     };
     
     new google.maps.DirectionsService().route(request, (result, status) => { // 第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
-        if (status === 'OK') {
+        if (status === 'OK'){
             markers.forEach(marker => {
             	marker.map = null; // 各店舗のマーカーを削除
             });
 			directionsRenderer.setDirections(result); // ルートをマップに表示
-			document.getElementById('back-to-list-button').style.display = 'block';
+			const backToListButton = document.getElementById('back-to-list-button');
+			backToListButton.style.display = 'block';
+			backToListButton.addEventListener('click', backToList);
         } else {
             alert(status);
         }
@@ -233,9 +243,9 @@ function backToList(){
 // TODO: 「--予算を選んでください--」が選ばれてしまったらどうする。ホバーでドロップダウンの方がいいか
 document.getElementById('price-limit').addEventListener('change', initMenus); // 予算の上限が変更されたとき、最初のランダムなメニューを表示
 
-function initMenus() {
+function initMenus(){
 	const menuResultContainer = document.getElementById('menu-result-container');
-	while (menuResultContainer.firstChild) { // メニューの表示場所をクリア
+	while (menuResultContainer.firstChild){ // メニューの表示場所をクリア
 		menuResultContainer.removeChild(menuResultContainer.firstChild);
 	}
 	
@@ -253,7 +263,7 @@ function initMenus() {
     shuffleAndDisplayMenu(brandName, priceLimit, secondMenuResultsDiv);
 }
 
-function shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv) {
+function shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv){
     fetch(`/chainstoresearch/menusearch?priceLimit=${priceLimit}&brandName=${brandName}`)
         .then(response => response.json())
         .then(response => {
@@ -264,8 +274,8 @@ function shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv) {
         });
 }
 
-function displayMenu(response, menuResultsDiv, brandName, priceLimit) {
-	while (menuResultsDiv.firstChild) { // メニューの表示場所をクリア
+function displayMenu(response, menuResultsDiv, brandName, priceLimit){
+	while (menuResultsDiv.firstChild){ // メニューの表示場所をクリア
 		menuResultsDiv.removeChild(menuResultsDiv.firstChild);
 	}
     let priceCount = 0; // 累計金額カウンター
@@ -317,7 +327,7 @@ function displayMenu(response, menuResultsDiv, brandName, priceLimit) {
 	const shuffleButton = document.createElement('button');
 	shuffleButton.textContent = 'シャッフル';
 	shuffleButton.className = 'shuffle-button';
-	shuffleButton.addEventListener('click', function() {
+	shuffleButton.addEventListener('click', function(){
 	    shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv);
 	});
 	
