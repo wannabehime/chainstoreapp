@@ -264,87 +264,103 @@ function initMenus(){
 		menuResultContainer.removeChild(menuResultContainer.firstChild);
 	}
 	
-	const firstMenuResultsDiv = document.createElement('div');
-	firstMenuResultsDiv.className = 'menu-result-wrapper';
-	const secondMenuResultsDiv = document.createElement('div');
-	secondMenuResultsDiv.className = 'menu-result-wrapper';
+	const firstMenuResultWrapper = document.createElement('div');
+	firstMenuResultWrapper.className = 'menu-result-wrapper';
+	const secondMenuResultWrapper = document.createElement('div');
+	secondMenuResultWrapper.className = 'menu-result-wrapper';
+	
+	menuResultContainer.appendChild(firstMenuResultWrapper);
+	menuResultContainer.appendChild(secondMenuResultWrapper);
 	
 	const brandName = document.getElementById('brand-name').value;
 	const priceLimit = document.getElementById('price-limit').value;
 	
-	menuResultContainer.appendChild(firstMenuResultsDiv);
-	menuResultContainer.appendChild(secondMenuResultsDiv);
-    shuffleAndDisplayMenu(brandName, priceLimit, firstMenuResultsDiv);
-    shuffleAndDisplayMenu(brandName, priceLimit, secondMenuResultsDiv);
+    shuffleAndDisplayMenus(brandName, priceLimit, firstMenuResultWrapper);
+    shuffleAndDisplayMenus(brandName, priceLimit, secondMenuResultWrapper);
 }
 
-function shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv){
+function shuffleAndDisplayMenus(brandName, priceLimit, menuResultWrapper){
     fetch(`/chainstoresearch/menusearch?priceLimit=${priceLimit}&brandName=${brandName}`)
-        .then(response => response.json())
         .then(response => {
-            displayMenu(response, menuResultsDiv, brandName, priceLimit);
+			if(!response.ok){
+				throw new Error();
+			}
+			return response.json();
+		})
+        .then(menus => {
+            displayMenu(brandName, priceLimit, menuResultWrapper, menus);
         })
         .catch(error => {
+			//TODO: エラー時どうする
             alert('通信に失敗しました。ステータス：' + error);
         });
 }
 
-function displayMenu(response, menuResultsDiv, brandName, priceLimit){
-	while (menuResultsDiv.firstChild){ // メニューの表示場所をクリア
-		menuResultsDiv.removeChild(menuResultsDiv.firstChild);
+function displayMenu(brandName, priceLimit, menuResultWrapper, menus){
+	while (menuResultWrapper.firstChild){ // メニューの表示場所をクリア
+		menuResultWrapper.removeChild(menuResultWrapper.firstChild);
 	}
-    let priceCount = 0; // 累計金額カウンター
+    let priceCounter = 0; // 累計金額カウンター
 	
-	const menuContainer = document.createElement('div');
-	menuContainer.className = 'menu-result-group';
-	const menuWrapper = document.createElement('div');
-	menuWrapper.className = 'menu-box';
+	createMenuBoxes(menus, priceCounter); //メニューの生成
+	createTotalPriceBoxes(priceCounter); //合計金額の生成
+	createShuffleMenusButtons(brandName, priceLimit, menuResultWrapper); //シャッフルボタンの生成
 
-    response.forEach(obj => {
-		const resultDiv = document.createElement('div');
-		resultDiv.className = 'menu';
+	//	生成した要素を集約
+	const menuResultGroupDiv = document.createElement('div');
+	menuResultGroupDiv.className = 'menu-result-group';
+	menuResultGroupDiv.appendChild(menuBoxDiv);
+	menuResultGroupDiv.appendChild(totalPriceBoxDiv);
+	menuResultWrapper.appendChild(menuResultGroupDiv);
+	menuResultWrapper.appendChild(shuffleMenusButton);
+}
+
+function createMenuBoxes(){
+	const menuBoxDiv = document.createElement('div');
+	menuBoxDiv.className = 'menu-box';
+
+    menus.forEach(menu => {
+		const menuDiv = document.createElement('div');
+		menuDiv.className = 'menu';
 		
-		const nameSpan = document.createElement('span');
-		nameSpan.className = 'menu-name';
-		nameSpan.textContent = obj.name;
-		const priceSpan = document.createElement('span');
-		priceSpan.className = 'menu-price';
-		priceSpan.textContent = obj.price + '円';
+		const menuNameSpan = document.createElement('span');
+		menuNameSpan.className = 'menu-name';
+		menuNameSpan.textContent = menu.name;
+		const menuPriceSpan = document.createElement('span');
+		menuPriceSpan.className = 'menu-price';
+		menuPriceSpan.textContent = menu.price + '円';
 		
-		resultDiv.appendChild(nameSpan);
-		resultDiv.appendChild(priceSpan);
-		menuWrapper.appendChild(resultDiv);
-        priceCount += parseInt(obj.price);
+		menuDiv.appendChild(menuNameSpan);
+		menuDiv.appendChild(menuPriceSpan);
+		menuBoxDiv.appendChild(menuDiv);
+        priceCounter += parseInt(menu.price);
     });
-	menuContainer.appendChild(menuWrapper);
+}
 
-	const totalPriceBox = document.createElement('div');
-	totalPriceBox.className = 'total-price-box';
+function createTotalPriceBoxes(){
+	const totalPriceSymbolSpan = document.createElement('span');
+	totalPriceSymbolSpan.className = 'total-price-symbol';
+	totalPriceSymbolSpan.textContent = '合計';
 	
-	const totalPrice = document.createElement('span');
-	totalPrice.className = 'total-price';
+	const totalPriceValueSpan = document.createElement('span');
+	totalPriceValueSpan.className = 'total-price-value';
+	totalPriceValueSpan.textContent = priceCounter + '円';
+
+	const totalPriceSpan = document.createElement('span');
+	totalPriceSpan.className = 'total-price';
+	totalPriceSpan.appendChild(totalPriceSymbolSpan);
+	totalPriceSpan.appendChild(totalPriceValueSpan);
 	
-	const totalPriceSymbol = document.createElement('span');
-	totalPriceSymbol.className = 'total-price-symbol';
-	totalPriceSymbol.textContent = '合計';
-	
-	const totalPriceValue = document.createElement('span');
-	totalPriceValue.className = 'total-price-value';
-	totalPriceValue.textContent = priceCount + '円';
-	
-	totalPrice.appendChild(totalPriceSymbol);
-	totalPrice.appendChild(totalPriceValue);
-	totalPriceBox.appendChild(totalPrice);
-	
-	menuContainer.appendChild(totalPriceBox);
-	menuResultsDiv.appendChild(menuContainer);
-	
-	const shuffleButton = document.createElement('button');
-	shuffleButton.textContent = 'シャッフル';
-	shuffleButton.className = 'shuffle-button';
-	shuffleButton.addEventListener('click', function(){
-	    shuffleAndDisplayMenu(brandName, priceLimit, menuResultsDiv);
+	const totalPriceBoxDiv = document.createElement('div');
+	totalPriceBoxDiv.className = 'total-price-box';
+	totalPriceBoxDiv.appendChild(totalPriceSpan);
+}
+
+function createShuffleMenusButtons(brandName, priceLimit, menuResultWrapper){
+	const shuffleMenusButton = document.createElement('button');
+	shuffleMenusButton.textContent = 'シャッフル';
+	shuffleMenusButton.className = 'shuffle-menus-button';
+	shuffleMenusButton.addEventListener('click', function(){
+	    shuffleAndDisplayMenus(brandName, priceLimit, menuResultWrapper);
 	});
-	
-	menuResultsDiv.appendChild(shuffleButton);
 }

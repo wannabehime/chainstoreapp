@@ -117,7 +117,7 @@
 #submit-button:hover,
 #return-to-stores-list-button:hover,
 .calc-route-button:hover,
-.shuffle-button:hover {
+.shuffle-menus-button:hover {
 	opacity: 0.6;
 	transition: 0.5s;
 }
@@ -322,7 +322,7 @@
 	font-weight: bold;
 }
 
-.shuffle-button {
+.shuffle-menus-button {
 	padding: 10px;			
 	color: white;			
     background-color:#ffa600;
