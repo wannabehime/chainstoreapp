@@ -8,24 +8,28 @@
 <body>
 	<div id="map"></div>
 	
-	<form id="search-form-container" action="/chainstoresearch/search" method="get">
-		<select id="brand-name" name="keyword">
-			<option>ブランド名を選択</option>
-			<option value="松屋">松屋</option>
-			<option value="すき家">すき家</option>
-			<option value="吉野家">吉野家</option>
-			<option value="はなまるうどん">はなまるうどん</option>
-			<option value="丸亀製麺">	丸亀製麺</option>
-		</select>
-		<input type="text" id="center" name="center" placeholder="駅名を入力、または" autocomplete="off">
-		<datalist id="station-name-list"></datalist>
-		<button type="button" id="set-current-location-button">現在地を指定</button>
-		<input type="hidden" name="radius" value="500">
-		<input id="current-latlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
-		<input id="submit-button" type="submit" value="検索">
-	</form>
+	<div id="search-form-and-return-to-stores-list-button-container">
+		<form id="search-form-wrapper" action="/chainstoresearch/search" method="get">
+			<select id="brand-name" name="keyword">
+				<option>ブランド名を選択</option>
+				<option value="松屋">松屋</option>
+				<option value="すき家">すき家</option>
+				<option value="吉野家">吉野家</option>
+				<option value="はなまるうどん">はなまるうどん</option>
+				<option value="丸亀製麺">	丸亀製麺</option>
+			</select>
+			<input type="text" id="center" name="center" placeholder="駅名を入力、または" autocomplete="off">
+			<datalist id="station-name-list"></datalist>
+			<button type="button" id="set-current-location-button">現在地を指定</button>
+			<input type="hidden" name="radius" value="500">
+			<input id="current-latlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
+			<input id="submit-button" type="submit" value="検索">
+		</form>
+		<button id="return-to-stores-list-button">店舗一覧に戻る</button>
+	</div>
+
 	<div id="current-location-information-status">位置情報を取得中...</div>
-	<button id="back-to-list-button">一覧に戻る</button>
+	<div id="calc-route-information-status">一時的にルートを検索できませんでした。時間をおいて再度お試しください</div>
 	
 	<div id="menu-board-container">
 		<div id="price-limit-container">

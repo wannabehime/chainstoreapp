@@ -121,7 +121,7 @@ document.getElementById('set-current-location-button').addEventListener('click',
 });
 		
 //		------ 店舗検索 ------
-const searchFormContainerDiv = document.getElementById('search-form-container');
+const searchFormContainerDiv = document.getElementById('search-form-wrapper');
 searchFormContainerDiv.addEventListener('submit', function(e){
     e.preventDefault(); //フォームの本来のリクエストを阻止
     const request = new URLSearchParams(new FormData(searchFormContainerDiv)).toString(); //FormData:フォームの内容をキーと値で格納, URLSearchParams:クエリ文字列を生成
@@ -154,7 +154,7 @@ function initMarkersAndButton(){
     });
 	markers = []; // マーカーリストを初期化
 	bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域のインスタンスを生成
-	document.getElementById('back-to-list-button').style.display = 'none';
+	document.getElementById('return-to-stores-list-button').style.display = 'none';
 }
 
 function setMarkersAndInfoWindows(storesInfo){
@@ -170,11 +170,12 @@ function setMarkersAndInfoWindows(storesInfo){
 		
 		//	------各店舗の所要時間とルート検索ボタンを表示する、情報ウィンドウを生成------
 		const infoWindow = new google.maps.InfoWindow({
-			//ルート検索で送信するために、hiddenで経緯度を送信
+			//ルート検索で送信するために、spamで経緯度を保持
             content: `
             	<div class='store-info-group'>
-	                <span class='duration'>徒歩 ${storeInfo.duration}</span>
-					<input type='hidden' value=${storeInfo.lat} name='${storeInfo.lng}'></input>
+	                <span class='store-duration'>徒歩 ${storeInfo.duration}</span>
+					<span class='store-lat'>${storeInfo.lat}</span>
+					<span class='store-lng'>${storeInfo.lng}</span>
 					<button class='calc-route-button'><img class='calc-route-icon' src='/img/calc-route-icon.png' alt='route'/></button>
 				</div>
             `
@@ -198,50 +199,59 @@ function setMarkersAndInfoWindows(storesInfo){
 function displayMenuResultsContainer(){
 	document.getElementById('menu-board-container').style.display = 'block';
 	document.getElementById('price-limit').options[0].selected = true; //予算設定を初期値に戻す
-	let menuResultsContainerDiv = document.getElementById('menu-result-container');
+	const menuResultsContainerDiv = document.getElementById('menu-result-container');
 	while (menuResultsContainerDiv.firstChild){
 	  menuResultsContainerDiv.removeChild(menuResultsContainerDiv.firstChild); //メニュー表示を全消去して初期化
 	}	
 }
 
 //		====== ルート検索 ======
-function calcRoute(obj){
-    directionsRenderer.setMap(map); // レンダラに結びつける地図情報を与える
-    
-    let preSibling = obj.previousElementSibling;
-    let desLatLng = new google.maps.LatLng(preSibling.value, preSibling.getAttribute('name')); // hiddenにある目的地の経緯度を取得
-    let request = {
-        origin: currentLatLng, // 現在地の経緯度
-        destination: desLatLng,
-        travelMode: 'WALKING'
+function calcRoute(calcRouteButton){
+	//ルート検索に用いるリクエストの作成
+    const lngSpan = calcRouteButton.previousElementSibling;
+    const latSpan = lngSpan.previousElementSibling;
+    const destinationLatLng = new google.maps.LatLng(latSpan.textContent, lngSpan.textContent); // 情報ウィンドウのspanにある目的地の経緯度を取得
+    const request = {
+        origin: currentLatLng,
+        destination: destinationLatLng,
+        travelMode: 'WALKING' //移動手段を徒歩に指定
     };
     
+    directionsRenderer.setMap(map); // レンダラに結びつける地図情報を与える
+    //ルート検索
     new google.maps.DirectionsService().route(request, (result, status) => { // 第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
+        //ルート検索に成功したら、ルートと「店舗一覧に戻る」ボタンの表示
         if (status === 'OK'){
             markers.forEach(marker => {
             	marker.map = null; // 各店舗のマーカーを削除
             });
-			directionsRenderer.setDirections(result); // ルートをマップに表示
-			const backToListButton = document.getElementById('back-to-list-button');
-			backToListButton.style.display = 'block';
-			backToListButton.addEventListener('click', backToList);
+			directionsRenderer.setDirections(result); // ルート表示
+			
+			const returnToStoresListButton = document.getElementById('return-to-stores-list-button');
+			returnToStoresListButton.style.display = 'block'; //「店舗一覧に戻る」ボタンの表示
+			returnToStoresListButton.addEventListener('click', returnToStoresList);
         } else {
-            alert(status);
+			//ルート検索に失敗したら、失敗のメッセージ表示
+			const calcRouteInfoStatusDiv = document.getElementById('calc-route-information-status');
+            calcRouteInfoStatusDiv.style.display = 'block'; //
+            setTimeout(function(){ //3秒で消える
+				calcRouteInfoStatusDiv.style.display = 'none';
+			}, 3000);
         }
     });
 }
 		
-//		====== 一覧に戻る ======
-function backToList(){
+//		====== 「店舗一覧に戻る」ボタン ======
+function returnToStoresList(){
 	directionsRenderer.setMap(null); // ルート案内を消すためにレンダラとマップの関連を削除
 	
     bounds = new google.maps.LatLngBounds(); // 最新の現在地のみを保持するために矩形領域をリセット
-    bounds.extend(currentLatLng); // 最新の現在地を追加
     markers.forEach(marker => {
         marker.map = map; // 各店舗のマーカーを再表示
 		bounds.extend(marker.position); //各店舗の位置を再追加
     });
-    map.fitBounds(bounds); // マップに矩形領域を伝える
+    bounds.extend(currentLatLng); // 最新の現在地を追加（ルート検索の成功は、現在地の取得を保証している）
+    map.fitBounds(bounds);
 }
 		
 //		====== メニュー検索 ======
