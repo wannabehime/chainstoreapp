@@ -232,10 +232,10 @@ function calcRoute(calcRouteButton){
 			returnToStoresListButton.addEventListener('click', returnToStoresList);
         } else {
 			//ルート検索に失敗したら、失敗のメッセージ表示
-			const calcRouteInfoStatusDiv = document.getElementById('calc-route-information-status');
-            calcRouteInfoStatusDiv.style.display = 'block'; //
+			const getInfoStatusDiv = document.getElementById('get-information-status');
+            getInfoStatusDiv.style.display = 'block';
             setTimeout(function(){ //3秒で消える
-				calcRouteInfoStatusDiv.style.display = 'none';
+				getInfoStatusDiv.style.display = 'none';
 			}, 3000);
         }
     });
@@ -255,31 +255,37 @@ function returnToStoresList(){
 }
 		
 //		====== メニュー検索 ======
-// TODO: 「--予算を選んでください--」が選ばれてしまったらどうする。ホバーでドロップダウンの方がいいか
-document.getElementById('price-limit').addEventListener('change', initMenus); // 予算の上限が変更されたとき、最初のランダムなメニューを表示
+document.getElementById('price-limit').addEventListener('change', function(){
+	initMenus(this);
+}); // 予算の上限が変更されたとき、最初のランダムなメニューを表示
 
-function initMenus(){
+function initMenus(priceLimitDiv){
+	if(priceLimitDiv.value === '---'){
+		return;
+	}
+	
 	const menuResultContainer = document.getElementById('menu-result-container');
 	while (menuResultContainer.firstChild){ // メニューの表示場所をクリア
 		menuResultContainer.removeChild(menuResultContainer.firstChild);
 	}
 	
-	const firstMenuResultWrapper = document.createElement('div');
-	firstMenuResultWrapper.className = 'menu-result-wrapper';
-	const secondMenuResultWrapper = document.createElement('div');
-	secondMenuResultWrapper.className = 'menu-result-wrapper';
-	
-	menuResultContainer.appendChild(firstMenuResultWrapper);
-	menuResultContainer.appendChild(secondMenuResultWrapper);
-	
 	const brandName = document.getElementById('brand-name').value;
 	const priceLimit = document.getElementById('price-limit').value;
-	
-    shuffleAndDisplayMenus(brandName, priceLimit, firstMenuResultWrapper);
-    shuffleAndDisplayMenus(brandName, priceLimit, secondMenuResultWrapper);
+	const firstMenuResultWrapper = createMenuResultWrapper(menuResultContainer);
+	const secondMenuResultWrapper = createMenuResultWrapper(menuResultContainer);
+    shuffleMenus(brandName, priceLimit, firstMenuResultWrapper);
+    shuffleMenus(brandName, priceLimit, secondMenuResultWrapper);
 }
 
-function shuffleAndDisplayMenus(brandName, priceLimit, menuResultWrapper){
+function createMenuResultWrapper(menuResultContainer){
+	const menuResultWrapper = document.createElement('div');
+	menuResultWrapper.className = 'menu-result-wrapper';
+	menuResultContainer.appendChild(menuResultWrapper);
+	
+	return menuResultWrapper;
+}
+
+function shuffleMenus(brandName, priceLimit, menuResultWrapper){
     fetch(`/chainstoresearch/menusearch?priceLimit=${priceLimit}&brandName=${brandName}`)
         .then(response => {
 			if(!response.ok){
@@ -288,23 +294,25 @@ function shuffleAndDisplayMenus(brandName, priceLimit, menuResultWrapper){
 			return response.json();
 		})
         .then(menus => {
-            displayMenu(brandName, priceLimit, menuResultWrapper, menus);
+            shuffleMenusSuccess(brandName, priceLimit, menuResultWrapper, menus);
         })
         .catch(error => {
-			//TODO: エラー時どうする
-            alert('通信に失敗しました。ステータス：' + error);
+			const getInfoStatusDiv = document.getElementById('get-information-status');
+            getInfoStatusDiv.style.display = 'block';
+            setTimeout(function(){ //3秒で消える
+				getInfoStatusDiv.style.display = 'none';
+			}, 3000);
         });
 }
 
-function displayMenu(brandName, priceLimit, menuResultWrapper, menus){
+function shuffleMenusSuccess(brandName, priceLimit, menuResultWrapper, menus){
 	while (menuResultWrapper.firstChild){ // メニューの表示場所をクリア
 		menuResultWrapper.removeChild(menuResultWrapper.firstChild);
 	}
-    let priceCounter = 0; // 累計金額カウンター
 	
-	createMenuBoxes(menus, priceCounter); //メニューの生成
-	createTotalPriceBoxes(priceCounter); //合計金額の生成
-	createShuffleMenusButtons(brandName, priceLimit, menuResultWrapper); //シャッフルボタンの生成
+	const {menuBoxDiv, priceCounter} = createMenuBox(menus); //メニューの生成
+	const totalPriceBoxDiv = createTotalPriceBox(priceCounter); //合計金額の生成
+	const shuffleMenusButton = createShuffleMenusButton(brandName, priceLimit, menuResultWrapper); //シャッフルボタンの生成
 
 	//	生成した要素を集約
 	const menuResultGroupDiv = document.createElement('div');
@@ -315,7 +323,8 @@ function displayMenu(brandName, priceLimit, menuResultWrapper, menus){
 	menuResultWrapper.appendChild(shuffleMenusButton);
 }
 
-function createMenuBoxes(){
+function createMenuBox(menus){
+	let priceCounter = 0;
 	const menuBoxDiv = document.createElement('div');
 	menuBoxDiv.className = 'menu-box';
 
@@ -335,9 +344,11 @@ function createMenuBoxes(){
 		menuBoxDiv.appendChild(menuDiv);
         priceCounter += parseInt(menu.price);
     });
+    
+    return {menuBoxDiv, priceCounter};
 }
 
-function createTotalPriceBoxes(){
+function createTotalPriceBox(priceCounter){
 	const totalPriceSymbolSpan = document.createElement('span');
 	totalPriceSymbolSpan.className = 'total-price-symbol';
 	totalPriceSymbolSpan.textContent = '合計';
@@ -354,13 +365,17 @@ function createTotalPriceBoxes(){
 	const totalPriceBoxDiv = document.createElement('div');
 	totalPriceBoxDiv.className = 'total-price-box';
 	totalPriceBoxDiv.appendChild(totalPriceSpan);
+	
+	return totalPriceBoxDiv;
 }
 
-function createShuffleMenusButtons(brandName, priceLimit, menuResultWrapper){
+function createShuffleMenusButton(brandName, priceLimit, menuResultWrapper){
 	const shuffleMenusButton = document.createElement('button');
-	shuffleMenusButton.textContent = 'シャッフル';
 	shuffleMenusButton.className = 'shuffle-menus-button';
+	shuffleMenusButton.textContent = 'シャッフル';
 	shuffleMenusButton.addEventListener('click', function(){
-	    shuffleAndDisplayMenus(brandName, priceLimit, menuResultWrapper);
+	    shuffleMenus(brandName, priceLimit, menuResultWrapper);
 	});
+	
+	return shuffleMenusButton;
 }
