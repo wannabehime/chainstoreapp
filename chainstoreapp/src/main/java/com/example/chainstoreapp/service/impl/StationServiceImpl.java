@@ -29,7 +29,6 @@ public class StationServiceImpl implements StationService {
 		for(Station station : stations) {
 			stationNames.add(station.getName_with_prefecture());
 		}
-//		stationNames.add(0, "武蔵小金井駅");
 		
 		return stationNames;
 	}

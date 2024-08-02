@@ -1,11 +1,11 @@
-var directionsRenderer;
-let currentLatLng;
-let map;
-const currentLocationInfoStatusDiv = document.getElementById('current-location-information-status');
-let currentLocationMarker;
-let currentLocationCircle;
-let markers = [];
-let bounds;
+var directionsRenderer; // ルートをレンダリングするためのオブジェクトを格納する
+let currentLatLng; // 現在地の経緯度オブジェクトを格納する
+let map; // マップオブジェクトを格納する
+const currentLocationInfoStatusDiv = document.getElementById('current-location-information-status'); // 位置情報取得の状態を表示する要素
+let currentLocationMarker; // 現在地マーカーオブジェクトを格納する
+let currentLocationCircle; // 現在地マーカーの周りの円オブジェクトを格納する
+let storeMarkers = []; // 店舗マーカーを格納する配列
+let bounds; // マップに表示する矩形領域オブジェクトを格納
 
 //		====== 地図の初期化 ======
 // 地図の読み込み時に実行される関数
@@ -149,10 +149,10 @@ function searchStoresSuccess(storesInfo){
 
 function initMarkersAndButton(){
 	directionsRenderer.setMap(null); // ルート案内を消すためにレンダラとマップの関連を削除
-	markers.forEach(marker => {
-    	marker.map = null; // 各店舗のマーカーを削除
+	storeMarkers.forEach(storeMarker => {
+    	storeMarker.map = null; // 各店舗のマーカーを削除
     });
-	markers = []; // マーカーリストを初期化
+	storeMarkers = []; // マーカーリストを初期化
 	bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域のインスタンスを生成
 	document.getElementById('return-to-stores-list-button').style.display = 'none';
 }
@@ -165,7 +165,7 @@ function setMarkersAndInfoWindows(storesInfo){
 			map,
             position: {lat: storeInfo.lat, lng: storeInfo.lng},
         });
-		markers.push(marker); //マーカーをリストに格納
+		storeMarkers.push(marker); //マーカーをリストに格納
 		bounds.extend({lat: storeInfo.lat, lng: storeInfo.lng}); //矩形領域に各店舗の位置を追加
 		
 		//	------各店舗の所要時間とルート検索ボタンを表示する、情報ウィンドウを生成------
@@ -222,8 +222,8 @@ function calcRoute(calcRouteButton){
     new google.maps.DirectionsService().route(request, (result, status) => { // 第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
         //ルート検索に成功したら、ルートと「店舗一覧に戻る」ボタンの表示
         if (status === 'OK'){
-            markers.forEach(marker => {
-            	marker.map = null; // 各店舗のマーカーを削除
+            storeMarkers.forEach(storeMarker => {
+            	storeMarker.map = null; // 各店舗のマーカーを削除
             });
 			directionsRenderer.setDirections(result); // ルート表示
 			
@@ -246,37 +246,43 @@ function returnToStoresList(){
 	directionsRenderer.setMap(null); // ルート案内を消すためにレンダラとマップの関連を削除
 	
     bounds = new google.maps.LatLngBounds(); // 最新の現在地のみを保持するために矩形領域をリセット
-    markers.forEach(marker => {
-        marker.map = map; // 各店舗のマーカーを再表示
-		bounds.extend(marker.position); //各店舗の位置を再追加
+    storeMarkers.forEach(storeMarker => {
+        storeMarker.map = map; // 各店舗のマーカーを再表示
+		bounds.extend(storeMarker.position); //各店舗の位置を再追加
     });
     bounds.extend(currentLatLng); // 最新の現在地を追加（ルート検索の成功は、現在地の取得を保証している）
     map.fitBounds(bounds);
 }
 		
 //		====== メニュー検索 ======
+//		------予算変更によるメニュー初期化の発火を設定------
 document.getElementById('price-limit').addEventListener('change', function(){
 	initMenus(this);
-}); // 予算の上限が変更されたとき、最初のランダムなメニューを表示
+});
 
+//		------メニュー表示のラッパーを作成し、最初のランダムなメニューを表示------
 function initMenus(priceLimitDiv){
-	if(priceLimitDiv.value === '---'){
+	if(priceLimitDiv.value === '---'){ // 予算選択で"---"が選ばれた場合は何もしない
 		return;
 	}
 	
+	// メニュー表示のコンテナをクリア
 	const menuResultContainer = document.getElementById('menu-result-container');
-	while (menuResultContainer.firstChild){ // メニューの表示場所をクリア
+	while (menuResultContainer.firstChild){
 		menuResultContainer.removeChild(menuResultContainer.firstChild);
 	}
 	
 	const brandName = document.getElementById('brand-name').value;
 	const priceLimit = document.getElementById('price-limit').value;
+	// メニュー表示のラッパーを作成
 	const firstMenuResultWrapper = createMenuResultWrapper(menuResultContainer);
 	const secondMenuResultWrapper = createMenuResultWrapper(menuResultContainer);
+	// 最初のランダムなメニューを表示
     shuffleMenus(brandName, priceLimit, firstMenuResultWrapper);
     shuffleMenus(brandName, priceLimit, secondMenuResultWrapper);
 }
 
+//		------ メニュー表示のラッパーを作成 ------
 function createMenuResultWrapper(menuResultContainer){
 	const menuResultWrapper = document.createElement('div');
 	menuResultWrapper.className = 'menu-result-wrapper';
@@ -284,7 +290,7 @@ function createMenuResultWrapper(menuResultContainer){
 	
 	return menuResultWrapper;
 }
-
+//		------ メニューをシャッフル ------
 function shuffleMenus(brandName, priceLimit, menuResultWrapper){
     fetch(`/chainstoresearch/menusearch?priceLimit=${priceLimit}&brandName=${brandName}`)
         .then(response => {
@@ -297,6 +303,7 @@ function shuffleMenus(brandName, priceLimit, menuResultWrapper){
             shuffleMenusSuccess(brandName, priceLimit, menuResultWrapper, menus);
         })
         .catch(error => {
+			//メニュー検索に失敗したら、失敗のメッセージ表示
 			const getInfoStatusDiv = document.getElementById('get-information-status');
             getInfoStatusDiv.style.display = 'block';
             setTimeout(function(){ //3秒で消える
@@ -305,8 +312,10 @@ function shuffleMenus(brandName, priceLimit, menuResultWrapper){
         });
 }
 
+//		------ shuffleMenus内fetchの成功時に呼び出される関数 ------
 function shuffleMenusSuccess(brandName, priceLimit, menuResultWrapper, menus){
-	while (menuResultWrapper.firstChild){ // メニューの表示場所をクリア
+	// メニュー表示のラッパーをクリア
+	while (menuResultWrapper.firstChild){
 		menuResultWrapper.removeChild(menuResultWrapper.firstChild);
 	}
 	
@@ -323,45 +332,57 @@ function shuffleMenusSuccess(brandName, priceLimit, menuResultWrapper, menus){
 	menuResultWrapper.appendChild(shuffleMenusButton);
 }
 
+//		------ メニューの生成 ------
 function createMenuBox(menus){
-	let priceCounter = 0;
+	let priceCounter = 0; // createTotalPriceBox関数で用いる合計金額のカウンター
+	// メニューdivを入れるボックスの生成
 	const menuBoxDiv = document.createElement('div');
 	menuBoxDiv.className = 'menu-box';
 
     menus.forEach(menu => {
+		// メニュー名と価格を入れるdivの生成
 		const menuDiv = document.createElement('div');
 		menuDiv.className = 'menu';
 		
+		// メニュー名の生成
 		const menuNameSpan = document.createElement('span');
 		menuNameSpan.className = 'menu-name';
 		menuNameSpan.textContent = menu.name;
+		// 価格の生成
 		const menuPriceSpan = document.createElement('span');
 		menuPriceSpan.className = 'menu-price';
 		menuPriceSpan.textContent = menu.price + '円';
 		
+		// メニュー名と価格をメニューdivに、メニューdivをボックスに入れる
 		menuDiv.appendChild(menuNameSpan);
 		menuDiv.appendChild(menuPriceSpan);
 		menuBoxDiv.appendChild(menuDiv);
+		// 合計金額を累加する
         priceCounter += parseInt(menu.price);
     });
     
     return {menuBoxDiv, priceCounter};
 }
 
+//		------ 合計金額の生成 ------
 function createTotalPriceBox(priceCounter){
+	// 合計金額の前に表示する「合計」の生成
 	const totalPriceSymbolSpan = document.createElement('span');
 	totalPriceSymbolSpan.className = 'total-price-symbol';
 	totalPriceSymbolSpan.textContent = '合計';
 	
+	// 合計金額の生成
 	const totalPriceValueSpan = document.createElement('span');
 	totalPriceValueSpan.className = 'total-price-value';
 	totalPriceValueSpan.textContent = priceCounter + '円';
-
+	
+	// spanを生成し、合計金額と「合計」を入れる
 	const totalPriceSpan = document.createElement('span');
 	totalPriceSpan.className = 'total-price';
 	totalPriceSpan.appendChild(totalPriceSymbolSpan);
 	totalPriceSpan.appendChild(totalPriceValueSpan);
 	
+	// divを生成し、spanを入れる
 	const totalPriceBoxDiv = document.createElement('div');
 	totalPriceBoxDiv.className = 'total-price-box';
 	totalPriceBoxDiv.appendChild(totalPriceSpan);
@@ -369,6 +390,7 @@ function createTotalPriceBox(priceCounter){
 	return totalPriceBoxDiv;
 }
 
+//		------ シャッフルボタンの生成 ------
 function createShuffleMenusButton(brandName, priceLimit, menuResultWrapper){
 	const shuffleMenusButton = document.createElement('button');
 	shuffleMenusButton.className = 'shuffle-menus-button';
