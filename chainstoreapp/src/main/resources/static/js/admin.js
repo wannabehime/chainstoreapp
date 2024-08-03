@@ -6,6 +6,7 @@ let currentLocationMarker; // 現在地マーカーオブジェクトを格納�
 let currentLocationCircle; // 現在地マーカーの周りの円オブジェクトを格納する
 let storeMarkers = []; // 店舗マーカーを格納する配列
 let bounds; // マップに表示する矩形領域オブジェクトを格納
+const returnToStoresListButton = document.getElementById('return-to-stores-list-button');
 
 //		====== 地図の初期化 ======
 // 地図の読み込み時に実行される関数
@@ -227,7 +228,6 @@ function calcRoute(calcRouteButton){
             });
 			directionsRenderer.setDirections(result); // ルート表示
 			
-			const returnToStoresListButton = document.getElementById('return-to-stores-list-button');
 			returnToStoresListButton.style.display = 'block'; //「店舗一覧に戻る」ボタンの表示
 			returnToStoresListButton.addEventListener('click', returnToStoresList);
         } else {
@@ -252,6 +252,8 @@ function returnToStoresList(){
     });
     bounds.extend(currentLatLng); // 最新の現在地を追加（ルート検索の成功は、現在地の取得を保証している）
     map.fitBounds(bounds);
+    
+    returnToStoresListButton.style.display = 'none'; //「店舗一覧に戻る」ボタンの非表示
 }
 		
 //		====== メニュー検索 ======

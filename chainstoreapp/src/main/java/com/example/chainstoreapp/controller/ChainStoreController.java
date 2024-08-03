@@ -19,19 +19,19 @@ import com.example.chainstoreapp.service.StationService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/chainstoresearch")
-@RequiredArgsConstructor
+@RequestMapping("chainstoresearch") // URLとクラスをマッピング
+@RequiredArgsConstructor // finalが付けられたフィールドを引数とするコンストラクタを自動生成。かつ、コンストラクタが1つのみのとき、DIでインスタンスを受け取るコンストラクタを示す@Autowiredを省略可
 public class ChainStoreController {
-	
+
 //	サービスのDI
 	private final StationService stationService;
 	private final ChainStoreService chainStoreService;
 	private final MenuService menuService;
 
-//	トップ検索画面の表示
+//	ホーム画面の表示
 	@GetMapping
-	public String top() {
-		return "chainstoresearch/top";
+	public String displayIndexPage() {
+		return "chainstoresearch/index";
 	}
 	
 //	駅名の一部から、候補となる駅名リストを返す
