@@ -10,7 +10,7 @@
 	
 	<div id="search-form-and-return-to-stores-list-button-container">
 		<form id="search-form-wrapper" action="/chainstoresearch/search" method="get">
-			<select id="brand-name" name="keyword">
+			<select id="brand-name" name="brandName"> <!-- nameはFormクラスのフィールド名と揃えるためにキャメルケース -->
 				<option>ブランド名を選択</option>
 				<option value="松屋">松屋</option>
 				<option value="すき家">すき家</option>
@@ -20,9 +20,8 @@
 			</select>
 			<input type="text" id="center" name="center" placeholder="駅名を入力、または" autocomplete="off">
 			<datalist id="station-name-list"></datalist>
+			<input type="hidden" id="current-latlng" name="currentLatLng" value=""> <!--現在地を中心に店舗検索するためhiddenで送信・nameはFormクラスのフィールド名と揃えるためにキャメルケース-->
 			<button type="button" id="set-current-location-button">現在地を指定</button>
-			<input type="hidden" name="radius" value="500">
-			<input id="current-latlng" type="hidden" name="nowLatLng" value=""> <!--現在地を中心に店舗を検索するためにhiddenで送信-->
 			<input id="submit-button" type="submit" value="検索">
 		</form>
 		<button id="return-to-stores-list-button">店舗一覧に戻る</button>

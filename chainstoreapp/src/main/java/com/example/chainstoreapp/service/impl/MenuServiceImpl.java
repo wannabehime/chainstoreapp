@@ -12,7 +12,7 @@ import com.example.chainstoreapp.service.MenuService;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
+@Transactional // トランザクション管理。更新処理を含むサービスに付与
 @RequiredArgsConstructor
 public class MenuServiceImpl implements MenuService {
 	

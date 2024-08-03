@@ -91,22 +91,22 @@ function colorChange(obj){
 	}		
 }
 
-//		------ 店舗検索の中心地のサジェスト ------
+//		------ 店舗検索の中心地の駅名サジェスト ------
 const centerInput = document.getElementById('center');
 centerInput.addEventListener('input', function(){
-	fetch(`/chainstoresearch/getstationnames?input=${centerInput.value}`)
+	fetch(`/chainstoresearch/get-station-names?input=${centerInput.value}`)
         .then(response => { //fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
 			if(!response.ok){
 				throw new Error(); //Promiseオブジェクトがrejectになるのはネットワークエラーなので、リクエスト失敗時にcatchで捕捉できるよう例外を投げる
 			}
 			return response.json(); //アロー関数の略記ではreturnしないと次のthenに値を渡せない
 		})
-        .then(stationNames => { //json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
+        .then(stations => { //json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
         	const staionNamesDataList = document.getElementById('station-name-list');
 			staionNamesDataList.innerHTML = '';
-            stationNames.forEach(stationName => {
+            stations.forEach(station => {
                 const option = document.createElement('option');
-                option.value = stationName;
+                option.value = station.name;
                 staionNamesDataList.appendChild(option);
             });
             centerInput.setAttribute('list', 'station-name-list');
@@ -126,7 +126,7 @@ const searchFormContainerDiv = document.getElementById('search-form-wrapper');
 searchFormContainerDiv.addEventListener('submit', function(e){
     e.preventDefault(); //フォームの本来のリクエストを阻止
     const request = new URLSearchParams(new FormData(searchFormContainerDiv)).toString(); //FormData:フォームの内容をキーと値で格納, URLSearchParams:クエリ文字列を生成
-    fetch(`/chainstoresearch/storesearch?${request}`)
+    fetch(`/chainstoresearch/search-stores?${request}`)
         .then(response => {
 			if(!response.ok){
 				throw new Error();
@@ -294,7 +294,7 @@ function createMenuResultWrapper(menuResultContainer){
 }
 //		------ メニューをシャッフル ------
 function shuffleMenus(brandName, priceLimit, menuResultWrapper){
-    fetch(`/chainstoresearch/menusearch?priceLimit=${priceLimit}&brandName=${brandName}`)
+    fetch(`/chainstoresearch/get-menus?brandName=${brandName}&priceLimit=${priceLimit}`)
         .then(response => {
 			if(!response.ok){
 				throw new Error();

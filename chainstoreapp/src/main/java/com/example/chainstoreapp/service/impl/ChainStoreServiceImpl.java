@@ -32,7 +32,7 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 		
 		if(searchReq.getCenter().equals("現在地")) { //場所に現在地が指定されていれば、検索の中心に現在地の経緯度を代入
 //			TODO latlngが取得できていない場合も考える
-			location = searchReq.getNowLatLng().replaceAll("[()]", ""); //()を除いている
+			location = searchReq.getCurrentLatLng().replaceAll("[()]", ""); //()を除いている
 		}else {										//指定されていなければ、ユーザーが入力した駅名から経緯度へ変換
 //			urlのテンプレート
 			String geocodeUrl = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyCV8QwXKedqprb4umRvDzUS8qXuRN9eCU8&language=ja&components=country:JP&address={address}";
@@ -67,10 +67,10 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 
 //		店舗名・起点・範囲をパラメータにセット
 		Map<String, String> nearbyParams = new HashMap<>();
-		String brandName = searchReq.getKeyword();
+		String brandName = searchReq.getBrandName();
 		nearbyParams.put("keyword", brandName);
 		nearbyParams.put("location", location);
-		nearbyParams.put("radius", String.valueOf(searchReq.getRadius()));
+		nearbyParams.put("radius", "500");
 		
 		String nearbyBody = restTemplate.getForObject(nearbyUrl, String.class, nearbyParams); //APIから結果をJSON文字列で取得
 
@@ -79,7 +79,7 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 		String matchedName = switch (brandName) {
 			case "松屋", "すき家", "吉野家", "はなまるうどん" -> brandName + ".*店";
 			case "丸亀製麺" -> brandName + ".*";
-			default -> throw new IllegalArgumentException("Unexpected value: " + searchReq.getKeyword());
+			default -> throw new IllegalArgumentException("Unexpected value: " + searchReq.getBrandName());
 		};
 		
 //		JSONからエンティティへの変換
@@ -87,7 +87,7 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 //			現在地から各店舗までの距離・時間を取得するAPIのURL
 //			TODO: 現在地取得できなかったらどうする
 			String directionUrl = "https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyCV8QwXKedqprb4umRvDzUS8qXuRN9eCU8&language=ja&mode=walking&destination={destination}&origin={origin}";
-			String origin = searchReq.getNowLatLng().replaceAll("[()]", ""); //起点となる現在地の経緯度を取得
+			String origin = searchReq.getCurrentLatLng().replaceAll("[()]", ""); //起点となる現在地の経緯度を取得
 			
 			JsonNode neabyNode = mapper.readTree(nearbyBody).path("results");
 			for(int i = 0; i < neabyNode.size(); i++) {
@@ -106,7 +106,7 @@ public class ChainStoreServiceImpl implements ChainStoreService {
 					String directionBody = restTemplate.getForObject(directionUrl, String.class, directionParams);
 					
 					JsonNode directionNode = mapper.readTree(directionBody).path("routes").get(0).path("legs").get(0);
-					String distance = directionNode.path("distance").path("text").asText();
+//					String distance = directionNode.path("distance").path("text").asText();
 					String duration = directionNode.path("duration").path("text").asText();
 					
 					SearchResult searchRes = new SearchResult();

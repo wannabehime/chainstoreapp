@@ -1,4 +1,4 @@
-package com.example.chainstoreapp.entity;
+package com.example.chainstoreapp.form;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // デフォルトコンストラクタを生成
 @AllArgsConstructor // 全てのフィールドを引数に持つコンストラクタを生成
 
-public class SearchRequirement {
+// 店舗検索フォームの情報をコントローラーに渡すForm
+public class SearchStoresForm {
+//	フィールド名と一致するnameの値を格納
+	
 //	ブランド名
 	private String brandName;
 //	検索範囲の中心

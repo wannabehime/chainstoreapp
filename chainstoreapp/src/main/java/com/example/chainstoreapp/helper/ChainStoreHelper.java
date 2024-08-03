@@ -1,29 +1,25 @@
 package com.example.chainstoreapp.helper;
 
 import com.example.chainstoreapp.entity.SearchRequirement;
-import com.example.chainstoreapp.form.ChainStoreForm;
+import com.example.chainstoreapp.form.SearchStoresForm;
 
 public class ChainStoreHelper {
 
 //	SearchRequirementへの変換
-	public static SearchRequirement convertSearchReq(ChainStoreForm form){
+	public static SearchRequirement convertSearchReq(SearchStoresForm form){
 		SearchRequirement searchReq = new SearchRequirement();
-		searchReq.setKeyword(form.getKeyword());
+		searchReq.setBrandName(form.getBrandName());
 		searchReq.setCenter(form.getCenter());
-		searchReq.setNowLatLng(form.getNowLatLng());
-		searchReq.setRadius(form.getRadius());
-		searchReq.setPriceLimit(form.getPriceLimit());
+		searchReq.setCurrentLatLng(form.getCurrentLatLng());
 		return searchReq;
 	}
 	
 //	ChainStoreFormへの変換
-	public static ChainStoreForm convertChainStoreForm(SearchRequirement searchReq) {
-		ChainStoreForm form = new ChainStoreForm();
-		form.setKeyword(searchReq.getKeyword());
+	public static SearchStoresForm convertChainStoreForm(SearchRequirement searchReq) {
+		SearchStoresForm form = new SearchStoresForm();
+		form.setBrandName(searchReq.getBrandName());
 		form.setCenter(searchReq.getCenter());
-		form.setNowLatLng(searchReq.getNowLatLng());
-		form.setRadius(searchReq.getRadius());
-		form.setPriceLimit(searchReq.getPriceLimit());
+		form.setCurrentLatLng(searchReq.getCurrentLatLng());
 		return form;
 	}
 }
