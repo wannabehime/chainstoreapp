@@ -94,17 +94,7 @@ function colorChange(obj){
 //		------ 店舗検索の中心地の駅名サジェスト ------
 const centerInput = document.getElementById('center');
 centerInput.addEventListener('input', function(){
-	const stationLatLngInput = document.getElementById('station-latlng')
-	stationLatLngInput.value = ''; // 店舗検索の際に送信する駅名の経緯度を初期化
-	
-	getStations();
-	
-    const staionsListOptions = document.querySelectorAll('#stations-list option');
-    [...staionsListOptions].forEach(staionsListOption => {
-		if(staionsListOption.value === centerInput.value){
-			stationLatLngInput.value = staionsListOption.dataset.latitude + ', ' + staionsListOption.dataset.longitude;
-		}
-	});
+	getStations(); // 入力値から駅リストを取得し、サジェストとして表示
 });
 
 function getStations(){
@@ -125,15 +115,29 @@ function getStations(){
 
 function getStationsSuccess(stations){
 	const staionsDataList = document.getElementById('stations-list');
-	staionsDataList.innerHTML = '';
-    stations.forEach(station => {
+	staionsDataList.innerHTML = ''; // サジェストする駅リストを初期化
+	
+    stations.forEach(station => { // 取得した各駅をリストに格納
         const option = document.createElement('option');
 		option.value = station.name;
-		option.dataset.latitude = station.latitude;
+		option.dataset.latitude = station.latitude; // 店舗検索の際に用いる経緯度を格納
 		option.dataset.longitude = station.longitude;
         staionsDataList.appendChild(option);
     });
-    centerInput.setAttribute('list', 'stations-list');	
+    centerInput.setAttribute('list', 'stations-list');
+    
+   	setStationLatLng(); // サジェストされた駅を選択したとき、店舗検索の際に送信する駅の経緯度に設定
+}
+
+function setStationLatLng(){
+	const stationLatLngInput = document.getElementById('station-latlng')
+	stationLatLngInput.value = ''; // 店舗検索の際に送信する駅の経緯度を初期化
+    const staionsListOptions = document.querySelectorAll('#stations-list option');
+    [...staionsListOptions].forEach(staionsListOption => { // staionsListOptionsはループできないHTMLCollectionなので、...で一度バラバラにして配列に格納する
+		if(staionsListOption.value === centerInput.value){ // 駅リストの各駅について、入力値と一致していたら（リストから駅が選択されていたら）店舗検索の際に送信する駅の経緯度に設定
+			stationLatLngInput.value = staionsListOption.dataset.latitude + ', ' + staionsListOption.dataset.longitude;
+		}
+	});
 }
 				
 //		------ 「現在地を指定」ボタン ------
