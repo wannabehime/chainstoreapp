@@ -19,8 +19,9 @@
 				<option value="丸亀製麺">	丸亀製麺</option>
 			</select>
 			<input type="text" id="center" name="center" placeholder="駅名を入力、または" autocomplete="off">
-			<datalist id="station-name-list"></datalist>
+			<datalist id="stations-list"></datalist>
 			<input type="hidden" id="current-latlng" name="currentLatLng" value=""> <!--現在地を中心に店舗検索するためhiddenで送信・nameはFormクラスのフィールド名と揃えるためにキャメルケース-->
+			<input type="hidden" id="station-latlng" name="stationLatLng" value="">
 			<button type="button" id="set-current-location-button">現在地を指定</button>
 			<input id="submit-button" type="submit" value="検索">
 		</form>

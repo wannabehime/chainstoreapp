@@ -94,7 +94,21 @@ function colorChange(obj){
 //		------ 店舗検索の中心地の駅名サジェスト ------
 const centerInput = document.getElementById('center');
 centerInput.addEventListener('input', function(){
-	fetch(`/chainstoresearch/get-station-names?input=${centerInput.value}`)
+	const stationLatLngInput = document.getElementById('station-latlng')
+	stationLatLngInput.value = ''; // 店舗検索の際に送信する駅名の経緯度を初期化
+	
+	getStations();
+	
+    const staionsListOptions = document.querySelectorAll('#stations-list option');
+    [...staionsListOptions].forEach(staionsListOption => {
+		if(staionsListOption.value === centerInput.value){
+			stationLatLngInput.value = staionsListOption.dataset.latitude + ', ' + staionsListOption.dataset.longitude;
+		}
+	});
+});
+
+function getStations(){
+	fetch(`/chainstoresearch/get-stations?input=${centerInput.value}`)
         .then(response => { //fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
 			if(!response.ok){
 				throw new Error(); //Promiseオブジェクトがrejectになるのはネットワークエラーなので、リクエスト失敗時にcatchで捕捉できるよう例外を投げる
@@ -102,19 +116,25 @@ centerInput.addEventListener('input', function(){
 			return response.json(); //アロー関数の略記ではreturnしないと次のthenに値を渡せない
 		})
         .then(stations => { //json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
-        	const staionNamesDataList = document.getElementById('station-name-list');
-			staionNamesDataList.innerHTML = '';
-            stations.forEach(station => {
-                const option = document.createElement('option');
-                option.value = station.name;
-                staionNamesDataList.appendChild(option);
-            });
-            centerInput.setAttribute('list', 'station-name-list');
+			getStationsSuccess(stations);
 		})
         .catch(error => {
             console.log(error); //ユーザーには知らせる必要がないので、コンソールに表示
-        });
-});
+        });	
+}
+
+function getStationsSuccess(stations){
+	const staionsDataList = document.getElementById('stations-list');
+	staionsDataList.innerHTML = '';
+    stations.forEach(station => {
+        const option = document.createElement('option');
+		option.value = station.name;
+		option.dataset.latitude = station.latitude;
+		option.dataset.longitude = station.longitude;
+        staionsDataList.appendChild(option);
+    });
+    centerInput.setAttribute('list', 'stations-list');	
+}
 				
 //		------ 「現在地を指定」ボタン ------
 document.getElementById('set-current-location-button').addEventListener('click', function(){

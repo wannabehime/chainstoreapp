@@ -15,7 +15,7 @@ import com.example.chainstoreapp.form.SearchStoresForm;
 import com.example.chainstoreapp.helper.ChainStoreHelper;
 import com.example.chainstoreapp.service.ChainStoreService;
 import com.example.chainstoreapp.service.MenuService;
-import com.example.chainstoreapp.service.StationNameService;
+import com.example.chainstoreapp.service.StationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class ChainStoreController { // TODO: クラス名
 
 //	サービスのDI TODO:変数名
-	private final StationNameService stationNameService;
+	private final StationService stationService;
 	private final ChainStoreService chainStoreService;
 	private final MenuService menuService;
 
@@ -36,12 +36,11 @@ public class ChainStoreController { // TODO: クラス名
 		return "chainstoresearch/index"; // TODO:URL名
 	}
 	
-//	------ 入力値から、候補となる駅名リストを取得 ------
-	@GetMapping("get-station-names")
+//	------ 入力値から、候補となる駅リストを取得 ------
+	@GetMapping("get-stations")
 	@ResponseBody // 戻り値がそのままレスポンスのコンテンツになる。jsonを返すために付ける
-	public List<Station> getStationNames(@RequestParam String input){ // @RequestParam:引数名と一致するnameを持つ、フォームの値を受け取る
-//		List<String> stationNames = stationNameService.getStationNames(input);
-		List<Station> stations = stationNameService.getStationNames(input);
+	public List<Station> getStations(@RequestParam String input){ // @RequestParam:引数名と一致するnameを持つ、フォームの値を受け取る
+		List<Station> stations = stationService.getStations(input);
 		return stations;
 	}
 	
