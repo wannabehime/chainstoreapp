@@ -22,7 +22,7 @@ public class StationServiceImpl implements StationService {
 	@Override
 //	入力値を検索値として、駅テーブルから駅リストを取得
 	public ArrayList<Station> getStations(String input) {
-		ArrayList<Station> stations = stationMapper.selectByStation_Name("%" + input + "%", input + "駅", input + "%");
+		ArrayList<Station> stations = stationMapper.selectStationsIncludingInput("%" + input + "%", input + "駅", input + "%");
 		return stations;
 	}
 

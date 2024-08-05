@@ -113,6 +113,7 @@ function getStations(){
             setTimeout(function(){ //3秒で消える
 				getInfoStatusDiv.style.display = 'none';
 			}, 3000);
+			// TODO: リストから駅名を選択してほしい旨を表示
         });	
 }
 

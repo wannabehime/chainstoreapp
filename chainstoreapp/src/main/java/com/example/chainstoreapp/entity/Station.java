@@ -11,17 +11,17 @@ import lombok.NoArgsConstructor;
 // 駅名のエンティティ
 public class Station {
 //	ID
-	private int id;
+//	private int id;
 //	駅名
 	private String name;
 //	鉄道会社
-	private String company;
+//	private String company;
 //	都道府県
-	private String prefecture;
+//	private String prefecture;
 //	駅名（都道府県）
-	private String name_with_prefecture;
+//	private String name_with_prefecture;
 //	住所
-	private String address;
+//	private String address;
 //	緯度
 	private double latitude;
 //	経度

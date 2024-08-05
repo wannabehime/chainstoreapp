@@ -8,6 +8,10 @@ import org.apache.ibatis.annotations.Param;
 import com.example.chainstoreapp.entity.Station;
 
 @Mapper // MyBatisによる自動実装・コンポーネントとして登録され@Autowiredでインジェクションされる・マッパーファイルのSQLにマッピングされる
-public interface StationMapper { // TODO: マッパーファイルと合わせて修正
-	ArrayList<Station> selectByStation_Name(@Param("searchTerm") String searchTerm, @Param("name") String name, @Param("prefix") String prefix);
+public interface StationMapper {
+	ArrayList<Station> selectStationsIncludingInput(
+			@Param("patternIncludingInput") String patternIncludingInput,
+			@Param("inputPlusStation") String inputPlusStation,
+			@Param("patternBeginningWithInput") String patternBeginningWithInput
+	);
 }
