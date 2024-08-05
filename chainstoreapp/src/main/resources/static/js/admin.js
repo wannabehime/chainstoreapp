@@ -93,9 +93,7 @@ function colorChange(obj){
 
 //		------ 店舗検索の中心地の駅名サジェスト ------
 const centerInput = document.getElementById('center');
-centerInput.addEventListener('input', function(){
-	getStations(); // 入力値から駅リストを取得し、サジェストとして表示
-});
+centerInput.addEventListener('input', getStations); // 入力値から駅リストを取得し、サジェストとして表示
 
 function getStations(){
 	fetch(`/chainstoresearch/get-stations?input=${centerInput.value}`)
@@ -109,21 +107,34 @@ function getStations(){
 			getStationsSuccess(stations);
 		})
         .catch(error => {
-            console.log(error); //ユーザーには知らせる必要がないので、コンソールに表示
+			//駅リスト取得に失敗したら、失敗のメッセージ表示
+			const getInfoStatusDiv = document.getElementById('get-information-status');
+            getInfoStatusDiv.style.display = 'block';
+            setTimeout(function(){ //3秒で消える
+				getInfoStatusDiv.style.display = 'none';
+			}, 3000);
         });	
 }
 
 function getStationsSuccess(stations){
-	const staionsDataList = document.getElementById('stations-list');
-	staionsDataList.innerHTML = ''; // サジェストする駅リストを初期化
+	const stationsDataList = document.getElementById('stations-list');
+	stationsDataList.innerHTML = ''; // サジェストする駅リストを初期化
 	
-    stations.forEach(station => { // 取得した各駅をリストに格納
-        const option = document.createElement('option');
-		option.value = station.name;
-		option.dataset.latitude = station.latitude; // 店舗検索の際に用いる経緯度を格納
-		option.dataset.longitude = station.longitude;
-        staionsDataList.appendChild(option);
-    });
+	if(stations.length === 0){
+		const getStationStatusDiv = document.getElementById('get-station-status');
+        getStationStatusDiv.style.display = 'block';
+        setTimeout(function(){ //3秒で消える
+			getStationStatusDiv.style.display = 'none';
+		}, 3000);
+	} else{
+	   stations.forEach(station => { // 取得した各駅をリストに格納
+	        const option = document.createElement('option');
+			option.value = station.name;
+			option.dataset.latitude = station.latitude; // 店舗検索の際に用いる経緯度を格納
+			option.dataset.longitude = station.longitude;
+	        stationsDataList.appendChild(option);
+	    });
+	}
     centerInput.setAttribute('list', 'stations-list');
     
    	setStationLatLng(); // サジェストされた駅を選択したとき、店舗検索の際に送信する駅の経緯度に設定
@@ -132,10 +143,10 @@ function getStationsSuccess(stations){
 function setStationLatLng(){
 	const stationLatLngInput = document.getElementById('station-latlng')
 	stationLatLngInput.value = ''; // 店舗検索の際に送信する駅の経緯度を初期化
-    const staionsListOptions = document.querySelectorAll('#stations-list option');
-    [...staionsListOptions].forEach(staionsListOption => { // staionsListOptionsはループできないHTMLCollectionなので、...で一度バラバラにして配列に格納する
-		if(staionsListOption.value === centerInput.value){ // 駅リストの各駅について、入力値と一致していたら（リストから駅が選択されていたら）店舗検索の際に送信する駅の経緯度に設定
-			stationLatLngInput.value = staionsListOption.dataset.latitude + ', ' + staionsListOption.dataset.longitude;
+    const stationsListOptions = document.querySelectorAll('#stations-list option');
+    [...stationsListOptions].forEach(stationsListOption => { // stationsListOptionsはループできないHTMLCollectionなので、...で一度バラバラにして配列に格納する
+		if(stationsListOption.value === centerInput.value){ // 駅リストの各駅について、入力値と一致していたら（リストから駅が選択されていたら）店舗検索の際に送信する駅の経緯度に設定
+			stationLatLngInput.value = stationsListOption.dataset.latitude + ', ' + stationsListOption.dataset.longitude;
 		}
 	});
 }

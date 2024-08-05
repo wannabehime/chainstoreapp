@@ -123,7 +123,7 @@
 }
 /* ------------ */
 
-#current-location-information-status, #get-information-status {
+#current-location-information-status, #get-information-status, #get-station-status {
 	display: none;
 	height: 30px;
 	line-height: 30px;
@@ -145,7 +145,7 @@
 	width: 200px;
 }
 
-#get-information-status {
+#get-information-status, #get-station-status {
 	top: 120px;
 	width: 480px;
 }
