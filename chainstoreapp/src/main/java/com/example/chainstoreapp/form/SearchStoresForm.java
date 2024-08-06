@@ -18,4 +18,6 @@ public class SearchStoresForm {
 	private String center;
 //	現在地の経緯度
 	private String currentLatLng;
+//	検索範囲の中心として駅名が入力された場合の経緯度
+	private String stationLatLng;
 }

@@ -10,8 +10,8 @@
 	
 	<div id="search-form-and-return-to-stores-list-button-container">
 		<form id="search-form-wrapper" action="/chainstoresearch/search" method="get">
-			<select id="brand-name" name="brandName"> <!-- nameはFormクラスのフィールド名と揃えるためにキャメルケース -->
-				<option>ブランド名を選択</option>
+			<select id="brand-name" name="brandName" required> <!-- nameはFormクラスのフィールド名と揃えるためにキャメルケース -->
+				<option value="" hidden>ブランド名を選択</option> <!-- TODO: 「ブランド名を選択」が選択されないようにする -->
 				<option value="松屋">松屋</option>
 				<option value="すき家">すき家</option>
 				<option value="吉野家">吉野家</option>

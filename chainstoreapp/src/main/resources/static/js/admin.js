@@ -247,10 +247,10 @@ function calcRoute(calcRouteButton){
 	//ルート検索に用いるリクエストの作成
     const lngSpan = calcRouteButton.previousElementSibling;
     const latSpan = lngSpan.previousElementSibling;
-    const destinationLatLng = new google.maps.LatLng(latSpan.textContent, lngSpan.textContent); // 情報ウィンドウのspanにある目的地の経緯度を取得
+    const storeLatLng = new google.maps.LatLng(latSpan.textContent, lngSpan.textContent); // 情報ウィンドウのspanにある目的地の経緯度を取得
     const request = {
         origin: currentLatLng,
-        destination: destinationLatLng,
+        destination: storeLatLng,
         travelMode: 'WALKING' //移動手段を徒歩に指定
     };
     
