@@ -10,17 +10,17 @@
 	
 	<div id="search-form-and-return-to-stores-list-button-container">
 		<form id="search-form-wrapper" action="/chainstoresearch/search" method="get">
-			<select id="brand-name" name="brandName" required> <!-- nameはFormクラスのフィールド名と揃えるためにキャメルケース -->
-				<option value="" hidden>ブランド名を選択</option> <!-- TODO: 「ブランド名を選択」が選択されないようにする -->
+			<select id="brand-name" name="brandName" required> <!-- nameはFormクラスのフィールド名と揃えるためにキャメルケース / 	required:必須項目 -->
+				<option value="" hidden>ブランド名を選択</option> <!-- requiredと合わせてvalueを空にすることで、「ブランド名を選択」の選択状態では送信できなくなる -->
 				<option value="松屋">松屋</option>
 				<option value="すき家">すき家</option>
 				<option value="吉野家">吉野家</option>
 				<option value="はなまるうどん">はなまるうどん</option>
 				<option value="丸亀製麺">	丸亀製麺</option>
 			</select>
-			<input type="text" id="center" name="center" placeholder="駅名を入力、または" autocomplete="off">
+			<input type="text" id="center" name="center" placeholder="駅名を入力、または" autocomplete="off" required>
 			<datalist id="stations-list"></datalist>
-			<input type="hidden" id="current-latlng" name="currentLatLng" value=""> <!--現在地を中心に店舗検索するためhiddenで送信・nameはFormクラスのフィールド名と揃えるためにキャメルケース-->
+			<input type="hidden" id="current-latlng" name="currentLatLng" value=""> <!--現在地を中心に店舗検索するためhiddenで送信 / nameはFormクラスのフィールド名と揃えるためにキャメルケース-->
 			<input type="hidden" id="station-latlng" name="stationLatLng" value="">
 			<button type="button" id="set-current-location-button">現在地を指定</button>
 			<input id="submit-button" type="submit" value="検索">
