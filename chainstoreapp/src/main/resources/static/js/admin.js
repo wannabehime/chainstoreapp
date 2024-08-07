@@ -122,7 +122,7 @@ function getStationsSuccess(stations){
 	stationsDataList.innerHTML = ''; // サジェストする駅リストを初期化
 	
 	if(stations.length === 0){
-		const getStationStatusDiv = document.getElementById('get-station-status');
+		const getStationStatusDiv = document.getElementById('get-stations-status');
         getStationStatusDiv.style.display = 'block';
         setTimeout(function(){ //3秒で消える
 			getStationStatusDiv.style.display = 'none';
@@ -161,21 +161,30 @@ document.getElementById('set-current-location-button').addEventListener('click',
 const searchFormContainerDiv = document.getElementById('search-form-wrapper');
 searchFormContainerDiv.addEventListener('submit', function(e){
     e.preventDefault(); //フォームの本来のリクエストを阻止
-    const request = new URLSearchParams(new FormData(searchFormContainerDiv)).toString(); //FormData:フォームの内容をキーと値で格納, URLSearchParams:クエリ文字列を生成
-    fetch(`/chainstoresearch/search-stores?${request}`)
-        .then(response => {
-			if(!response.ok){
-				throw new Error();
-			}
-			return response.json();
-		})
-        .then(stores => {
-            searchStoresSuccess(stores);
-        })
-        .catch(error => {
-			// TODO: エラー時どうする
-            alert('通信に失敗しました。ステータス：' + error);
-        });
+	if(centerInput.value === '現在地' && typeof currentLatLng === 'undefined'){
+		//現在地の経緯度が格納されていなければ、失敗のメッセージ表示し、送信しない
+		const searchStoresStatusDiv = document.getElementById('search-stores-status');
+        searchStoresStatusDiv.style.display = 'block';
+        setTimeout(function(){ //4秒で消える
+			searchStoresStatusDiv.style.display = 'none';
+		}, 4000);
+	}else{
+	    const request = new URLSearchParams(new FormData(searchFormContainerDiv)).toString(); //FormData:フォームの内容をキーと値で格納, URLSearchParams:クエリ文字列を生成
+	    fetch(`/chainstoresearch/search-stores?${request}`)
+	        .then(response => {
+				if(!response.ok){
+					throw new Error();
+				}
+				return response.json();
+			})
+	        .then(stores => {
+	            searchStoresSuccess(stores);
+	        })
+	        .catch(error => {
+				// TODO: エラー時どうする
+	            alert('通信に失敗しました。ステータス：' + error);
+	        });		
+	}
 });
 
 function searchStoresSuccess(stores){

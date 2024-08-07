@@ -8,26 +8,32 @@ import org.springframework.web.client.RestTemplate;
 import com.example.chainstoreapp.entity.Store;
 import com.example.chainstoreapp.form.SearchStoresForm;
 import com.example.chainstoreapp.service.StoreService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
-@RequiredArgsConstructor
+@Service // ビジネスロジックに付与する、インスタンス生成アノテーション
+@RequiredArgsConstructor // finalが付けられたフィールドを引数とするコンストラクタを自動生成。かつ、コンストラクタが1つのみのとき、DIでインスタンスを受け取るコンストラクタを示す@Autowiredを省略可
+
+//====== コントローラーのsearchStoresで使うサービス ======
 public class StoreServiceImpl implements StoreService {
 
 //	RestTemplateのDI
 	private final RestTemplate restTemplate;
 	
-//	ユーザーの入力からメニュー一覧を取得
+	@Override
+//	ブランド名と中心地から、該当するチェーン店を検索
 	public ArrayList<Store> searchStores(SearchStoresForm searchStoresForm) {
 		
+//		引数に用いる値を取得
 		ObjectMapper mapper = new ObjectMapper(); //オブジェクトとjson変換を行うクラスのインスタンス化
 		String brandName = searchStoresForm.getBrandName();
 		String center = searchStoresForm.getCenter();
 //		TODO: 現在地取得できなかったらどうする
 		String currentLatLng = searchStoresForm.getCurrentLatLng().replaceAll("[()]", ""); //起点となる現在地の経緯度を取得
+//		TODO: 駅の経緯度格納されてなかったらどうする
 		String stationLatLng = searchStoresForm.getStationLatLng().replaceAll("[()]", "");
 
 		JsonNode nearbySearchResultsNode = nearbySearchAPIExecute(mapper, brandName, center, currentLatLng, stationLatLng);
@@ -39,16 +45,11 @@ public class StoreServiceImpl implements StoreService {
 				case "松屋", "すき家", "吉野家", "はなまるうどん" -> brandName + ".*店";
 				default -> brandName + ".*";
 			};
-			if(placeName.matches(brandNamePattern) /*&& open_now == true*/) {
+			if(placeName.matches(brandNamePattern)) {
 				double latitude = placeNode.path("geometry").path("location").path("lat").asDouble();
 				double longitude = placeNode.path("geometry").path("location").path("lng").asDouble();
 				String duration = directionsAPIExecute(mapper, latitude, longitude, currentLatLng);
-				
-				Store store = new Store();
-				store.setLatitude(latitude);
-				store.setLongitude(longitude);
-				store.setDuration(duration);
-				stores.add(store);
+				stores.add(new Store(latitude, longitude, duration));
 			}
 		}
 		return stores;
@@ -57,12 +58,12 @@ public class StoreServiceImpl implements StoreService {
 	public JsonNode nearbySearchAPIExecute(ObjectMapper mapper, String brandName, String center, String currentLatLng, String stationLatLng) {
 		try {
 //			指定した起点から、同心円状の範囲にある店舗を検索するためのAPIのURL
-			String nearbySearchUrl = "https://maps.googleapis.com/maps/api/placeNode/nearbysearch/json"
+			String nearbySearchUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 					+ "?key=AIzaSyCV8QwXKedqprb4umRvDzUS8qXuRN9eCU8&language=ja&keyword={brandName}&location={centerLatLng}&radius={radius}";
 			String centerLatLng = center.equals("現在地") ? currentLatLng : stationLatLng; //店舗検索の中心の緯度経度を入れる変数
 			String nearbySearchResponse = restTemplate.getForObject(nearbySearchUrl, String.class, brandName, centerLatLng, "500"); //APIからレスポンスボディをJSON文字列で取得
 			return mapper.readTree(nearbySearchResponse).path("results");
-		} catch (Exception e) {
+		} catch (JsonProcessingException e) {
 			// TODO: handle exception
 			return null;
 		}

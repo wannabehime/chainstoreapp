@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class MenuServiceImpl implements MenuService {
 	
 	private final MenuMapper menuMapper;
+	
 	@Override
 	public ArrayList<Menu> shuffleMenus(String brandName, Integer priceLimit) {
 		
