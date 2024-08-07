@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.chainstoreapp.entity.Menu;
 import com.example.chainstoreapp.entity.Station;
+import com.example.chainstoreapp.entity.Store;
 import com.example.chainstoreapp.form.SearchStoresForm;
 import com.example.chainstoreapp.service.MenuService;
 import com.example.chainstoreapp.service.StationService;
@@ -38,14 +39,13 @@ public class ChainStoreController { // TODO: クラス名
 	@GetMapping("get-stations")
 	@ResponseBody // 戻り値がそのままレスポンスのコンテンツになる。jsonを返すために付ける
 	public List<Station> getStations(@RequestParam String input){ // @RequestParam:引数名と一致するnameを持つ、フォームの値を受け取る
-		List<Station> stations = stationService.getStations(input);
-		return stations;
+		return stationService.getStations(input);
 	}
 	
 //	------ ブランド名と中心地から、該当するチェーン店を検索 ------
 	@GetMapping("search-stores")
 	@ResponseBody
-	public String searchStores(SearchStoresForm searchStoresForm){
+	public List<Store> searchStores(SearchStoresForm searchStoresForm){
 //		SearchRequirement searchReq = ChainStoreHelper.convertSearchReq(form); // 検索条件をフォームからエンティティへ変換
 		return storeService.searchStores(searchStoresForm);
 	}

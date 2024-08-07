@@ -176,7 +176,7 @@
 	margin-right: 10px;
 }
 
-.store-lat, .store-lng {
+.store-latitude, .store-longitude {
 	display: none;
 }
 

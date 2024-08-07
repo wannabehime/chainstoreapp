@@ -167,10 +167,10 @@ searchFormContainerDiv.addEventListener('submit', function(e){
 			if(!response.ok){
 				throw new Error();
 			}
-			return response.text();
+			return response.json();
 		})
-        .then(storesInfo => {
-            searchStoresSuccess(storesInfo);
+        .then(stores => {
+            searchStoresSuccess(stores);
         })
         .catch(error => {
 			// TODO: エラー時どうする
@@ -178,9 +178,9 @@ searchFormContainerDiv.addEventListener('submit', function(e){
         });
 });
 
-function searchStoresSuccess(storesInfo){
+function searchStoresSuccess(stores){
 	initMarkersAndButton(); //マーカーとボタンの初期化
-	setMarkersAndInfoWindows(storesInfo); //マーカーと情報ウィンドウを生成
+	setMarkersAndInfoWindows(stores); //マーカーと情報ウィンドウを生成
 	displayMenuResultsContainer(); //メニューを表示するコンテナを表示
 }
 
@@ -194,25 +194,25 @@ function initMarkersAndButton(){
 	document.getElementById('return-to-stores-list-button').style.display = 'none';
 }
 
-function setMarkersAndInfoWindows(storesInfo){
-	JSON.parse(storesInfo).forEach(storeInfo => { // JSONデータをJavaScriptのオブジェクトに変換
+function setMarkersAndInfoWindows(stores){
+	/*JSON.parse(*/stores/*)*/.forEach(store => { // JSONデータをJavaScriptのオブジェクトに変換
 	
 		//	------各店舗のマーカーを生成------
 		const marker = new google.maps.marker.AdvancedMarkerElement({
 			map,
-            position: {lat: storeInfo.lat, lng: storeInfo.lng},
+            position: {lat: store.latitude, lng: store.longitude},
         });
 		storeMarkers.push(marker); //マーカーをリストに格納
-		bounds.extend({lat: storeInfo.lat, lng: storeInfo.lng}); //矩形領域に各店舗の位置を追加
+		bounds.extend({lat: store.latitude, lng: store.longitude}); //矩形領域に各店舗の位置を追加
 		
 		//	------各店舗の所要時間とルート検索ボタンを表示する、情報ウィンドウを生成------
 		const infoWindow = new google.maps.InfoWindow({
 			//ルート検索で送信するために、spamで経緯度を保持
             content: `
             	<div class='store-info-group'>
-	                <span class='store-duration'>徒歩 ${storeInfo.duration}</span>
-					<span class='store-lat'>${storeInfo.lat}</span>
-					<span class='store-lng'>${storeInfo.lng}</span>
+	                <span class='store-duration'>徒歩 ${store.duration}</span>
+					<span class='store-latitude'>${store.latitude}</span>
+					<span class='store-longitude'>${store.longitude}</span>
 					<button class='calc-route-button'><img class='calc-route-icon' src='/img/calc-route-icon.png' alt='route'/></button>
 				</div>
             `

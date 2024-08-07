@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.chainstoreapp.entity.SearchResult;
+import com.example.chainstoreapp.entity.Store;
 import com.example.chainstoreapp.form.SearchStoresForm;
 import com.example.chainstoreapp.service.StoreService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,58 +21,64 @@ public class StoreServiceImpl implements StoreService {
 	private final RestTemplate restTemplate;
 	
 //	ユーザーの入力からメニュー一覧を取得
-	public String searchStores(SearchStoresForm searchStoresForm) {
+	public ArrayList<Store> searchStores(SearchStoresForm searchStoresForm) {
 		
-//		JSONからエンティティへの変換
-		try {
-			ObjectMapper mapper = new ObjectMapper(); //オブジェクトとjson変換を行うクラスのインスタンス化
-			
-//			指定した起点から、同心円状の範囲にある店舗を検索するためのAPIのURL
-			String nearbySearchUrl = "https://maps.googleapis.com/maps/api/placeNode/nearbysearch/json"
-					+ "?key=AIzaSyCV8QwXKedqprb4umRvDzUS8qXuRN9eCU8&language=ja&keyword={brandName}&location={centerLatLng}&radius={radius}";
-			String brandName = searchStoresForm.getBrandName();
-			String centerLatLng = searchStoresForm.getCenter().equals("現在地") 
-					? searchStoresForm.getCurrentLatLng().replaceAll("[()]", "") 
-					: searchStoresForm.getStationLatLng().replaceAll("[()]", ""); //店舗検索の中心の緯度経度を入れる変数
+		ObjectMapper mapper = new ObjectMapper(); //オブジェクトとjson変換を行うクラスのインスタンス化
+		String brandName = searchStoresForm.getBrandName();
+		String center = searchStoresForm.getCenter();
+//		TODO: 現在地取得できなかったらどうする
+		String currentLatLng = searchStoresForm.getCurrentLatLng().replaceAll("[()]", ""); //起点となる現在地の経緯度を取得
+		String stationLatLng = searchStoresForm.getStationLatLng().replaceAll("[()]", "");
 
-			String nearbySearchResponse = restTemplate.getForObject(nearbySearchUrl, String.class, brandName, centerLatLng, "500"); //APIからレスポンスボディをJSON文字列で取得
-			JsonNode nearbySearchResultsNode = mapper.readTree(nearbySearchResponse).path("results");
+		JsonNode nearbySearchResultsNode = nearbySearchAPIExecute(mapper, brandName, center, currentLatLng, stationLatLng);
+		ArrayList<Store> stores = new ArrayList<>(); //returnするリストを用意
+
+		for(JsonNode placeNode : nearbySearchResultsNode) {
+			String placeName = placeNode.path("name").asText();
 			String brandNamePattern = switch (brandName) {
 				case "松屋", "すき家", "吉野家", "はなまるうどん" -> brandName + ".*店";
 				default -> brandName + ".*";
 			};
+			if(placeName.matches(brandNamePattern) /*&& open_now == true*/) {
+				double latitude = placeNode.path("geometry").path("location").path("lat").asDouble();
+				double longitude = placeNode.path("geometry").path("location").path("lng").asDouble();
+				String duration = directionsAPIExecute(mapper, latitude, longitude, currentLatLng);
+				
+				Store store = new Store();
+				store.setLatitude(latitude);
+				store.setLongitude(longitude);
+				store.setDuration(duration);
+				stores.add(store);
+			}
+		}
+		return stores;
+	}
 
+	public JsonNode nearbySearchAPIExecute(ObjectMapper mapper, String brandName, String center, String currentLatLng, String stationLatLng) {
+		try {
+//			指定した起点から、同心円状の範囲にある店舗を検索するためのAPIのURL
+			String nearbySearchUrl = "https://maps.googleapis.com/maps/api/placeNode/nearbysearch/json"
+					+ "?key=AIzaSyCV8QwXKedqprb4umRvDzUS8qXuRN9eCU8&language=ja&keyword={brandName}&location={centerLatLng}&radius={radius}";
+			String centerLatLng = center.equals("現在地") ? currentLatLng : stationLatLng; //店舗検索の中心の緯度経度を入れる変数
+			String nearbySearchResponse = restTemplate.getForObject(nearbySearchUrl, String.class, brandName, centerLatLng, "500"); //APIからレスポンスボディをJSON文字列で取得
+			return mapper.readTree(nearbySearchResponse).path("results");
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+	}
+	
+	public String directionsAPIExecute(ObjectMapper mapper, double latitude, double longitude, String currentLatLng){
+		try {
 //			現在地から各店舗までの距離・時間を取得するAPIのURL
-//			TODO: 現在地取得できなかったらどうする
 			String directionsUrl = "https://maps.googleapis.com/maps/api/directions/json"
 					+ "?key=AIzaSyCV8QwXKedqprb4umRvDzUS8qXuRN9eCU8&language=ja&mode=walking&origin={currentLatLng}&destination={storeLatLng}";
-			String currentLatLng = searchStoresForm.getCurrentLatLng().replaceAll("[()]", ""); //起点となる現在地の経緯度を取得
-			
-			ArrayList<SearchResult> searchResults = new ArrayList<>(); //returnするリストを用意
-
-			for(JsonNode placeNode : nearbySearchResultsNode) {
-				String placeName = placeNode.path("name").asText();
-				
-				if(placeName.matches(brandNamePattern) /*&& open_now == true*/) {
-					double storelat = placeNode.path("geometry").path("location").path("lat").asDouble();
-					double storelng = placeNode.path("geometry").path("location").path("lng").asDouble();
-					
-					String storeLatLng = storelat + ", " + storelng; //目的地の経緯度
-					String directionsResponse = restTemplate.getForObject(directionsUrl, String.class, currentLatLng, storeLatLng);
-//					routes:複数のルートを含むので、get(0)で一番目を取り出す / legs:経由地を指定した場合に区間毎の情報を持つが、今回指定していないので情報は1つ。get(0)で取り出す / duration:所要時間 / text:テキストで取り出す
-					String duration = mapper.readTree(directionsResponse).path("routes").get(0).path("legs").get(0).path("duration").path("text").asText();
-					
-					SearchResult searchRes = new SearchResult();
-					searchRes.setLat(storelat);
-					searchRes.setLng(storelng);
-					searchRes.setDuration(duration);
-					searchResults.add(searchRes);
-				}
-			}
-			return mapper.writeValueAsString(searchResults);
-			
-		}catch (JsonProcessingException e) {
-			e.printStackTrace();
+			String storeLatLng = latitude + ", " + longitude; //目的地の経緯度
+			String directionsResponse = restTemplate.getForObject(directionsUrl, String.class, currentLatLng, storeLatLng);
+//			routes:複数のルートを含むので、get(0)で一番目を取り出す / legs:経由地を指定した場合に区間毎の情報を持つが、今回指定していないので情報は1つ。get(0)で取り出す / duration:所要時間 / text:テキストで取り出す
+			return mapper.readTree(directionsResponse).path("routes").get(0).path("legs").get(0).path("duration").path("text").asText();
+		} catch (Exception e) {
+			// TODO: handle exception
 			return null;
 		}
 	}
