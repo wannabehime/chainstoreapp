@@ -27,7 +27,7 @@
 	z-index: 100;
 	left: 50%;
 	transform: translateX(-50%);
-	top: 10px;
+	top: 45px;
 	align-items: center;
 }
 
@@ -123,6 +123,7 @@
 }
 /* ------------ */
 
+#choose-from-list-notice,
 #current-location-information-status, 
 #get-information-status, 
 #get-stations-status, 
@@ -143,18 +144,23 @@
 	transform: translateX(-50%);
 }
 
+#choose-from-list-notice {
+	top: 10px;
+	width: 250px;
+}
+
 #current-location-information-status {
-	top: 80px;
-	width: 200px;
+	top: 120px;
+	width: 170px;
 }
 
 #get-information-status, #get-stations-status {
-	top: 120px;
+	top: 160px;
 	width: 480px;
 }
 
 #search-stores-status {
-	top: 120px;
+	top: 160px;
 	width: 560px;
 }
 

@@ -96,30 +96,36 @@ const centerInput = document.getElementById('center');
 centerInput.addEventListener('input', getStations); // 入力値から駅リストを取得し、サジェストとして表示
 
 function getStations(){
-	fetch(`/chainstoresearch/get-stations?input=${centerInput.value}`)
-        .then(response => { //fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
-			if(!response.ok){
-				throw new Error(); //Promiseオブジェクトがrejectになるのはネットワークエラーなので、リクエスト失敗時にcatchで捕捉できるよう例外を投げる
-			}
-			return response.json(); //アロー関数の略記ではreturnしないと次のthenに値を渡せない
-		})
-        .then(stations => { //json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
-			getStationsSuccess(stations);
-		})
-        .catch(error => {
-			//駅リスト取得に失敗したら、失敗のメッセージ表示
-			const getInfoStatusDiv = document.getElementById('get-information-status');
-            getInfoStatusDiv.style.display = 'block';
-            setTimeout(function(){ //3秒で消える
-				getInfoStatusDiv.style.display = 'none';
-			}, 3000);
-			// TODO: リストから駅名を選択してほしい旨を表示
-        });	
+	if(centerInput.value == ''){
+		document.getElementById('choose-from-list-notice').style.display = 'none';
+	}else{
+		fetch(`/chainstoresearch/get-stations?input=${centerInput.value}`)
+	        .then(response => { //fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
+				if(!response.ok){
+					throw new Error(); //Promiseオブジェクトがrejectになるのはネットワークエラーなので、リクエスト失敗時にcatchで捕捉できるよう例外を投げる
+				}
+				return response.json(); //アロー関数の略記ではreturnしないと次のthenに値を渡せない
+			})
+	        .then(stations => { //json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
+				getStationsSuccess(stations);
+			})
+	        .catch(error => {
+				//駅リスト取得に失敗したら、失敗のメッセージ表示
+				const getInfoStatusDiv = document.getElementById('get-information-status');
+	            getInfoStatusDiv.style.display = 'block';
+	            setTimeout(function(){ //3秒で消える
+					getInfoStatusDiv.style.display = 'none';
+				}, 3000);
+				// TODO: リストから駅名を選択してほしい旨を表示
+	        });
+	}
 }
 
 function getStationsSuccess(stations){
 	const stationsDataList = document.getElementById('stations-list');
 	stationsDataList.innerHTML = ''; // サジェストする駅リストを初期化
+	const stationLatLngInput = document.getElementById('station-latlng');
+	stationLatLngInput.value = ''; // 店舗検索の際に送信する駅の経緯度を初期化
 	
 	if(stations.length === 0){
 		const getStationStatusDiv = document.getElementById('get-stations-status');
@@ -127,6 +133,7 @@ function getStationsSuccess(stations){
         setTimeout(function(){ //3秒で消える
 			getStationStatusDiv.style.display = 'none';
 		}, 3000);
+		document.getElementById('choose-from-list-notice').style.display = 'none';
 	} else{
 	   stations.forEach(station => { // 取得した各駅をリストに格納
 	        const option = document.createElement('option');
@@ -135,15 +142,14 @@ function getStationsSuccess(stations){
 			option.dataset.longitude = station.longitude;
 	        stationsDataList.appendChild(option);
 	    });
+		centerInput.setAttribute('list', 'stations-list');
+	   	setStationLatLng(stationLatLngInput, centerInput); // サジェストされた駅を選択したとき、店舗検索の際に送信する駅の経緯度に設定
+	  	document.getElementById('choose-from-list-notice').style.display = (stationLatLngInput.value == '') ? 'block' : 'none';
 	}
-    centerInput.setAttribute('list', 'stations-list');
-    
-   	setStationLatLng(); // サジェストされた駅を選択したとき、店舗検索の際に送信する駅の経緯度に設定
+ 
 }
 
-function setStationLatLng(){
-	const stationLatLngInput = document.getElementById('station-latlng')
-	stationLatLngInput.value = ''; // 店舗検索の際に送信する駅の経緯度を初期化
+function setStationLatLng(stationLatLngInput, centerInput){
     const stationsListOptions = document.querySelectorAll('#stations-list option');
     [...stationsListOptions].forEach(stationsListOption => { // stationsListOptionsはループできないHTMLCollectionなので、...で一度バラバラにして配列に格納する
 		if(stationsListOption.value === centerInput.value){ // 駅リストの各駅について、入力値と一致していたら（リストから駅が選択されていたら）店舗検索の際に送信する駅の経緯度に設定
