@@ -4,6 +4,7 @@ let map; // マップオブジェクトを格納する
 const currentLocationInfoStatusDiv = document.getElementById('current-location-information-status'); // 位置情報取得の状態を表示する要素
 let currentLocationMarker; // 現在地マーカーオブジェクトを格納する
 let currentLocationCircle; // 現在地マーカーの周りの円オブジェクトを格納する
+let stationLatLngInput = document.getElementById('station-latlng'); // 店舗検索の中心としての、駅の経緯度を格納するhidden要素
 let storeMarkers = []; // 店舗マーカーを格納する配列
 let bounds; // マップに表示する矩形領域オブジェクトを格納
 const returnToStoresListButton = document.getElementById('return-to-stores-list-button');
@@ -96,6 +97,10 @@ const centerInput = document.getElementById('center');
 centerInput.addEventListener('input', getStations); // 入力値から駅リストを取得し、サジェストとして表示
 
 function getStations(){
+	const stationsDataList = document.getElementById('stations-list');
+	stationsDataList.innerHTML = ''; // サジェストする駅リストを初期化
+	stationLatLngInput.value = ''; // 店舗検索の際に送信する駅の経緯度を初期化
+	
 	if(centerInput.value == ''){
 		document.getElementById('choose-from-list-notice').style.display = 'none';
 	}else{
@@ -107,26 +112,21 @@ function getStations(){
 				return response.json(); //アロー関数の略記ではreturnしないと次のthenに値を渡せない
 			})
 	        .then(stations => { //json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
-				getStationsSuccess(stations);
+				getStationsSuccess(stations, stationsDataList, stationLatLngInput);
 			})
 	        .catch(error => {
+				document.getElementById('choose-from-list-notice').style.display = 'none';
 				//駅リスト取得に失敗したら、失敗のメッセージ表示
 				const getInfoStatusDiv = document.getElementById('get-information-status');
 	            getInfoStatusDiv.style.display = 'block';
 	            setTimeout(function(){ //3秒で消える
 					getInfoStatusDiv.style.display = 'none';
 				}, 3000);
-				// TODO: リストから駅名を選択してほしい旨を表示
 	        });
 	}
 }
 
-function getStationsSuccess(stations){
-	const stationsDataList = document.getElementById('stations-list');
-	stationsDataList.innerHTML = ''; // サジェストする駅リストを初期化
-	const stationLatLngInput = document.getElementById('station-latlng');
-	stationLatLngInput.value = ''; // 店舗検索の際に送信する駅の経緯度を初期化
-	
+function getStationsSuccess(stations, stationsDataList, stationLatLngInput){
 	if(stations.length === 0){
 		const getStationStatusDiv = document.getElementById('get-stations-status');
         getStationStatusDiv.style.display = 'block';
@@ -167,13 +167,15 @@ document.getElementById('set-current-location-button').addEventListener('click',
 const searchFormContainerDiv = document.getElementById('search-form-wrapper');
 searchFormContainerDiv.addEventListener('submit', function(e){
     e.preventDefault(); //フォームの本来のリクエストを阻止
-	if(centerInput.value === '現在地' && typeof currentLatLng === 'undefined'){
+	if(centerInput.value == '現在地' && currentLatLng == ''){
 		//現在地の経緯度が格納されていなければ、失敗のメッセージ表示し、送信しない
 		const searchStoresStatusDiv = document.getElementById('search-stores-status');
         searchStoresStatusDiv.style.display = 'block';
         setTimeout(function(){ //4秒で消える
 			searchStoresStatusDiv.style.display = 'none';
 		}, 4000);
+	}else if(centerInput.value != '現在地' && stationLatLngInput == ''){
+		; // 空文
 	}else{
 	    const request = new URLSearchParams(new FormData(searchFormContainerDiv)).toString(); //FormData:フォームの内容をキーと値で格納, URLSearchParams:クエリ文字列を生成
 	    fetch(`/chainstoresearch/search-stores?${request}`)

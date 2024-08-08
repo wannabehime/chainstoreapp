@@ -31,7 +31,7 @@ public class StoreServiceImpl implements StoreService {
 		ObjectMapper mapper = new ObjectMapper(); //オブジェクトとjson変換を行うクラスのインスタンス化
 		String brandName = searchStoresForm.getBrandName();
 		String center = searchStoresForm.getCenter();
-//		TODO: 現在地取得できなかったらどうする
+//		TODO: 現在地取得できなかったときのdirectionsAPIどうする
 		String currentLatLng = searchStoresForm.getCurrentLatLng().replaceAll("[()]", ""); //起点となる現在地の経緯度を取得
 //		TODO: 駅の経緯度格納されてなかったらどうする
 		String stationLatLng = searchStoresForm.getStationLatLng().replaceAll("[()]", "");
