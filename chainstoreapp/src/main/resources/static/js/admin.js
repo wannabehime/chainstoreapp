@@ -101,7 +101,7 @@ function getStations(){
 	stationsDataList.innerHTML = ''; // サジェストする駅リストを初期化
 	stationLatLngInput.value = ''; // 店舗検索の際に送信する駅の経緯度を初期化
 	
-	if(centerInput.value == ''){
+	if(!centerInput.value){
 		document.getElementById('choose-from-list-notice').style.display = 'none';
 	}else{
 		fetch(`/chainstoresearch/get-stations?input=${centerInput.value}`)
@@ -127,7 +127,7 @@ function getStations(){
 }
 
 function getStationsSuccess(stations, stationsDataList, stationLatLngInput){
-	if(stations.length === 0){
+	if(!stations.length){
 		const getStationStatusDiv = document.getElementById('get-stations-status');
         getStationStatusDiv.style.display = 'block';
         setTimeout(function(){ //3秒で消える
@@ -144,7 +144,7 @@ function getStationsSuccess(stations, stationsDataList, stationLatLngInput){
 	    });
 		centerInput.setAttribute('list', 'stations-list');
 	   	setStationLatLng(stationLatLngInput, centerInput); // サジェストされた駅を選択したとき、店舗検索の際に送信する駅の経緯度に設定
-	  	document.getElementById('choose-from-list-notice').style.display = (stationLatLngInput.value == '') ? 'block' : 'none';
+	  	document.getElementById('choose-from-list-notice').style.display = (!stationLatLngInput.value) ? 'block' : 'none';
 	}
  
 }
@@ -167,15 +167,19 @@ document.getElementById('set-current-location-button').addEventListener('click',
 const searchFormContainerDiv = document.getElementById('search-form-wrapper');
 searchFormContainerDiv.addEventListener('submit', function(e){
     e.preventDefault(); //フォームの本来のリクエストを阻止
-	if(centerInput.value == '現在地' && currentLatLng == ''){
+	if(centerInput.value == '現在地' && !currentLatLng){
 		//現在地の経緯度が格納されていなければ、失敗のメッセージ表示し、送信しない
 		const searchStoresStatusDiv = document.getElementById('search-stores-status');
         searchStoresStatusDiv.style.display = 'block';
         setTimeout(function(){ //4秒で消える
 			searchStoresStatusDiv.style.display = 'none';
 		}, 4000);
-	}else if(centerInput.value != '現在地' && stationLatLngInput == ''){
-		; // 空文
+	}else if(centerInput.value != '現在地' && !stationLatLngInput.value){
+		const chooseRightStationNoticeDiv = document.getElementById('choose-right-station-notice');
+        chooseRightStationNoticeDiv.style.display = 'block';
+        setTimeout(function(){ //4秒で消える
+			chooseRightStationNoticeDiv.style.display = 'none';
+		}, 4000);
 	}else{
 	    const request = new URLSearchParams(new FormData(searchFormContainerDiv)).toString(); //FormData:フォームの内容をキーと値で格納, URLSearchParams:クエリ文字列を生成
 	    fetch(`/chainstoresearch/search-stores?${request}`)
@@ -212,7 +216,7 @@ function initMarkersAndButton(){
 }
 
 function setMarkersAndInfoWindows(stores){
-	/*JSON.parse(*/stores/*)*/.forEach(store => { // JSONデータをJavaScriptのオブジェクトに変換
+	stores.forEach(store => {
 	
 		//	------各店舗のマーカーを生成------
 		const marker = new google.maps.marker.AdvancedMarkerElement({
@@ -244,7 +248,7 @@ function setMarkersAndInfoWindows(stores){
         });
     });
     
-   	if(currentLatLng !== 'undefined'){
+   	if(currentLatLng){
 		bounds.extend(currentLatLng); //現在地が取得できていれば矩形領域に追加
 	}
 	map.fitBounds(bounds); //マップに矩形領域を伝える
@@ -317,9 +321,6 @@ document.getElementById('price-limit').addEventListener('change', function(){
 
 //		------メニュー表示のラッパーを作成し、最初のランダムなメニューを表示------
 function initMenus(priceLimitDiv){
-	if(priceLimitDiv.value === '---'){ // 予算選択で"---"が選ばれた場合は何もしない
-		return;
-	}
 	
 	// メニュー表示のコンテナをクリア
 	const menuResultContainer = document.getElementById('menu-result-container');

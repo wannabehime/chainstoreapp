@@ -127,7 +127,8 @@
 #current-location-information-status, 
 #get-information-status, 
 #get-stations-status, 
-#search-stores-status {
+#search-stores-status,
+#choose-right-station-notice {
 	display: none;
 	height: 30px;
 	line-height: 30px;
@@ -154,14 +155,12 @@
 	width: 170px;
 }
 
-#get-information-status, #get-stations-status {
+#get-information-status, 
+#get-stations-status, 
+#search-stores-status, 
+#choose-right-station-notice {
 	top: 160px;
-	width: 480px;
-}
-
-#search-stores-status {
-	top: 160px;
-	width: 560px;
+	width: 500px;
 }
 
 /* ------------ */

@@ -3,6 +3,7 @@ package com.example.chainstoreapp.service.impl;
 import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.chainstoreapp.entity.Store;
@@ -31,24 +32,28 @@ public class StoreServiceImpl implements StoreService {
 		ObjectMapper mapper = new ObjectMapper(); //オブジェクトとjson変換を行うクラスのインスタンス化
 		String brandName = searchStoresForm.getBrandName();
 		String center = searchStoresForm.getCenter();
-//		TODO: 現在地取得できなかったときのdirectionsAPIどうする
 		String currentLatLng = searchStoresForm.getCurrentLatLng().replaceAll("[()]", ""); //起点となる現在地の経緯度を取得
-//		TODO: 駅の経緯度格納されてなかったらどうする
 		String stationLatLng = searchStoresForm.getStationLatLng().replaceAll("[()]", "");
 
+//		TODO: 店舗なかったら->nullが返る
 		JsonNode nearbySearchResultsNode = nearbySearchAPIExecute(mapper, brandName, center, currentLatLng, stationLatLng);
 		ArrayList<Store> stores = new ArrayList<>(); //returnするリストを用意
 
 		for(JsonNode placeNode : nearbySearchResultsNode) {
+//			TODO: nameなかったら->nullが返る
 			String placeName = placeNode.path("name").asText();
 			String brandNamePattern = switch (brandName) {
 				case "松屋", "すき家", "吉野家", "はなまるうどん" -> brandName + ".*店";
 				default -> brandName + ".*";
 			};
-			if(placeName.matches(brandNamePattern)) {
-				double latitude = placeNode.path("geometry").path("location").path("lat").asDouble();
-				double longitude = placeNode.path("geometry").path("location").path("lng").asDouble();
-				String duration = directionsAPIExecute(mapper, latitude, longitude, currentLatLng);
+			double latitude = placeNode.path("geometry").path("location").path("lat").asDouble();
+			double longitude = placeNode.path("geometry").path("location").path("lng").asDouble();
+//			TODO: nameがマッチするものがなかったら->nullが返る
+			if(placeName.matches(brandNamePattern) && latitude > 0 && longitude > 0) {
+				String duration = StringUtils.hasText(currentLatLng) 
+						&& StringUtils.hasText(directionsAPIExecute(mapper, latitude, longitude, currentLatLng))
+							? directionsAPIExecute(mapper, latitude, longitude, currentLatLng)
+							: "-分";
 				stores.add(new Store(latitude, longitude, duration));
 			}
 		}
@@ -77,10 +82,9 @@ public class StoreServiceImpl implements StoreService {
 			String storeLatLng = latitude + ", " + longitude; //目的地の経緯度
 			String directionsResponse = restTemplate.getForObject(directionsUrl, String.class, currentLatLng, storeLatLng);
 //			routes:複数のルートを含むので、get(0)で一番目を取り出す / legs:経由地を指定した場合に区間毎の情報を持つが、今回指定していないので情報は1つ。get(0)で取り出す / duration:所要時間 / text:テキストで取り出す
-			return mapper.readTree(directionsResponse).path("routes").get(0).path("legs").get(0).path("duration").path("text").asText();
+			return mapper.readTree(directionsResponse).path("routes").path(0).path("legs").path(0).path("duration").path("text").asText();
 		} catch (Exception e) {
-			// TODO: handle exception
-			return null;
+			return "-分";
 		}
 	}
 
