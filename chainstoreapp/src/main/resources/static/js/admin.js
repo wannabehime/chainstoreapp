@@ -315,12 +315,10 @@ function returnToStoresList(){
 		
 //		====== メニュー検索 ======
 //		------予算変更によるメニュー初期化の発火を設定------
-document.getElementById('price-limit').addEventListener('change', function(){
-	initMenus(this);
-});
+document.getElementById('price-limit').addEventListener('change', initMenus);
 
 //		------メニュー表示のラッパーを作成し、最初のランダムなメニューを表示------
-function initMenus(priceLimitDiv){
+function initMenus(){
 	
 	// メニュー表示のコンテナをクリア
 	const menuResultContainer = document.getElementById('menu-result-container');
