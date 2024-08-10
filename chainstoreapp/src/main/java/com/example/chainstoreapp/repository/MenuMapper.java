@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.example.chainstoreapp.entity.Menu;
 
 @Mapper // MyBatisによる自動実装・コンポーネントとして登録され@Autowiredでインジェクションされる・マッパーファイルのSQLにマッピングされる
-public interface MenuMapper { // TODO: マッパーファイルと合わせて修正
+public interface MenuMapper {
 	void dropTempMainTable();
 	void dropTempSideSetTable();
 	void createTempMain(@Param("tableName") String tableName, @Param("priceLimit") int priceLimit);

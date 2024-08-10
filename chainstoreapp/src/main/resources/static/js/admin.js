@@ -342,8 +342,8 @@ function initMenus(){
 	const firstMenuResultWrapper = createMenuResultWrapper(menuResultContainer);
 	const secondMenuResultWrapper = createMenuResultWrapper(menuResultContainer);
 	// 最初のランダムなメニューを表示
-    shuffleMenus(brandName, priceLimit, firstMenuResultWrapper);
-    shuffleMenus(brandName, priceLimit, secondMenuResultWrapper);
+    getMenus(brandName, priceLimit, firstMenuResultWrapper);
+    getMenus(brandName, priceLimit, secondMenuResultWrapper);
 }
 
 //		------ メニュー表示のラッパーを作成 ------
@@ -355,7 +355,7 @@ function createMenuResultWrapper(menuResultContainer){
 	return menuResultWrapper;
 }
 //		------ メニューをシャッフル ------
-function shuffleMenus(brandName, priceLimit, menuResultWrapper){
+function getMenus(brandName, priceLimit, menuResultWrapper){
     fetch(`/chainstoresearch/get-menus?brandName=${brandName}&priceLimit=${priceLimit}`)
         .then(response => {
 			if(!response.ok){
@@ -364,7 +364,7 @@ function shuffleMenus(brandName, priceLimit, menuResultWrapper){
 			return response.json();
 		})
         .then(menus => {
-            shuffleMenusSuccess(brandName, priceLimit, menuResultWrapper, menus);
+            getMenusSuccess(brandName, priceLimit, menuResultWrapper, menus);
         })
         .catch(error => {
 			//メニュー検索に失敗したら、失敗のメッセージ表示
@@ -376,8 +376,8 @@ function shuffleMenus(brandName, priceLimit, menuResultWrapper){
         });
 }
 
-//		------ shuffleMenus内fetchの成功時に呼び出される関数 ------
-function shuffleMenusSuccess(brandName, priceLimit, menuResultWrapper, menus){
+//		------ getMenus内fetchの成功時に呼び出される関数 ------
+function getMenusSuccess(brandName, priceLimit, menuResultWrapper, menus){
 	// メニュー表示のラッパーをクリア
 	while (menuResultWrapper.firstChild){
 		menuResultWrapper.removeChild(menuResultWrapper.firstChild);
@@ -460,7 +460,7 @@ function createShuffleMenusButton(brandName, priceLimit, menuResultWrapper){
 	shuffleMenusButton.className = 'shuffle-menus-button';
 	shuffleMenusButton.textContent = 'シャッフル';
 	shuffleMenusButton.addEventListener('click', function(){
-	    shuffleMenus(brandName, priceLimit, menuResultWrapper);
+	    getMenus(brandName, priceLimit, menuResultWrapper);
 	});
 	
 	return shuffleMenusButton;

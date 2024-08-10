@@ -57,7 +57,7 @@ public class ChainStoreController { // TODO: クラス名
 	@GetMapping("get-menus")
 	@ResponseBody
 	public List<Menu> getMenus(@RequestParam String brandName, @RequestParam Integer priceLimit){
-		return menuService.shuffleMenus(brandName, priceLimit);
+		return menuService.getMenus(brandName, priceLimit);
 	}
 
 	
