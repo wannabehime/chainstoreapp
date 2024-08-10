@@ -2,11 +2,15 @@ package com.example.chainstoreapp.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.client.ResourceAccessException;
 
 import com.example.chainstoreapp.entity.Menu;
 import com.example.chainstoreapp.entity.Station;
@@ -56,4 +60,13 @@ public class ChainStoreController { // TODO: クラス名
 	public List<Menu> getMenus(@RequestParam String brandName, @RequestParam Integer priceLimit){
 		return menuService.shuffleMenus(brandName, priceLimit);
 	}
+
+	
+//	------ searchStoresのstoreService.searchStoresで発生するResourceAccessExceptionを処理する ------
+	@ExceptionHandler(ResourceAccessException.class) // 指定した例外の発生時に処理を行うメソッドに付ける
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // メソッドでは通常ResponseEntityを返すが、今回ステータスコードを返せればよくボディは不要。戻り値なしにし、代わりに、ステータスコードを指定できるアノテーションを付与
+	public void handleResourceAccessException(ResourceAccessException e){
+		; // 空文
+    }
+
 }

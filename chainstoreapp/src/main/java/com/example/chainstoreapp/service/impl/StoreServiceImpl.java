@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.chainstoreapp.entity.Store;
 import com.example.chainstoreapp.form.SearchStoresForm;
 import com.example.chainstoreapp.service.StoreService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -68,9 +68,9 @@ public class StoreServiceImpl implements StoreService {
 			String centerLatLng = center.equals("現在地") ? currentLatLng : stationLatLng; //店舗検索の中心の緯度経度を入れる変数
 			String nearbySearchResponse = restTemplate.getForObject(nearbySearchUrl, String.class, brandName, centerLatLng, "500"); //APIからレスポンスボディをJSON文字列で取得
 			return mapper.readTree(nearbySearchResponse).path("results");
-		} catch (JsonProcessingException e) {
-			// TODO: handle exception
-			return null;
+		} catch (Exception e) { // getForObjectやreadTreeで発生する例外をキャッチ
+			// コントローラーのExceptionHandlerにキャッチさせるために例外を発生させる。RestClientExceptionはRestTemplateの基本クラス。errorMsgは使わないがコンストラクタに引数が必要なので仮に設定
+			throw new RestClientException("errorMsg");
 		}
 	}
 	
@@ -83,7 +83,7 @@ public class StoreServiceImpl implements StoreService {
 			String directionsResponse = restTemplate.getForObject(directionsUrl, String.class, currentLatLng, storeLatLng);
 //			routes:複数のルートを含むので、get(0)で一番目を取り出す / legs:経由地を指定した場合に区間毎の情報を持つが、今回指定していないので情報は1つ。get(0)で取り出す / duration:所要時間 / text:テキストで取り出す
 			return mapper.readTree(directionsResponse).path("routes").path(0).path("legs").path(0).path("duration").path("text").asText();
-		} catch (Exception e) {
+		} catch (Exception e) { // getForObjectやreadTreeで発生する例外をキャッチ
 			return "-分";
 		}
 	}

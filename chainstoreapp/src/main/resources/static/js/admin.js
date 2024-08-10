@@ -193,8 +193,11 @@ searchFormContainerDiv.addEventListener('submit', function(e){
 	            searchStoresSuccess(stores);
 	        })
 	        .catch(error => {
-				// TODO: エラー時どうする
-	            alert('通信に失敗しました。ステータス：' + error);
+				const getInfoStatusDiv = document.getElementById('get-information-status');
+	            getInfoStatusDiv.style.display = 'block';
+	            setTimeout(function(){ //3秒で消える
+					getInfoStatusDiv.style.display = 'none';
+				}, 3000);
 	        });		
 	}
 });
