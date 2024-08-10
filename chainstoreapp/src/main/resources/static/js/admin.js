@@ -112,7 +112,16 @@ function getStations(){
 				return response.json(); //アロー関数の略記ではreturnしないと次のthenに値を渡せない
 			})
 	        .then(stations => { //json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
-				getStationsSuccess(stations, stationsDataList, stationLatLngInput);
+				if(!stations.length){
+					const getStationStatusDiv = document.getElementById('get-stations-status');
+			        getStationStatusDiv.style.display = 'block';
+			        setTimeout(function(){ //3秒で消える
+						getStationStatusDiv.style.display = 'none';
+					}, 3000);
+					document.getElementById('choose-from-list-notice').style.display = 'none';
+				} else{
+					getStationsSuccess(stations, stationsDataList, stationLatLngInput);				
+				}
 			})
 	        .catch(error => {
 				document.getElementById('choose-from-list-notice').style.display = 'none';
@@ -127,26 +136,16 @@ function getStations(){
 }
 
 function getStationsSuccess(stations, stationsDataList, stationLatLngInput){
-	if(!stations.length){
-		const getStationStatusDiv = document.getElementById('get-stations-status');
-        getStationStatusDiv.style.display = 'block';
-        setTimeout(function(){ //3秒で消える
-			getStationStatusDiv.style.display = 'none';
-		}, 3000);
-		document.getElementById('choose-from-list-notice').style.display = 'none';
-	} else{
-	   stations.forEach(station => { // 取得した各駅をリストに格納
-	        const option = document.createElement('option');
-			option.value = station.name;
-			option.dataset.latitude = station.latitude; // 店舗検索の際に用いる経緯度を格納
-			option.dataset.longitude = station.longitude;
-	        stationsDataList.appendChild(option);
-	    });
-		centerInput.setAttribute('list', 'stations-list');
-	   	setStationLatLng(stationLatLngInput, centerInput); // サジェストされた駅を選択したとき、店舗検索の際に送信する駅の経緯度に設定
-	  	document.getElementById('choose-from-list-notice').style.display = (!stationLatLngInput.value) ? 'block' : 'none';
-	}
- 
+	stations.forEach(station => { // 取得した各駅をリストに格納
+        const option = document.createElement('option');
+		option.value = station.name;
+		option.dataset.latitude = station.latitude; // 店舗検索の際に用いる経緯度を格納
+		option.dataset.longitude = station.longitude;
+        stationsDataList.appendChild(option);
+    });
+	centerInput.setAttribute('list', 'stations-list');
+   	setStationLatLng(stationLatLngInput, centerInput); // サジェストされた駅を選択したとき、店舗検索の際に送信する駅の経緯度に設定
+  	document.getElementById('choose-from-list-notice').style.display = (!stationLatLngInput.value) ? 'block' : 'none';
 }
 
 function setStationLatLng(stationLatLngInput, centerInput){
@@ -190,7 +189,15 @@ searchFormContainerDiv.addEventListener('submit', function(e){
 				return response.json();
 			})
 	        .then(stores => {
-	            searchStoresSuccess(stores);
+				if(!stores.length){ // 該当する店舗がなければメッセージを表示
+					const noStoreNoticeDiv = document.getElementById('no-store-notice');
+		            noStoreNoticeDiv.style.display = 'block';
+		            setTimeout(function(){ //3秒で消える
+						noStoreNoticeDiv.style.display = 'none';
+					}, 3000);					
+				}else{
+	            	searchStoresSuccess(stores);					
+				}
 	        })
 	        .catch(error => {
 				const getInfoStatusDiv = document.getElementById('get-information-status');

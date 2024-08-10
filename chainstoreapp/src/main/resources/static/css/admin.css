@@ -128,7 +128,8 @@
 #get-information-status, 
 #get-stations-status, 
 #search-stores-status,
-#choose-right-station-notice {
+#choose-right-station-notice,
+#no-store-notice {
 	display: none;
 	height: 30px;
 	line-height: 30px;
@@ -158,7 +159,8 @@
 #get-information-status, 
 #get-stations-status, 
 #search-stores-status, 
-#choose-right-station-notice {
+#choose-right-station-notice,
+#no-store-notice {
 	top: 160px;
 	width: 500px;
 }
