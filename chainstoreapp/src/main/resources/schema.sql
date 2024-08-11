@@ -2,9 +2,7 @@ DROP TABLE IF EXISTS stations;
 CREATE TABLE stations(
 	id INT NOT NULL AUTO_INCREMENT, 
 	name VARCHAR(30) NOT NULL,
-	company VARCHAR(15) NOT NULL, -- TODO: 不要ならデータ・エンティティのフィールドとともに消す
-	prefecture VARCHAR(4) NOT NULL, -- TODO: 不要ならデータ・エンティティのフィールドとともに消す
-	address VARCHAR(50) NOT NULL, -- TODO: 不要ならデータ・エンティティのフィールドとともに消す
+	prefecture VARCHAR(4) NOT NULL,
 	latitude DOUBLE NOT NULL,
 	longitude DOUBLE NOT NULL,
 	PRIMARY KEY (id)

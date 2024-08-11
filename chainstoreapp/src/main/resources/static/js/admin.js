@@ -102,7 +102,7 @@ function getStations(){
 	stationLatLngInput.value = ''; // 店舗検索の際に送信する駅の経緯度を初期化
 	
 	if(!centerInput.value){
-		document.getElementById('choose-from-list-notice').style.display = 'none';
+		document.getElementById('choose-from-list-notice').style.display = 'none'; // 入力値がなくなったら「リストから...」を非表示にする
 	}else{
 		fetch(`/chainstoresearch/get-stations?input=${centerInput.value}`)
 	        .then(response => { //fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
