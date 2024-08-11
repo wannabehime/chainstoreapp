@@ -33,12 +33,12 @@ public class MenuServiceImpl implements MenuService {
 			default -> "marugame_menus";
 		};
 		
-		menuMapper.dropTempMainTable();
-		menuMapper.dropTempSideSetTable();
-		menuMapper.createTempMain(tableName, priceLimit);
-		int mainPrice = menuMapper.selectMainPrice();
-		menuMapper.createTempSideSet(tableName);
-		return menuMapper.selectWithinPriceLimit(priceLimit, mainPrice);
+		menuMapper.dropTmpMainMenuTable();
+		menuMapper.dropTmpSideMenusTable();
+		menuMapper.createTmpMainMenuTable(tableName, priceLimit);
+		int mainMenuPrice = menuMapper.selectMainMenuPrice();
+		menuMapper.createTmpSideMenusTable(tableName);
+		return menuMapper.selectMenusWithinPriceLimit(priceLimit, mainMenuPrice);
 	}
 
 }

@@ -2,52 +2,60 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.chainstoreapp.repository.MenuMapper">
 	
-    <update id="dropTempMainTable">
-        DROP TEMPORARY TABLE IF EXISTS temp_main;
+<!-- ====== 既存のテーブルの削除 ====== -->
+    <update id="dropTmpMainMenuTable">
+        DROP TEMPORARY TABLE IF EXISTS tmp_main_menu; <!-- TEMPORARY TABLE:セッション内のみで表示されるテーブル -->
     </update>
 
-    <update id="dropTempSideSetTable">
-        DROP TEMPORARY TABLE IF EXISTS temp_side_set;
+    <update id="dropTmpSideMenusTable">
+        DROP TEMPORARY TABLE IF EXISTS tmp_side_menus;
     </update>
 
-    <update id="createTempMain">
-        CREATE TEMPORARY TABLE temp_main AS <!-- TEMPORARY TABLE:セッション内のみで表示されるテーブル -->
+<!-- ====== 必要なテーブルや変数の準備 ====== -->
+	<!-- メインメニュー1品を選んで保持するテーブルを作成 -->
+    <update id="createTmpMainMenuTable">
+        CREATE TEMPORARY TABLE tmp_main_menu AS
         SELECT *
-        FROM ${tableName}
+        FROM ${tableName} <!-- フォームの入力値のブランド名から変換したテーブル名 -->
         WHERE category = 'メイン'
-          AND price <![CDATA[<=]]> #{priceLimit} <!-- CDATA:マークアップ用の<を文字として認識させる -->
+          AND price <![CDATA[<=]]> #{priceLimit} <!-- CDATA:マークアップ用の<を文字として認識させる / 予算以下 -->
         ORDER BY RAND()
         LIMIT 1;
     </update>
-
-    <select id="selectMainPrice" resultType="int">
+	
+	<!-- 選んだメインメニューの価格を取得 -->
+    <select id="selectMainMenuPrice" resultType="int">
         SELECT price
-        FROM temp_main
+        FROM tmp_main_menu
         LIMIT 1;
     </select>
 
-    <update id="createTempSideSet">
-        CREATE TEMPORARY TABLE temp_side_set AS
+	<!-- サイドメニューのみを抽出して保持するテーブルを作成 -->
+    <update id="createTmpSideMenusTable">
+        CREATE TEMPORARY TABLE tmp_side_menus AS
         SELECT *
         FROM ${tableName}
         WHERE category = 'サイド'
         ORDER BY RAND();
     </update>
 
-    <select id="selectWithinPriceLimit" resultType="com.example.chainstoreapp.entity.Menu">
-        SELECT id, category, name, price
-        FROM (
-            SELECT id, category, name, price, @sum := @sum + price AS cumulative_sum
-            FROM (
-                SELECT *, @sum := 0 FROM temp_side_set
-            ) t
-            WHERE @sum + price <![CDATA[<=]]> #{priceLimit} - #{mainPrice}
-        ) u
-        WHERE cumulative_sum <![CDATA[<=]]> #{priceLimit} - #{mainPrice}
-
+<!-- ====== 予算からメイン1品+サイドを取得 ====== -->
+    <select id="selectMenusWithinPriceLimit" resultType="com.example.chainstoreapp.entity.Menu">
+    	<!-- 選んでおいたメイン -->
+        SELECT name, price
+        FROM tmp_main_menu;
+        
         UNION ALL
-
-        SELECT id, category, name, price
-        FROM temp_main;
+        
+        <!-- サイドの抽出 -->
+    	SELECT name, price
+    	FROM (
+	        SELECT name, price, @price_sum := @price_sum + price AS price_sum
+	        FROM (
+	            SELECT *, @price_sum := 0 FROM tmp_side_menus <!-- "@(変数):=":変数宣言と代入 / 累積価格を格納する変数を初期化 -->
+	        ) t
+	        WHERE @price_sum + price <![CDATA[<=]]> #{priceLimit} - #{mainMenuPrice} <!-- 1品ずつ価格を累積していき、累積価格が(予算)-(メインの価格)を超えなければ抽出する -->
+	    ) u
+		WHERE price_sum <![CDATA[<=]]> #{priceLimit} - #{mainMenuPrice} <!-- 累積価格が(予算)-(メインの価格)を超えていないサイドを改めて選ぶ -->
     </select>
 </mapper>

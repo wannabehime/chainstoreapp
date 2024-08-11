@@ -275,37 +275,46 @@ function displayMenuResultsContainer(){
 
 //		====== ルート検索 ======
 function calcRoute(calcRouteButton){
-	//ルート検索に用いるリクエストの作成
-    const lngSpan = calcRouteButton.previousElementSibling;
-    const latSpan = lngSpan.previousElementSibling;
-    const storeLatLng = new google.maps.LatLng(latSpan.textContent, lngSpan.textContent); // 情報ウィンドウのspanにある目的地の経緯度を取得
-    const request = {
-        origin: currentLatLng,
-        destination: storeLatLng,
-        travelMode: 'WALKING' //移動手段を徒歩に指定
-    };
-    
-    directionsRenderer.setMap(map); // レンダラに結びつける地図情報を与える
-    //ルート検索
-    new google.maps.DirectionsService().route(request, (result, status) => { // 第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
+	if(!currentLatLng){ // 現在地が格納されていなければ検索せず、メッセージを表示
+		const calcRouteNoticeDiv = document.getElementById('calc-route-notice');
+	    calcRouteNoticeDiv.style.display = 'block';
+	    setTimeout(function(){ //3秒で消える
+			calcRouteNoticeDiv.style.display = 'none';
+		}, 3000);		
+	}else{
+		//ルート検索に用いるリクエストの作成
+	    const lngSpan = calcRouteButton.previousElementSibling;
+	    const latSpan = lngSpan.previousElementSibling;
+	    const storeLatLng = new google.maps.LatLng(latSpan.textContent, lngSpan.textContent); // 情報ウィンドウのspanにある目的地の経緯度を取得
+	    const request = {
+	        origin: currentLatLng,
+	        destination: storeLatLng,
+	        travelMode: 'WALKING' //移動手段を徒歩に指定
+	    };
+	    
+	    directionsRenderer.setMap(map); // レンダラに結びつける地図情報を与える
+	    
+		//ルート検索
+		new google.maps.DirectionsService().route(request, (result, status) => { // 第一引数をリクエストすると返ってくるresultとstatusを第二引数の関数に渡す
         //ルート検索に成功したら、ルートと「店舗一覧に戻る」ボタンの表示
-        if (status === 'OK'){
-            storeMarkers.forEach(storeMarker => {
-            	storeMarker.map = null; // 各店舗のマーカーを削除
-            });
-			directionsRenderer.setDirections(result); // ルート表示
-			
-			returnToStoresListButton.style.display = 'block'; //「店舗一覧に戻る」ボタンの表示
-			returnToStoresListButton.addEventListener('click', returnToStoresList);
-        } else {
-			//ルート検索に失敗したら、失敗のメッセージ表示
-			const getInfoStatusDiv = document.getElementById('get-information-status');
-            getInfoStatusDiv.style.display = 'block';
-            setTimeout(function(){ //3秒で消える
-				getInfoStatusDiv.style.display = 'none';
-			}, 3000);
-        }
-    });
+	        if (status === 'OK'){
+	            storeMarkers.forEach(storeMarker => {
+	            	storeMarker.map = null; // 各店舗のマーカーを削除
+	            });
+				directionsRenderer.setDirections(result); // ルート表示
+				
+				returnToStoresListButton.style.display = 'block'; //「店舗一覧に戻る」ボタンの表示
+				returnToStoresListButton.addEventListener('click', returnToStoresList);
+	        } else {
+				//ルート検索に失敗したら、失敗のメッセージ表示
+				const getInfoStatusDiv = document.getElementById('get-information-status');
+	            getInfoStatusDiv.style.display = 'block';
+	            setTimeout(function(){ //3秒で消える
+					getInfoStatusDiv.style.display = 'none';
+				}, 3000);
+	        }
+    	});
+	}
 }
 		
 //		====== 「店舗一覧に戻る」ボタン ======

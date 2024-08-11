@@ -129,7 +129,8 @@
 #get-stations-status, 
 #search-stores-status,
 #choose-right-station-notice,
-#no-store-notice {
+#no-store-notice,
+#calc-route-notice {
 	display: none;
 	height: 30px;
 	line-height: 30px;
@@ -160,7 +161,8 @@
 #get-stations-status, 
 #search-stores-status, 
 #choose-right-station-notice,
-#no-store-notice {
+#no-store-notice,
+#calc-route-notice {
 	top: 160px;
 	width: 500px;
 }
