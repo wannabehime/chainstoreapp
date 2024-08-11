@@ -43,7 +43,7 @@
     <select id="selectMenusWithinPriceLimit" resultType="com.example.chainstoreapp.entity.Menu">
     	<!-- 選んでおいたメイン -->
         SELECT name, price
-        FROM tmp_main_menu;
+        FROM tmp_main_menu
         
         UNION ALL
         
@@ -56,6 +56,6 @@
 	        ) t
 	        WHERE @price_sum + price <![CDATA[<=]]> #{priceLimit} - #{mainMenuPrice} <!-- 1品ずつ価格を累積していき、累積価格が(予算)-(メインの価格)を超えなければ抽出する -->
 	    ) u
-		WHERE price_sum <![CDATA[<=]]> #{priceLimit} - #{mainMenuPrice} <!-- 累積価格が(予算)-(メインの価格)を超えていないサイドを改めて選ぶ -->
+		WHERE price_sum <![CDATA[<=]]> #{priceLimit} - #{mainMenuPrice}; <!-- 累積価格が(予算)-(メインの価格)を超えていないサイドを改めて選ぶ -->
     </select>
 </mapper>

@@ -10,10 +10,6 @@ import lombok.NoArgsConstructor;
 
 // メニューのエンティティ
 public class Menu {
-//	ID
-//	private int id;
-//	カテゴリー
-//	private String category;
 //	商品名
 	private String name;
 //	価格
