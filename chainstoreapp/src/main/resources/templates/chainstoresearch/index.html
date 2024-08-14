@@ -3,7 +3,8 @@
 <head>
 	<meta charset="UTF-8">
 	<title>ChainStore Menus</title><!--TODO タイトルとアイコン-->
-	<link th:href="@{/css/admin.css}" rel="stylesheet">
+	<link th:href="@{/css/reset.css}" rel="stylesheet">
+	<link th:href="@{/css/style.css}" rel="stylesheet">
 </head>
 <body>
 	<div id="map"></div>
@@ -18,14 +19,14 @@
 				<option value="はなまるうどん">はなまるうどん</option>
 				<option value="丸亀製麺">	丸亀製麺</option>
 			</select>
-			<input type="text" id="center" name="center" placeholder="駅名を入力、または" autocomplete="off" required>
-			<datalist id="stations-list"></datalist>
+			<input type="text" id="center" name="center" placeholder="駅名を入力、または" autocomplete="off" required> <!-- autocomplete:入力したことのある値をサジェストするが、アプリの機能としてのサジェストと重複するためoff -->
+			<datalist id="stations-list"></datalist> <!-- サジェストする駅名リストを格納するdatalist -->
 			<input type="hidden" id="current-latlng" name="currentLatLng" value=""> <!--現在地を中心に店舗検索するためhiddenで送信 / nameはFormクラスのフィールド名と揃えるためにキャメルケース-->
 			<input type="hidden" id="station-latlng" name="stationLatLng" value="">
 			<button type="button" id="set-current-location-button">現在地を指定</button>
-			<input id="submit-button" type="submit" value="検索">
+			<button	type="submit" id="submit-button">検索</button>
 		</form>
-		<button id="return-to-stores-list-button">店舗一覧に戻る</button>
+		<button type="button" id="return-to-stores-list-button">店舗一覧に戻る</button>
 	</div>
 
 	<div id="choose-from-list-notice">リストから駅名を選択してください</div>
@@ -60,8 +61,9 @@
 		</div>
 		<div id="menu-result-container"></div>
 	</div>
-	<div>
-		<a target="_blank" href="https://icons8.com/icon/37189/route">ルート</a> アイコン by <a target="_blank" href="https://icons8.com">Icons8</a><!-- TODO: クレジット掲載義務 -->
+	
+	<div id="calc-route-icon-credit"> <!-- ルート検索アイコン画像のクレジット掲載 -->
+		<a target="_blank" href="https://icons8.com/icon/37189/route">ルート</a> アイコン by <a target="_blank" href="https://icons8.com">Icons8</a>
 	</div>
 	
 	<script th:src="@{/js/admin.js}"></script>
