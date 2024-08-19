@@ -66,7 +66,7 @@ export class MenuManager {
     }
 
 //		------ メニューの生成 ------
-createMenuBox(menus) {
+	createMenuBox(menus) {
         let priceCounter = 0; // createTotalPriceBox関数で用いる合計金額のカウンター
         // メニューdivを入れるボックスの生成
         const menuBoxDiv = document.createElement('div');

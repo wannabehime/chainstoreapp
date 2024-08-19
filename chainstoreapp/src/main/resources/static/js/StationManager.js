@@ -7,17 +7,24 @@ export class StationManager {
         this.stationsDataList = document.getElementById('stations-list'); // 駅名サジェストの候補を格納する要素
         this.stationLatLngInput = document.getElementById('station-latlng'); // 店舗検索の中心としての、駅の経緯度を格納するhidden要素
     }
-
+	
+	/**
+	 * 店舗検索の中心の入力値が変化した際に、getStationsが発火するよう設定するメソッド
+	 */
     init() {
-        this.centerInput.addEventListener('input', this.getStations.bind(this)); // 入力値から駅リストを取得し、サジェストとして表示
+        this.centerInput.addEventListener('input', this.getStations.bind(this));
     }
 
+	/**
+	 * 入力値に応じて駅名をサジェストするメソッド
+	 */
     getStations() {
         this.stationsDataList.innerHTML = ''; // サジェストする駅リストを初期化
         this.stationLatLngInput.value = ''; // 店舗検索の際に送信する駅の経緯度を初期化
-
+		
+		// 入力値がなくなったら「リストから...」を非表示にして処理を終了する
         if (!this.centerInput.value) {
-            document.getElementById('choose-from-list-notice').style.display = 'none'; // 入力値がなくなったら「リストから...」を非表示にする
+            document.getElementById('choose-from-list-notice').style.display = 'none';
             return;
         }
 
@@ -29,7 +36,7 @@ export class StationManager {
                 return response.json(); //アロー関数の略記ではreturnしないと次のthenに値を渡せない
             })
             .then(stations => { //json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
-                if (!stations.length) {
+                if (!stations.length) { // 該当する駅がなければメッセージを表示
                     this.showGetStationStatus();
                 } else {
                     this.getStationsSuccess(stations);
@@ -39,7 +46,10 @@ export class StationManager {
                 this.showGetInformationStatus();
             });
     }
-
+	
+	/**
+	 * 駅名の取得に成功した場合の、サジェストを表示するメソッド
+	 */
     getStationsSuccess(stations) {
         stations.forEach(station => { // 取得した各駅をリストに格納
             const option = document.createElement('option');
@@ -49,10 +59,13 @@ export class StationManager {
             this.stationsDataList.appendChild(option);
         });
         this.centerInput.setAttribute('list', 'stations-list');
-        this.setStationLatLng(); // サジェストされた駅を選択したとき、店舗検索の際に送信する駅の経緯度に設定
+        this.setStationLatLng();
         document.getElementById('choose-from-list-notice').style.display = (!this.stationLatLngInput.value) ? 'block' : 'none';
     }
-
+	
+	/**
+	 * サジェストされた駅を選択したとき、店舗検索の際に送信する駅の経緯度に設定するメソッド
+	 */
     setStationLatLng() {
         const stationsListOptions = document.querySelectorAll('#stations-list option');
         [...stationsListOptions].forEach(stationsListOption => { // stationsListOptionsはループできないHTMLCollectionなので、...で一度バラバラにして配列に格納する
@@ -61,7 +74,8 @@ export class StationManager {
             }
         });
     }
-
+	
+	// TODO: エラーメッセージまとめる
     showGetStationStatus() {
         const getStationStatusDiv = document.getElementById('get-stations-status');
         getStationStatusDiv.style.display = 'block';

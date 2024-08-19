@@ -1,7 +1,7 @@
 /**
  * 現在地の監視に関するクラス
  */
-export class CurrentLocationManager {
+export class LocationManager {
     constructor(mapManager) {
         this.mapManager = mapManager; // 地図の操作に関するクラスをインスタンス化
         this.currentLatLng = null; // 現在地の経緯度オブジェクトを格納する変数

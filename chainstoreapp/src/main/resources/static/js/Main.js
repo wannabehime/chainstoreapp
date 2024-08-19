@@ -1,18 +1,18 @@
 import { MapManager } from './MapManager.js';
-import { CurrentLocationManager } from './CurrentLocationManager.js';
+import { LocationManager } from './LocationManager.js';
 import { StationManager } from './StationManager.js';
 import { StoreManager } from './StoreManager.js';
 import { MenuManager } from './MenuManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const mapManager = new MapManager();
-    const currentLocationManager = new CurrentLocationManager(mapManager);
+    const locationManager = new LocationManager(mapManager);
     const stationManager = new StationManager();
     const storeManager = new StoreManager(mapManager);
     const menuManager = new MenuManager();
 
     // 地図の初期化
-    currentLocationManager.watchCurrentLocation();
+    locationManager.watchCurrentLocation();
 
     // 駅名サジェスト
     stationManager.init();
@@ -29,13 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const centerInput = document.getElementById('center');
         const stationLatLngInput = document.getElementById('station-latlng');
 
-        if (centerInput.value == '現在地' && !currentLocationManager.currentLatLng) {
+        if (centerInput.value == '現在地' && !locationManager.currentLatLng) {
 			// 現在地の経緯度が格納されていなければ、失敗のメッセージ表示し、送信しない
             showSearchStoresStatus();
         } else if (centerInput.value != '現在地' && !stationLatLngInput.value) {
             showChooseRightStationNotice();
         } else {
-            storeManager.searchStores(new FormData(searchFormWrapperDiv));
+            storeManager.searchStores(new FormData(searchFormWrapperDiv)); // FormData:フォームの内容をキーと値で格納, 
         }
     });
 

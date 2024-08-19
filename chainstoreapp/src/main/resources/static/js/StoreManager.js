@@ -1,19 +1,25 @@
+/**
+ * 店舗検索とルート検索に関するクラス
+ */
 export class StoreManager {
     constructor(mapManager) {
         this.mapManager = mapManager;
         this.storeMarkers = []; // 店舗マーカーを格納する配列
     }
 
+	/**
+	 * 店舗検索を行うメソッド
+	 */
     searchStores(formData) {
-        const request = new URLSearchParams(formData).toString(); //FormData:フォームの内容をキーと値で格納, URLSearchParams:クエリ文字列を生成
+        const request = new URLSearchParams(formData).toString(); // URLSearchParams:クエリ文字列を生成
         fetch(`/chainstoresearch/search-stores?${request}`)
-            .then(response => {
+            .then(response => { // fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
                 if (!response.ok) {
-                    throw new Error();
+                    throw new Error(); // Promiseオブジェクトがrejectになるのはネットワークエラーなので、リクエスト失敗時にcatchで捕捉できるよう例外を投げる
                 }
-                return response.json();
+                return response.json(); // アロー関数の略記ではreturnしないと次のthenに値を渡せない
             })
-            .then(stores => {
+            .then(stores => { // json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
                 if (!stores.length) { // 該当する店舗がなければメッセージを表示
                     this.showNoStoreNotice();
                 } else {
@@ -25,12 +31,18 @@ export class StoreManager {
             });
     }
 
+	/**
+	 * 店舗検索に成功した場合の、マーカー・情報ウィンドウ・メニューコンテナを表示するメソッド
+	 */
     searchStoresSuccess(stores) {
         this.initMarkersAndButton(); //マーカーとボタンの初期化
         this.setMarkersAndInfoWindows(stores); //マーカーと情報ウィンドウを生成
         this.displayMenuResultsContainer(); //メニューを表示するコンテナを表示
     }
 
+	/**
+	 * マーカーとボタンを初期化するメソッド
+	 */
     initMarkersAndButton() {
         this.mapManager.clearDirections(); // ルート案内を消すためにレンダラとマップの関連を削除
         this.storeMarkers.forEach(storeMarker => {
@@ -41,6 +53,9 @@ export class StoreManager {
         document.getElementById('return-to-stores-list-button').style.display = 'none';
     }
 
+	/**
+	 * マーカーと情報ウィンドウを生成するメソッド
+	 */
     setMarkersAndInfoWindows(stores) {
         stores.forEach(store => {
 			
@@ -78,6 +93,9 @@ export class StoreManager {
         this.mapManager.fitBounds(); //マップに矩形領域を伝える
     }
 
+	/**
+	 * メニューのコンテナを表示するメソッド
+	 */
     displayMenuResultsContainer() {
         document.getElementById('menu-board-container').style.display = 'block';
         document.getElementById('price-limit').options[0].selected = true; //予算設定を初期値に戻す
@@ -87,6 +105,9 @@ export class StoreManager {
         }
     }
 
+	/**
+	 * ルート検索を行うメソッド
+	 */
     calcRoute(calcRouteButton) {
         if (!this.mapManager.currentLatLng) { // 現在地が格納されていなければ検索せず、メッセージを表示
             this.showCalcRouteNotice();
@@ -118,6 +139,7 @@ export class StoreManager {
         });
     }
 
+	//TODO: エラーメッセージ
     showNoStoreNotice() {
         const noStoreNoticeDiv = document.getElementById('no-store-notice');
         noStoreNoticeDiv.style.display = 'block';
@@ -148,6 +170,9 @@ export class StoreManager {
         returnToStoresListButton.addEventListener('click', this.returnToStoresList.bind(this));
     }
 
+	/**
+	 * 店舗一覧に戻るメソッド
+	 */
     returnToStoresList() {
         this.mapManager.clearDirections(); // ルート案内を消すためにレンダラとマップの関連を削除
         this.mapManager.bounds = new google.maps.LatLngBounds(); // 最新の現在地のみを保持するために矩形領域をリセット
