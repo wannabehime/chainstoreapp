@@ -77,20 +77,10 @@ function watchPositionFail(error){
 }
 
 //		====== 検索フォーム ======
-//		------ ブランド名・予算セレクトボックスのテキストの色変更 ------
+//		------ 予算セレクトボックスのテキストの色変更 ------
 document.getElementById('brand-name').addEventListener('change', function(){
-	colorChange(this);
-});
-document.getElementById('price-limit').addEventListener('change', function(){
-	colorChange(this);
-});
-function colorChange(obj){
-	if(obj.value === 'ブランド名を選択'){
-	 	obj.style.color = '#7e7f7b'; //薄い灰色
-	}else{
-		obj.style.color = '#443D3A'; //ほぼ黒に近い茶色
-	}		
-}
+	this.style.color = '#443D3A'; // ほぼ黒に近い茶色
+});		
 
 //		------ 店舗検索の中心地の駅名サジェスト ------
 const centerInput = document.getElementById('center');
@@ -239,14 +229,14 @@ function setMarkersAndInfoWindows(stores){
 		//	------各店舗の所要時間とルート検索ボタンを表示する、情報ウィンドウを生成------
 		const infoWindow = new google.maps.InfoWindow({
 			//ルート検索で送信するために、spamで経緯度を保持
-            content: `
+            content: 
             	<div class='store-info-group'>
 	                <span class='store-duration'>徒歩 ${store.duration}</span>
 					<span class='store-latitude'>${store.latitude}</span>
 					<span class='store-longitude'>${store.longitude}</span>
 					<button class='calc-route-button'><img class='calc-route-icon' src='/img/calc-route-icon.png' alt='route'/></button>
 				</div>
-            `
+            
         });
         infoWindow.open(map, marker); //ウィンドウを表示
 		infoWindow.addListener('domready', function(){ //domが読み込んでからでないと、ルート検索ボタンへのリスナーを追加できない

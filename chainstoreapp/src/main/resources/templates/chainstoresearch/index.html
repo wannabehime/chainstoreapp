@@ -66,8 +66,14 @@
 		<a target="_blank" href="https://icons8.com/icon/37189/route">ルート</a> アイコン by <a target="_blank" href="https://icons8.com">Icons8</a>
 	</div>
 	
-	<script th:src="@{/js/admin.js}"></script>
-	<!-- async:HTML・JS読み込み->HTML中断・JS実行->HTML再開 defer:HTML・JS読み込み->HTML実行->JS実行 両方を書いておくことで、asyncが対応していないブラウザではdeferが適用-->
+	<script type="module" th:src="@{/js/Main.js}"></script>
+	<script th:inline="javascript">
+	    function initMap() {
+	        // このテキストは元のinitMap関数内容を削除し、空にしています。
+	        // 必要なら、main.jsでMAPの初期化を行います。
+	    }
+	</script>
+	<!-- async:HTML・JS読み込み->HTML中断・JS実行->HTML再開 / defer:HTML・JS読み込み->HTML実行->JS実行 両方を書いておくことで、asyncが対応していないブラウザではdeferが適用-->
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&v=beta&callback=initMap&libraries=marker" async defer></script>
 </body>
 </html>
