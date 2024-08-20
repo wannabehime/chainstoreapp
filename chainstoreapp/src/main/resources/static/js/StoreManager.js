@@ -2,8 +2,9 @@
  * 店舗検索とルート検索に関するクラス
  */
 export class StoreManager {
-    constructor(mapManager) {
+    constructor(mapManager, locationManager) {
         this.mapManager = mapManager;
+        this.locationManager = locationManager;
         this.storeMarkers = []; // 店舗マーカーを格納する配列
     }
 
@@ -35,9 +36,19 @@ export class StoreManager {
 	 * 店舗検索に成功した場合の、マーカー・情報ウィンドウ・メニューコンテナを表示するメソッド
 	 */
     searchStoresSuccess(stores) {
-        this.initMarkersAndButton(); //マーカーとボタンの初期化
-        this.setMarkersAndInfoWindows(stores); //マーカーと情報ウィンドウを生成
-        this.displayMenuResultsContainer(); //メニューを表示するコンテナを表示
+        this.initMarkersAndButton(); // マーカーとボタンの初期化
+        
+ 		stores.forEach(store => {
+			const marker = this.setMarker(store); // マーカーの生成
+			this.setInfoWindow(store, marker); // 情報ウィンドウの生成
+		});
+		
+        if (this.locationManager.currentLatLng) {
+            this.mapManager.addToBounds(this.locationManager.currentLatLng); //現在地が取得できていれば矩形領域に追加
+        }
+        this.mapManager.fitBounds(); //マップに矩形領域を伝える
+        
+        this.displayMenuResultsContainer(); //メニューコンテナを表示
     }
 
 	/**
@@ -54,45 +65,41 @@ export class StoreManager {
     }
 
 	/**
-	 * マーカーと情報ウィンドウを生成するメソッド
+	 * マーカーを生成するメソッド
 	 */
-    setMarkersAndInfoWindows(stores) {
-        stores.forEach(store => {
-			
-			//	------各店舗のマーカーを生成------
-            const marker = new google.maps.marker.AdvancedMarkerElement({
-                map: this.mapManager.map,
-                position: { lat: store.latitude, lng: store.longitude },
-            });
-            this.storeMarkers.push(marker); //マーカーをリストに格納
-            this.mapManager.addToBounds({ lat: store.latitude, lng: store.longitude }); //矩形領域に各店舗の位置を追加
-
-			//	------各店舗の所要時間とルート検索ボタンを表示する、情報ウィンドウを生成------
-            const infoWindow = new google.maps.InfoWindow({
-				// ルート検索で送信するために、spanで経緯度を保持
-                content: `
-                    <div class='store-info-group'>
-                        <span class='store-duration'>徒歩 ${store.duration}</span>
-                        <span class='store-latitude'>${store.latitude}</span>
-                        <span class='store-longitude'>${store.longitude}</span>
-                        <button class='calc-route-button'><img class='calc-route-icon' src='/img/calc-route-icon.png' alt='route'/></button>
-                    </div>
-                `
-            });
-            infoWindow.open(this.mapManager.map, marker); //ウィンドウを表示
-            infoWindow.addListener('domready', () => { //domが読み込んでからでないと、ルート検索ボタンへのリスナーを追加できない
-                document.querySelectorAll('.calc-route-button').forEach(calcRouteButton => {
-                    calcRouteButton.addEventListener('click', () => this.calcRoute(calcRouteButton));
-                });
-            });
+	setMarker(store){
+        const marker = new google.maps.marker.AdvancedMarkerElement({ // 各店舗のマーカーを生成
+            map: this.mapManager.map,
+            position: { lat: store.latitude, lng: store.longitude },
         });
+        this.storeMarkers.push(marker); //マーカーをリストに格納
+        this.mapManager.addToBounds({ lat: store.latitude, lng: store.longitude }); //矩形領域に各店舗の位置を追加
+        return marker;
+	}
 
-        if (this.mapManager.currentLatLng) {
-            this.mapManager.addToBounds(this.mapManager.currentLatLng); //現在地が取得できていれば矩形領域に追加
-        }
-        this.mapManager.fitBounds(); //マップに矩形領域を伝える
-    }
-
+	/**
+	 * 各店舗の所要時間とルート検索ボタンを表示する、情報ウィンドウを生成するメソッド
+	 */	
+	setInfoWindow(store, marker){
+        const infoWindow = new google.maps.InfoWindow({ // ウィンドウを生成
+			// ルート検索で送信するために、spanで経緯度を保持
+            content: `
+                <div class='store-info-group'>
+                    <span class='store-duration'>徒歩 ${store.duration}</span>
+                    <span class='store-latitude'>${store.latitude}</span>
+                    <span class='store-longitude'>${store.longitude}</span>
+                    <button class='calc-route-button'><img class='calc-route-icon' src='/img/calc-route-icon.png' alt='route'/></button>
+                </div>
+            `
+        });
+        infoWindow.open(this.mapManager.map, marker); // ウィンドウを表示
+        infoWindow.addListener('domready', () => { // domが読み込んでからでないと、ルート検索ボタンへのイベントを追加できない
+            document.querySelectorAll('.calc-route-button').forEach(calcRouteButton => {
+                calcRouteButton.addEventListener('click', () => this.calcRoute(calcRouteButton));
+            });
+        });		
+	}
+ 
 	/**
 	 * メニューのコンテナを表示するメソッド
 	 */
@@ -109,7 +116,7 @@ export class StoreManager {
 	 * ルート検索を行うメソッド
 	 */
     calcRoute(calcRouteButton) {
-        if (!this.mapManager.currentLatLng) { // 現在地が格納されていなければ検索せず、メッセージを表示
+        if (!this.locationManager.currentLatLng) { // 現在地が格納されていなければ検索せず、メッセージを表示
             this.showCalcRouteNotice();
             return;
         }
@@ -119,7 +126,7 @@ export class StoreManager {
         const latSpan = lngSpan.previousElementSibling;
         const storeLatLng = new google.maps.LatLng(latSpan.textContent, lngSpan.textContent); // 情報ウィンドウのspanにある目的地の経緯度を取得
         const request = {
-            origin: this.mapManager.currentLatLng,
+            origin: this.locationManager.currentLatLng,
             destination: storeLatLng,
             travelMode: 'WALKING' // 移動手段を徒歩に指定
         };
@@ -132,7 +139,7 @@ export class StoreManager {
                     storeMarker.map = null; // 各店舗のマーカーを削除
                 });
                 this.mapManager.setDirections(result); // ルート表示
-                this.showReturnToStoresListButton();
+                this.showReturnToStoresListButton(); // 「店舗一覧に戻る」ボタンの表示
             } else {
                 this.showGetInformationStatus();
             }
@@ -164,6 +171,9 @@ export class StoreManager {
         }, 3000);
     }
 
+	/**
+	 * 「店舗一覧に戻る」ボタンを表示するメソッド
+	 */
     showReturnToStoresListButton() {
         const returnToStoresListButton = document.getElementById('return-to-stores-list-button');
         returnToStoresListButton.style.display = 'block';
@@ -180,7 +190,7 @@ export class StoreManager {
             storeMarker.map = this.mapManager.map; // 各店舗のマーカーを再表示
             this.mapManager.addToBounds(storeMarker.position); //各店舗の位置を再追加
         });
-        this.mapManager.addToBounds(this.mapManager.currentLatLng); // 最新の現在地を追加（ルート検索の成功は、現在地の取得を保証している）
+        this.mapManager.addToBounds(this.locationManager.currentLatLng); // 最新の現在地を追加（ルート検索の成功は、現在地の取得を保証している）
         this.mapManager.fitBounds();
         document.getElementById('return-to-stores-list-button').style.display = 'none'; //「店舗一覧に戻る」ボタンの非表示
     }

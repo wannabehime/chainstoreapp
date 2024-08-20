@@ -1,9 +1,12 @@
+/**
+ * メニューに関するクラス
+ */
 export class MenuManager {
     constructor() {
-        this.menuResultContainer = document.getElementById('menu-result-container');
+        this.menuResultContainer = document.getElementById('menu-result-container'); // メニューを表示するコンテナ要素
     }
 
-    initMenus(brandName, priceLimit) {
+    init(brandName, priceLimit) {
 		// メニュー表示のコンテナをクリア
         this.clearMenuResultContainer();
         // メニュー表示のラッパーを作成
@@ -14,13 +17,18 @@ export class MenuManager {
         this.getMenus(brandName, priceLimit, secondMenuResultWrapper);
     }
 
-//		------ メニュー表示のラッパーを作成 ------
+	/**
+	 * メニュー表示のコンテナをクリアするメソッド
+	 */
     clearMenuResultContainer() {
         while (this.menuResultContainer.firstChild) {
             this.menuResultContainer.removeChild(this.menuResultContainer.firstChild);
         }
     }
 
+	/**
+	 * コンテナの中にラッパーを作成するメソッド
+	 */
     createMenuResultWrapper() {
         const menuResultWrapper = document.createElement('div');
         menuResultWrapper.className = 'menu-result-wrapper';
@@ -28,16 +36,18 @@ export class MenuManager {
         return menuResultWrapper;
     }
 
-//		------ メニューをシャッフル ------
+	/**
+	 * メニューを取得するメソッド
+	 */
     getMenus(brandName, priceLimit, menuResultWrapper) {
         fetch(`/chainstoresearch/get-menus?brandName=${brandName}&priceLimit=${priceLimit}`)
-            .then(response => {
+            .then(response => { // fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
                 if (!response.ok) {
-                    throw new Error();
+                    throw new Error(); // Promiseオブジェクトがrejectになるのはネットワークエラーなので、リクエスト失敗時にcatchで捕捉できるよう例外を投げる
                 }
-                return response.json();
+                return response.json(); // アロー関数の略記ではreturnしないと次のthenに値を渡せない
             })
-            .then(menus => {
+            .then(menus => { // json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
                 this.getMenusSuccess(brandName, priceLimit, menuResultWrapper, menus);
             })
             .catch(error => {
@@ -45,7 +55,9 @@ export class MenuManager {
             });
     }
 
-//		------ getMenus内fetchの成功時に呼び出される関数 ------
+	/**
+	 * メニュー取得に成功した場合の、メニュー表示を行うメソッド
+	 */
     getMenusSuccess(brandName, priceLimit, menuResultWrapper, menus) {
 		// メニュー表示のラッパーをクリア
         while (menuResultWrapper.firstChild) {
@@ -65,7 +77,9 @@ export class MenuManager {
         menuResultWrapper.appendChild(shuffleMenusButton);
     }
 
-//		------ メニューの生成 ------
+	/**
+	 * メニューを生成するメソッド
+	 */
 	createMenuBox(menus) {
         let priceCounter = 0; // createTotalPriceBox関数で用いる合計金額のカウンター
         // メニューdivを入れるボックスの生成
@@ -97,7 +111,9 @@ export class MenuManager {
         return { menuBoxDiv, priceCounter };
     }
 
-//		------ 合計金額の生成 ------
+	/**
+	 * 合計金額を生成するメソッド
+	 */
     createTotalPriceBox(priceCounter) {
 		// 合計金額の前に表示する「合計」の生成
         const totalPriceSymbolSpan = document.createElement('span');
@@ -123,7 +139,9 @@ export class MenuManager {
         return totalPriceBoxDiv;
     }
 
-//		------ シャッフルボタンの生成 ------
+	/**
+	 * シャッフルボタンを生成するメソッド
+	 */
     createShuffleMenusButton(brandName, priceLimit, menuResultWrapper) {
         const shuffleMenusButton = document.createElement('button');
         shuffleMenusButton.className = 'shuffle-menus-button';
@@ -135,6 +153,7 @@ export class MenuManager {
         return shuffleMenusButton;
     }
 
+	//TODO: エラーメッセージ
     showGetInformationStatus() {
         const getInfoStatusDiv = document.getElementById('get-information-status');
         getInfoStatusDiv.style.display = 'block';

@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mapManager = new MapManager();
     const locationManager = new LocationManager(mapManager);
     const stationManager = new StationManager();
-    const storeManager = new StoreManager(mapManager);
+    const storeManager = new StoreManager(mapManager, locationManager);
     const menuManager = new MenuManager();
 
     // 地図の初期化
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('price-limit').addEventListener('change', () => {
         const brandName = document.getElementById('brand-name').value;
         const priceLimit = document.getElementById('price-limit').value;
-        menuManager.initMenus(brandName, priceLimit);
+        menuManager.init(brandName, priceLimit);
     });
 
     // ブランド名の色変更

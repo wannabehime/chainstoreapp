@@ -21,7 +21,7 @@ export class StationManager {
     getStations() {
         this.stationsDataList.innerHTML = ''; // サジェストする駅リストを初期化
         this.stationLatLngInput.value = ''; // 店舗検索の際に送信する駅の経緯度を初期化
-		
+
 		// 入力値がなくなったら「リストから...」を非表示にして処理を終了する
         if (!this.centerInput.value) {
             document.getElementById('choose-from-list-notice').style.display = 'none';
@@ -64,7 +64,7 @@ export class StationManager {
     }
 	
 	/**
-	 * サジェストされた駅を選択したとき、店舗検索の際に送信する駅の経緯度に設定するメソッド
+	 * サジェストされた駅を選択したとき、店舗検索の際に送信する、検索の中心としての経緯度に設定するメソッド
 	 */
     setStationLatLng() {
         const stationsListOptions = document.querySelectorAll('#stations-list option');
