@@ -2,9 +2,10 @@
  * 店舗検索とルート検索に関するクラス
  */
 export class StoreManager {
-    constructor(mapManager, locationManager) {
+    constructor(mapManager, locationManager, menuManager) {
         this.mapManager = mapManager;
         this.locationManager = locationManager;
+        this.menuManager = menuManager;
         this.storeMarkers = []; // 店舗マーカーを格納する配列
     }
 
@@ -48,7 +49,7 @@ export class StoreManager {
         }
         this.mapManager.fitBounds(); //マップに矩形領域を伝える
         
-        this.displayMenuResultsContainer(); //メニューコンテナを表示
+        this.menuManager.displayMenuResultsContainer(); //メニューコンテナを表示
     }
 
 	/**
@@ -99,18 +100,6 @@ export class StoreManager {
             });
         });		
 	}
- 
-	/**
-	 * メニューのコンテナを表示するメソッド
-	 */
-    displayMenuResultsContainer() {
-        document.getElementById('menu-board-container').style.display = 'block';
-        document.getElementById('price-limit').options[0].selected = true; //予算設定を初期値に戻す
-        const menuResultsContainerDiv = document.getElementById('menu-result-container');
-        while (menuResultsContainerDiv.firstChild) {
-            menuResultsContainerDiv.removeChild(menuResultsContainerDiv.firstChild); //メニュー表示を全消去して初期化
-        }
-    }
 
 	/**
 	 * ルート検索を行うメソッド

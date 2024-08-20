@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const mapManager = new MapManager();
     const locationManager = new LocationManager(mapManager);
     const stationManager = new StationManager();
-    const storeManager = new StoreManager(mapManager, locationManager);
     const menuManager = new MenuManager();
+    const storeManager = new StoreManager(mapManager, locationManager, menuManager);
 
     // 地図の初期化
     locationManager.watchCurrentLocation();
