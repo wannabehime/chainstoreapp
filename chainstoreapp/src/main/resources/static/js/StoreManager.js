@@ -1,3 +1,5 @@
+import { NoticeManager } from './NoticeManager.js';
+
 /**
  * 店舗検索とルート検索に関するクラス
  */
@@ -23,13 +25,13 @@ export class StoreManager {
             })
             .then(stores => { // json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
                 if (!stores.length) { // 該当する店舗がなければメッセージを表示
-                    this.showNoStoreNotice();
+                    NoticeManager.createNoStoreNotice();
                 } else {
                     this.searchStoresSuccess(stores);
                 }
             })
             .catch(error => { // ルート検索に失敗したら、失敗のメッセージ表示
-                this.showGetInformationStatus();
+                NoticeManager.createFailGetInformationNotice();
             });
     }
 
@@ -106,7 +108,7 @@ export class StoreManager {
 	 */
     calcRoute(calcRouteButton) {
         if (!this.locationManager.currentLatLng) { // 現在地が格納されていなければ検索せず、メッセージを表示
-            this.showCalcRouteNotice();
+            NoticeManager.createFailCalcRouteNotice();
             return;
         }
 
@@ -130,34 +132,9 @@ export class StoreManager {
                 this.mapManager.setDirections(result); // ルート表示
                 this.showReturnToStoresListButton(); // 「店舗一覧に戻る」ボタンの表示
             } else {
-                this.showGetInformationStatus();
+                NoticeManager.createFailGetInformationNotice();
             }
         });
-    }
-
-	//TODO: エラーメッセージ
-    showNoStoreNotice() {
-        const noStoreNoticeDiv = document.getElementById('no-store-notice');
-        noStoreNoticeDiv.style.display = 'block';
-        setTimeout(() => {
-            noStoreNoticeDiv.style.display = 'none';
-        }, 3000);
-    }
-
-    showCalcRouteNotice() {
-        const calcRouteNoticeDiv = document.getElementById('calc-route-notice');
-        calcRouteNoticeDiv.style.display = 'block';
-        setTimeout(() => {
-            calcRouteNoticeDiv.style.display = 'none';
-        }, 3000);
-    }
-
-    showGetInformationStatus() {
-        const getInfoStatusDiv = document.getElementById('get-information-status');
-        getInfoStatusDiv.style.display = 'block';
-        setTimeout(() => {
-            getInfoStatusDiv.style.display = 'none';
-        }, 3000);
     }
 
 	/**

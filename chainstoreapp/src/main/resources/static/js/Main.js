@@ -3,6 +3,7 @@ import { LocationManager } from './LocationManager.js';
 import { StationManager } from './StationManager.js';
 import { StoreManager } from './StoreManager.js';
 import { MenuManager } from './MenuManager.js';
+import { NoticeManager } from './NoticeManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const mapManager = new MapManager();
@@ -34,11 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault(); //フォームの本来のリクエストを阻止
         if (centerInput.value == '現在地' && !locationManager.currentLatLng) {
 			// 現在地の経緯度が格納されていなければ、失敗のメッセージ表示し、送信しない
-            showSearchStoresStatus();
+            NoticeManager.createFailSearchStoresNotice();
         } else if (centerInput.value != '現在地' && !stationManager.stationLatLngInput.value) {
-            showChooseRightStationNotice();
+            NoticeManager.createChooseRightStationNotice();
         } else {
-            storeManager.searchStores(new FormData(searchFormWrapperDiv)); // FormData:フォームの内容をキーと値で格納, 
+            storeManager.searchStores(new FormData(searchFormWrapperDiv)); // FormData:フォームの内容をキーと値で格納
         }
     });
 
@@ -52,20 +53,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-
-// TODO: エラーメッセージ
-function showSearchStoresStatus() {
-    const searchStoresStatusDiv = document.getElementById('search-stores-status');
-    searchStoresStatusDiv.style.display = 'block';
-    setTimeout(() => {
-        searchStoresStatusDiv.style.display = 'none';
-    }, 4000);
-}
-
-function showChooseRightStationNotice() {
-    const chooseRightStationNoticeDiv = document.getElementById('choose-right-station-notice');
-    chooseRightStationNoticeDiv.style.display = 'block';
-    setTimeout(() => {
-        chooseRightStationNoticeDiv.style.display = 'none';
-    }, 4000);
-}

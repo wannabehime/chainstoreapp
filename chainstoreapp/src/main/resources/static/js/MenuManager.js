@@ -1,3 +1,5 @@
+import { NoticeManager } from './NoticeManager.js';
+
 /**
  * メニューに関するクラス
  */
@@ -45,7 +47,7 @@ export class MenuManager {
                 this.getMenusSuccess(menus, menuResultWrapper);
             })
             .catch(error => {
-                this.showGetInformationStatus();
+                NoticeManager.createFailGetInformationNotice();
             });
     }
 
@@ -76,14 +78,5 @@ export class MenuManager {
             <span class="menu-price">${menu.price}円</span>
         `;
         return menuDiv;
-    }
-
-	//TODO: エラーメッセージ
-    showGetInformationStatus() {
-        const getInfoStatusDiv = document.getElementById('get-information-status');
-        getInfoStatusDiv.style.display = 'block';
-        setTimeout(() => {
-            getInfoStatusDiv.style.display = 'none';
-        }, 3000);
     }
 }

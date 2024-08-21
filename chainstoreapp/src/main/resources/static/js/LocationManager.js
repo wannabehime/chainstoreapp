@@ -1,3 +1,5 @@
+import { NoticeManager } from './NoticeManager.js';
+
 /**
  * 現在地の監視に関するクラス
  */
@@ -31,7 +33,7 @@ export class LocationManager {
     watchPositionSuccess(position) {
         this.currentLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); // 現在地のlatlngオブジェクトを更新
         document.getElementById('current-latlng').value = this.currentLatLng; // 店舗検索の中心地として、フォームのhiddenで送る現在地の更新
-        document.getElementById('current-location-information-status').style.display = 'none'; //「位置情報を取得中...」の表示を非表示
+        NoticeManager.removeGettingCurrentLocationNotice(); //「位置情報を取得中...」の表示を非表示
 
         if (!this.mapManager.map) {	// マップがまだ存在しない場合は新しく作成
             this.mapManager.initMap(this.currentLatLng);
@@ -43,7 +45,7 @@ export class LocationManager {
 	 * watchPositionの失敗時コールバックメソッド
 	 */
     watchPositionFail(error) {
-        document.getElementById('current-location-information-status').style.display = 'block'; //「位置情報を取得中...」を表示
+        NoticeManager.createGettingCurrentLocationNotice(); //「位置情報を取得中...」を表示
         if (!this.mapManager.map) {// マップがまだ存在しない場合は新しく作成
             const tokyoStationLatLng = new google.maps.LatLng(35.6812405, 139.7649361); //初期状態を東京駅とする
             this.mapManager.initMap(tokyoStationLatLng);
@@ -81,7 +83,7 @@ export class LocationManager {
             //fill:塗りつぶし
             fillColor: '#115EC3',
             fillOpacity: 0.2,
-            map: map,
+            map: this.mapManager.map,
             center: this.currentLatLng,
             radius: 40
         });

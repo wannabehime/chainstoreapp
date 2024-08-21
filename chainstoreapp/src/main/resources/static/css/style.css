@@ -119,15 +119,14 @@
 }
 /* ------------ */
 
+#getting-current-location-notice,
 #choose-from-list-notice,
-#current-location-information-status, 
-#get-information-status, 
-#get-stations-status, 
-#search-stores-status,
+#fail-get-information-notice, 
+#no-station-notice, 
+#fail-search-stores-notice,
 #choose-right-station-notice,
 #no-store-notice,
-#calc-route-notice {
-	display: none;
+#fail-calc-route-notice {
 	height: 30px;
 	line-height: 30px;
 	font-size: 0.8rem;
@@ -148,17 +147,17 @@
 	width: 250px;
 }
 
-#current-location-information-status {
+#getting-current-location-notice {
 	top: 120px;
 	width: 170px;
 }
 
-#get-information-status, 
-#get-stations-status, 
-#search-stores-status, 
+#fail-get-information-notice, 
+#no-station-notice, 
+#fail-search-stores-notice,
 #choose-right-station-notice,
 #no-store-notice,
-#calc-route-notice {
+#fail-calc-route-notice {
 	top: 160px;
 	width: 500px;
 }

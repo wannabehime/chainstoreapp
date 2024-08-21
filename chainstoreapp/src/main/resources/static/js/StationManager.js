@@ -1,3 +1,5 @@
+import { NoticeManager } from './NoticeManager.js';
+
 /**
  * 店舗検索フォームの駅名サジェストに関するクラス
  */
@@ -17,7 +19,7 @@ export class StationManager {
 
 		// 入力値がなくなったら「リストから...」を非表示にして処理を終了する
         if (!this.centerInput.value) {
-            document.getElementById('choose-from-list-notice').style.display = 'none';
+            NoticeManager.removeChooseFromListNotice();
             return;
         }
 
@@ -30,13 +32,16 @@ export class StationManager {
             })
             .then(stations => { //json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
                 if (!stations.length) { // 該当する駅がなければメッセージを表示
-                    this.showGetStationStatus();
+                    NoticeManager.createNoStationNotice();
+                    NoticeManager.removeChooseFromListNotice();
                 } else {
+					NoticeManager.createNoStationNotice();
                     this.getStationsSuccess(stations);
                 }
             })
             .catch(error => {
-                this.showGetInformationStatus();
+                NoticeManager.createFailGetInformationNotice();
+                NoticeManager.removeChooseFromListNotice();
             });
     }
 	
@@ -53,7 +58,11 @@ export class StationManager {
         });
         this.centerInput.setAttribute('list', 'stations-list');
         this.setStationLatLng();
-        document.getElementById('choose-from-list-notice').style.display = (!this.stationLatLngInput.value) ? 'block' : 'none';
+        if(!this.stationLatLngInput.value){
+			NoticeManager.createChooseFromListNotice();
+		}else{
+			NoticeManager.removeChooseFromListNotice();
+		}
     }
 	
 	/**
@@ -66,24 +75,5 @@ export class StationManager {
                 this.stationLatLngInput.value = stationsListOption.dataset.latitude + ', ' + stationsListOption.dataset.longitude;
             }
         });
-    }
-	
-	// TODO: エラーメッセージまとめる
-    showGetStationStatus() {
-        const getStationStatusDiv = document.getElementById('get-stations-status');
-        getStationStatusDiv.style.display = 'block';
-        setTimeout(function () {
-            getStationStatusDiv.style.display = 'none';
-        }, 3000);
-        document.getElementById('choose-from-list-notice').style.display = 'none';
-    }
-
-    showGetInformationStatus() {
-        document.getElementById('choose-from-list-notice').style.display = 'none';
-        const getInfoStatusDiv = document.getElementById('get-information-status');
-        getInfoStatusDiv.style.display = 'block';
-        setTimeout(function () {
-            getInfoStatusDiv.style.display = 'none';
-        }, 3000);
     }
 }
