@@ -35,7 +35,6 @@ export class StationManager {
                     NoticeManager.createNoStationNotice();
                     NoticeManager.removeChooseFromListNotice();
                 } else {
-					NoticeManager.createNoStationNotice();
                     this.getStationsSuccess(stations);
                 }
             })

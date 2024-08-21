@@ -3,6 +3,9 @@
  */
 export class NoticeManager {
     
+    /**
+	 * メッセージを生成するメソッド
+	 */
 	static createNotice(id, text) {
 		if(document.getElementById(id) == null){
 		    const notice = document.createElement('div');
@@ -12,19 +15,28 @@ export class NoticeManager {
 		}
 	}
 	
+	/**
+	 * メッセージを削除するメソッド
+	 */
 	static removeNotice(id){
 		if(document.getElementById(id) != null){
 			document.getElementById(id).remove();
 		}
 	}
 	
-	static createAndRemoveNotice(id, text, duration = 3000){
+	/**
+	 * メッセージを生成し、一定時間後に削除するメソッド
+	 */
+	static createAndRemoveNotice(id, text, delay = 3000){
 		this.createNotice(id, text);
 	    setTimeout(() => {
 	        this.removeNotice(id);
-	    }, duration);
+	    }, delay);
 	}
 	
+	/**
+	 * 以下、各メッセージごとに生成・消去、またはその両方を行うメソッド
+	 */
 	static createGettingCurrentLocationNotice(){
 		this.createNotice('getting-current-location-notice', '位置情報を取得中...')
 	}

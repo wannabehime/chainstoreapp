@@ -34,9 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     searchFormWrapperDiv.addEventListener('submit', (e) => {
         e.preventDefault(); //フォームの本来のリクエストを阻止
         if (centerInput.value == '現在地' && !locationManager.currentLatLng) {
-			// 現在地の経緯度が格納されていなければ、失敗のメッセージ表示し、送信しない
+			// 中心地に「現在地」を指定した上で、現在地の経緯度が格納されていなければ、失敗のメッセージ表示し、送信しない
             NoticeManager.createFailSearchStoresNotice();
         } else if (centerInput.value != '現在地' && !stationManager.stationLatLngInput.value) {
+			// 中心地に駅名を指定した上で、駅の経緯度が格納されていなければ、失敗のメッセージ表示し、送信しない
             NoticeManager.createChooseRightStationNotice();
         } else {
             storeManager.searchStores(new FormData(searchFormWrapperDiv)); // FormData:フォームの内容をキーと値で格納

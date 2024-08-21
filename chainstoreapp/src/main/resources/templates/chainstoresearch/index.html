@@ -7,8 +7,10 @@
 	<link th:href="@{/css/style.css}" rel="stylesheet">
 </head>
 <body>
+	<!-- マップ -->
 	<div id="map"></div>
 	
+	<!-- 検索フォーム -->
 	<div id="search-form-and-return-to-stores-list-button-container">
 		<form id="search-form-wrapper" action="/chainstoresearch/search" method="get">
 			<select id="brand-name" name="brandName" required> <!-- nameはFormクラスのフィールド名と揃えるためにキャメルケース / 	required:必須項目 -->
@@ -29,7 +31,9 @@
 		<button type="button" id="return-to-stores-list-button">店舗一覧に戻る</button>
 	</div>
 	
+	<!-- メニュー表示 -->
 	<div id="menu-board-container">
+		<!-- 予算 -->
 		<div id="price-limit-container">
 			<span id="price-limit-group">
 				予算	
@@ -51,6 +55,7 @@
 			</span>
 		</div>
 		
+		<!-- メニュー -->
 		<div id="menu-result-container">
 			<div class="menu-result-wrapper">
 				<div class="menu-result-group">
@@ -66,8 +71,7 @@
 			
 			<div class="menu-result-wrapper">
 				<div class="menu-result-group">
-					<div class="menu-box">
-					</div>
+					<div class="menu-box"></div>
 					<div class="total-price-box">
 						<span class="total-price">
 							<span class="total-price-symbol"></span><span class="total-price-value"></span>
@@ -79,18 +83,14 @@
 		</div>
 	</div>
 	
-	<div id="calc-route-icon-credit"> <!-- ルート検索アイコン画像のクレジット掲載 -->
+	<!-- ルート検索アイコン画像のクレジット掲載 -->
+	<div id="calc-route-icon-credit"> 
 		<a target="_blank" href="https://icons8.com/icon/37189/route">ルート</a> アイコン by <a target="_blank" href="https://icons8.com">Icons8</a>
 	</div>
 	
 	<script type="module" th:src="@{/js/Main.js}"></script>
-	<script th:inline="javascript">
-	    function initMap() {
-	        // このテキストは元のinitMap関数内容を削除し、空にしています。
-	        // 必要なら、main.jsでMAPの初期化を行います。
-	    }
-	</script>
+	
 	<!-- async:HTML・JS読み込み->HTML中断・JS実行->HTML再開 / defer:HTML・JS読み込み->HTML実行->JS実行 両方を書いておくことで、asyncが対応していないブラウザではdeferが適用-->
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&v=beta&callback=initMap&libraries=marker" async defer></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&v=beta&libraries=marker" async defer></script>
 </body>
 </html>
