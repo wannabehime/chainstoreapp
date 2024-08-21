@@ -7,13 +7,6 @@ export class StationManager {
         this.stationsDataList = document.getElementById('stations-list'); // 駅名サジェストの候補を格納する要素
         this.stationLatLngInput = document.getElementById('station-latlng'); // 店舗検索の中心としての、駅の経緯度を格納するhidden要素
     }
-	
-	/**
-	 * 店舗検索の中心の入力値が変化した際に、getStationsが発火するよう設定するメソッド
-	 */
-    init() {
-        this.centerInput.addEventListener('input', this.getStations.bind(this));
-    }
 
 	/**
 	 * 入力値に応じて駅名をサジェストするメソッド

@@ -3,35 +3,37 @@
  */
 export class MenuManager {
     constructor() {
-        this.menuBoardContainerDiv = document.getElementById('menu-board-container');
-        this.menuResultContainer = document.getElementById('menu-result-container');
-        this.menuResultWrappers = this.menuResultContainer.querySelectorAll('.menu-result-wrapper');
-        this.priceLimit = document.getElementById('price-limit');
+		// メニューとシャッフルボタンのセットを格納する要素2つ分
+		this.menuResultWrappers = document.getElementById('menu-result-container').querySelectorAll('.menu-result-wrapper');
     }
 
-    init(brandName, priceLimit) {
-        this.menuResultWrappers.forEach(wrapper => {
-            wrapper.style.display = 'flex';
-            this.getMenus(brandName, priceLimit, wrapper);
-        });
-    }
-    
+	/**
+	 * 店舗検索の際にメニューコンテナを表示するメソッド
+	 */
     displayMenuResultsContainer() {
-        this.menuBoardContainerDiv.style.display = 'block';
-        this.priceLimit.options[0].selected = true;
-        this.menuResultWrappers.forEach(wrapper => {
-            wrapper.style.display = 'none';
-            const menuBox = wrapper.querySelector('.menu-box');
-            menuBox.innerHTML = ''; // メニューをクリア
-            const totalPriceValue = wrapper.querySelector('.total-price-value');
-            totalPriceValue.textContent = ''; // 合計金額をクリア
+        document.getElementById('menu-board-container').style.display = 'block'; // メニューコンテナを表示
+        document.getElementById('price-limit').options[0].selected = true; // 予算を初期状態にする
+        this.menuResultWrappers.forEach(menuResultWrapper => {
+            menuResultWrapper.style.display = 'none'; // メニューとシャッフルボタンのセットを格納する要素を非表示にする
         });
     }
 
 	/**
+	 * 予算が選択されたとき、メニューを取得して表示するメソッド
+	 */
+	initMenus() {
+	    this.menuResultWrappers.forEach(menuResultWrapper => {
+	        menuResultWrapper.style.display = 'flex'; // メニューとシャッフルボタンのセットを格納する要素を表示
+	        this.getMenus(menuResultWrapper); // メニューを取得
+	    });
+	}
+    
+	/**
 	 * メニューを取得するメソッド
 	 */
-    getMenus(brandName, priceLimit, menuResultWrapper) {
+    getMenus(menuResultWrapper) {
+	    const brandName = document.getElementById('brand-name').value;
+	    const priceLimit = document.getElementById('price-limit').value;
         fetch(`/chainstoresearch/get-menus?brandName=${brandName}&priceLimit=${priceLimit}`)
             .then(response => { // fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
                 if (!response.ok) {
@@ -40,7 +42,7 @@ export class MenuManager {
                 return response.json(); // アロー関数の略記ではreturnしないと次のthenに値を渡せない
             })
             .then(menus => { // json()はPromiseオブジェクトを返すので、thenで繋げる必要がある
-                this.getMenusSuccess(brandName, priceLimit, menuResultWrapper, menus);
+                this.getMenusSuccess(menus, menuResultWrapper);
             })
             .catch(error => {
                 this.showGetInformationStatus();
@@ -50,25 +52,23 @@ export class MenuManager {
 	/**
 	 * メニュー取得に成功した場合の、メニュー表示を行うメソッド
 	 */
-    getMenusSuccess(brandName, priceLimit, menuResultWrapper, menus) {
+    getMenusSuccess(menus, menuResultWrapper) {
         const menuBox = menuResultWrapper.querySelector('.menu-box');
         menuBox.innerHTML = ''; // メニューをクリア
 
-        let priceCounter = 0;
+        let priceCounter = 0; // 合計金額を累計する変数
         menus.forEach(menu => {
-            const menuDiv = this.createMenuElement(menu);
-            menuBox.appendChild(menuDiv);
-            priceCounter += parseInt(menu.price);
+            menuBox.appendChild(this.createMenuDiv(menu)); // メニューを格納する要素を作成
+            priceCounter += parseInt(menu.price); // 合計金額を累加
         });
 
-        const totalPriceValue = menuResultWrapper.querySelector('.total-price-value');
-        totalPriceValue.textContent = priceCounter + '円';
-
-        const shuffleMenusButton = menuResultWrapper.querySelector('.shuffle-menus-button');
-        shuffleMenusButton.onclick = () => this.getMenus(brandName, priceLimit, menuResultWrapper);
+        menuResultWrapper.querySelector('.total-price-value').textContent = priceCounter + '円'; // 合計金額を表示
     }
 
-    createMenuElement(menu) {
+	/**
+	 * メニューを格納する要素を作成するメソッド
+	 */
+    createMenuDiv(menu) {
         const menuDiv = document.createElement('div');
         menuDiv.className = 'menu';
         menuDiv.innerHTML = `
