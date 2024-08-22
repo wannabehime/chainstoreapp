@@ -1,57 +1,52 @@
 @charset "UTF-8";
 
+/*
+マップ
+*/
+
 #map {
     width: 100vw; /* vw:ブラウザの表示範囲の幅1/100を1とする */
     height: 100vh; /* vh:ブラウザの表示範囲の高さ1/100を1とする */
 }
 
 #current-location-marker {
-	width: 16px;
-	height: 16px;
+	width: 18px;
+	height: 18px;
 	background-color: #115EC3;
 	border: 2px solid white;
 	border-radius: 50%;	/* 設定した半径の円弧の丸みが適用される。%の場合は要素の幅や高さが基準 */
-	box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 0 6px rgba(0, 0, 0, 0.5); /* 左右(必須) 上下(必須） ぼかし 広がり 色 内側指定 */
 }
 
+/*
+店舗検索フォームと「店舗一覧に戻る」ボタン
+*/
+
 #search-form-and-return-to-stores-list-button-container {
-    display: flex;
   	position: absolute;
-	z-index: 100;
-	left: 50%;
-	transform: translateX(-50%);
 	top: 45px;
-	align-items: center;
+	left: 50%;
+	transform: translateX(-50%); /* x軸方向の平行移動。leftと合わせて画面の中心に配置 */
+	z-index: 100;
+    display: flex;
+	align-items: center; /* flexアイテムの配置を決める */
 }
 
 #search-form-wrapper {
-    display: flex;
 	height: 60px;
+	margin-right: 15px;
+	flex: 0 0 auto; /* 伸び具合 縮み具合 基本の大きさ */
     background-color: white;
-	border: none;			
+	border: none;
 	border-radius: 10px;
 	box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
-	flex: 0 0 auto;
-	margin-right: 10px;
-}
-
-#return-to-stores-list-button {
-	display: none;
-	color: white;
-	background-color: #ffa600;
-	border: none;
-    cursor: pointer;
-	border-radius: 10px;
-	font-weight: bold;
-	box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
-	flex: 0 0 auto;
-	height: 40px;
+	display: flex;
 }
 
 #brand-name, #center {
 	background-color: white;
-	font-size: 0.9rem;
-	outline: none;
+	font-size: 14.5px;
+	outline: none; /* フォーカスが当たったときの輪郭線を消去 */
 }
 
 #brand-name {
@@ -113,6 +108,19 @@
 .shuffle-menus-button:hover {
 	opacity: 0.6;
 	transition: 0.5s;
+}
+
+#return-to-stores-list-button {
+	display: none;
+	color: white;
+	background-color: #ffa600;
+	border: none;
+    cursor: pointer;
+	border-radius: 10px;
+	font-weight: bold;
+	box-shadow: 0px 7px 15px -3px rgba(0, 0, 0, 0.42);
+	flex: 0 0 auto;
+	height: 40px;
 }
 /* ------------ */
 
