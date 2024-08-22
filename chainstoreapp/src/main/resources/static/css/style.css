@@ -1,19 +1,16 @@
 @charset "UTF-8";
 
 #map {
-	position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw; /* 画面の横幅いっぱい */
-    height: 100vh; /* 画面の縦幅いっぱい */
+    width: 100vw; /* vw:ブラウザの表示範囲の幅1/100を1とする */
+    height: 100vh; /* vh:ブラウザの表示範囲の高さ1/100を1とする */
 }
 
 #current-location-marker {
+	width: 16px;
+	height: 16px;
 	background-color: #115EC3;
 	border: 2px solid white;
-	border-radius: 50%;
-	width: 18px;
-	height: 18px;
+	border-radius: 50%;	/* 設定した半径の円弧の丸みが適用される。%の場合は要素の幅や高さが基準 */
 	box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
