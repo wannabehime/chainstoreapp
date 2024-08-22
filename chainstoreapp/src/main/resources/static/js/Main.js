@@ -5,7 +5,7 @@ import { StoreManager } from './StoreManager.js';
 import { MenuManager } from './MenuManager.js';
 import { NoticeManager } from './NoticeManager.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
     const mapManager = new MapManager();
     const locationManager = new LocationManager(mapManager);
     const stationManager = new StationManager();

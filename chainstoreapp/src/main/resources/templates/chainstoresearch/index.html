@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
 	<meta charset="UTF-8">
-	<title>ChainStore Menus</title><!--TODO タイトルとアイコン-->
-	<link th:href="@{/css/reset.css}" rel="stylesheet">
-	<link th:href="@{/css/style.css}" rel="stylesheet">
+	<title>チェンサ - Chain Store Search -</title>
+	<link rel=”icon” href=“/img/favicon.ico”>
+	<link rel="icon" type="image/png" href="/img/favicon.png">
+	<link rel="stylesheet" href="/css/reset.css">
+	<link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 	<!-- マップ -->
@@ -88,9 +90,8 @@
 		<a target="_blank" href="https://icons8.com/icon/37189/route">ルート</a> アイコン by <a target="_blank" href="https://icons8.com">Icons8</a>
 	</div>
 	
-	<script type="module" th:src="@{/js/Main.js}"></script>
-	
 	<!-- async:HTML・JS読み込み->HTML中断・JS実行->HTML再開 / defer:HTML・JS読み込み->HTML実行->JS実行 両方を書いておくことで、asyncが対応していないブラウザではdeferが適用-->
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&v=beta&libraries=marker" async defer></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvngfDlCJ3HuSMFjB0jylBTpowN9pb-RQ&v=beta&libraries=marker" async defer></script>	
+	<script type="module" src="/js/Main.js"></script>
 </body>
 </html>
