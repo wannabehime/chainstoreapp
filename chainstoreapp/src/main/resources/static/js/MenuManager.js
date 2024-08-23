@@ -5,8 +5,8 @@ import { NoticeManager } from './NoticeManager.js';
  */
 export class MenuManager {
     constructor() {
-		// メニューとシャッフルボタンのセットを格納する要素2つ分
-		this.menuResultWrappers = document.getElementById('menu-result-container').querySelectorAll('.menu-result-wrapper');
+		// メニューとシャッフルボタンのセットを格納するコンテナ
+		this.menuResultContainer = document.getElementById('menu-result-container');
     }
 
 	/**
@@ -15,17 +15,15 @@ export class MenuManager {
     displayMenuResultsContainer() {
         document.getElementById('menu-board-container').style.display = 'block'; // メニューコンテナを表示
         document.getElementById('price-limit').options[0].selected = true; // 予算を初期状態にする
-        this.menuResultWrappers.forEach(menuResultWrapper => {
-            menuResultWrapper.style.display = 'none'; // メニューとシャッフルボタンのセットを格納する要素を非表示にする
-        });
+        this.menuResultContainer.style.display = 'none'; // メニューとシャッフルボタンのセットを格納するコンテナを非表示にする
     }
 
 	/**
 	 * 予算が選択されたとき、メニューを取得して表示するメソッド
 	 */
 	initMenus() {
-	    this.menuResultWrappers.forEach(menuResultWrapper => {
-	        menuResultWrapper.style.display = 'flex'; // メニューとシャッフルボタンのセットを格納する要素を表示
+		this.menuResultContainer.style.display = 'flex'; // メニューとシャッフルボタンのセットを格納するコンテナを表示する
+	    this.menuResultContainer.querySelectorAll('.menu-result-wrapper').forEach(menuResultWrapper => {
 	        this.getMenus(menuResultWrapper); // メニューを取得
 	    });
 	}
