@@ -10,6 +10,7 @@ export class NoticeManager {
 		if(document.getElementById(id) == null){
 		    const notice = document.createElement('div');
 		    notice.id = id;
+		    notice.className = 'notice';
 		    notice.textContent = text;
 		    document.body.appendChild(notice);
 		}

@@ -64,7 +64,7 @@ export class StoreManager {
         });
         this.storeMarkers = []; // マーカーリストを初期化
         this.mapManager.bounds = new google.maps.LatLngBounds(); // マップに表示する矩形領域のインスタンスを生成
-        document.getElementById('return-to-stores-list-button').style.display = 'none';
+        document.getElementById('return-to-stores-list-button-wrapper').style.display = 'none';
     }
 
 	/**
@@ -130,20 +130,11 @@ export class StoreManager {
                     storeMarker.map = null; // 各店舗のマーカーを削除
                 });
                 this.mapManager.setDirections(result); // ルート表示
-                this.showReturnToStoresListButton(); // 「店舗一覧に戻る」ボタンの表示
+                document.getElementById('return-to-stores-list-button-wrapper').style.display = 'block'; // 「店舗一覧に戻る」ボタンの表示
             } else {
                 NoticeManager.createFailGetInformationNotice();
             }
         });
-    }
-
-	/**
-	 * 「店舗一覧に戻る」ボタンを表示するメソッド
-	 */
-    showReturnToStoresListButton() {
-        const returnToStoresListButton = document.getElementById('return-to-stores-list-button');
-        returnToStoresListButton.style.display = 'block';
-        returnToStoresListButton.addEventListener('click', this.returnToStoresList.bind(this));
     }
 
 	/**
@@ -158,6 +149,6 @@ export class StoreManager {
         });
         this.mapManager.addToBounds(this.locationManager.currentLatLng); // 最新の現在地を追加（ルート検索の成功は、現在地の取得を保証している）
         this.mapManager.fitBounds();
-        document.getElementById('return-to-stores-list-button').style.display = 'none'; //「店舗一覧に戻る」ボタンの非表示
+        document.getElementById('return-to-stores-list-button-wrapper').style.display = 'none'; //「店舗一覧に戻る」ボタンの非表示
     }
 }

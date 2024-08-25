@@ -43,6 +43,9 @@ window.addEventListener('load', () => {
             storeManager.searchStores(new FormData(searchFormWrapperDiv)); // FormData:フォームの内容をキーと値で格納
         }
     });
+    
+    // 「店舗一覧に戻る」ボタン
+    document.getElementById('return-to-stores-list-button').addEventListener('click', storeManager.returnToStoresList.bind(storeManager));
 
     // メニュー検索
 	document.getElementById('price-limit').addEventListener('change', menuManager.initMenus.bind(menuManager));

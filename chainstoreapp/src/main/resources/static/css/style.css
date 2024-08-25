@@ -7,9 +7,7 @@
 	transition: 0.5s;
 }
 
-/*
-オレンジのボタン
-*/
+/* オレンジのボタン */
 #submit-button, #return-to-stores-list-button, .shuffle-menus-button {
 	padding: 10px;
 	color: white;
@@ -109,11 +107,16 @@
     cursor: pointer;
 }
 
-#return-to-stores-list-button {
+#return-to-stores-list-button-wrapper {
 	display: none;
 	flex: 0 0 auto;
+	background-color: white;
 	border-radius: 10px;
 	box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);
+}
+
+#return-to-stores-list-button {
+	border-radius: 10px;
     cursor: pointer;
 }
 
@@ -121,8 +124,7 @@
 エラーメッセージ
 */
 
-#getting-current-location-notice, #choose-from-list-notice, #fail-get-information-notice, #no-station-notice, 
-#fail-search-stores-notice, #choose-right-station-notice, #no-store-notice, #fail-calc-route-notice {
+.notice {
 	height: 30px;
 	position: absolute;
 	left: 50%;
@@ -330,9 +332,15 @@
 	font-weight: bold;
 }
 
-.shuffle-menus-button {
+.shuffle-menus-button-box {
+	background-color: white;
 	border-radius: 10px;
-	box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.3);
+	box-shadow: 0px 11px 15px -5px rgba(0, 0, 0, 0.42);	
+}
+
+.shuffle-menus-button {
+	width: 100%;
+	border-radius: 10px;
     cursor: pointer;
 }
 
