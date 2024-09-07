@@ -25,19 +25,19 @@ https://chainstoresearch.com/chainstoresearch
 
 ## 機能一覧
 | トップ画面 |　駅名サジェスト |
-| ---- | ---- |
-| ![Top画面](/docs/img/app-view/welcome_1.1.png) | ![駅名サジェスト機能](/docs/img/app-view/login_1.1.png) |
-| 登録せずにサービスをお試しいただくためのトライアル機能を実装しました。 | ログインIDとパスワードでの認証機能を実装しました。 |
+| - | - |
+| ![トップ画面](/docs/img/app-view/welcome_1.1.png) | ![駅名サジェスト機能](/docs/img/app-view/login_1.1.png) |
+| 地図上に現在地が表示されます。 | 店舗検索の中心として、駅名の一部を入力すると、駅名候補がサジェストされます。 |
 
-| 店舗検索 |　ルート検索 |
-| ---- | ---- |
-| ![店舗検索機能](/docs/img/app-view/select-business_1.1.png) | ![ルート検索機能](/docs/img/app-view/create-invoice_1.1.png) |
-| 登録済みの複数の事業者の中から、請求書を作成したい事業者を選択する機能を実装しました。 | 請求書の作成機能・マスタデータの呼び出し機能・税率変更機能・税率別内訳の計算機能、合計金額の計算機能を実装しました。 |
+| 店舗検索 |
+| - |
+| ![店舗検索機能](/docs/img/app-view/select-business_1.1.png) |
+| 現在地、もしくは駅を中心として、半径500m以内にある店舗を検索できます。 |
 
-| メニュー表示・シャッフル |　PDF出力画面 |
-| ---- | ---- |
-| ![メニュー表示・シャッフル機能](/docs/img/app-view/invoice-detail_1.1.png) | ![　PDF出力画面](/docs/img/app-view/print-invoice_1.1.png) |
-| 請求書データの表示機能を実装しました。 | PDFでの請求書発行機能を実装しました。 |
+| ルート検索 |　メニュー表示・シャッフル |
+| - | - |
+| ![ルート検索機能](/docs/img/app-view/invoice-detail_1.1.png) | ![メニュー表示・シャッフル機能](/docs/img/app-view/print-invoice_1.1.png) |
+| 現在地から店舗までのルートを表示できます。 | 予算を選択すると、メインメニューを1つ含むメニューが、ランダムで表示されます。 |
 
 <br />
 
