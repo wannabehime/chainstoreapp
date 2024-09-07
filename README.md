@@ -48,17 +48,15 @@ https://chainstoresearch.com/chainstoresearch
 
 ## 使用技術
 
-| Category          | Technology Stack                                     |
-| ----------------- | --------------------------------------------------   |
-| Frontend          | TypeScript, Next.js, Storybook                       |
-| Backend           | TypeScript, NestJS, Prisma                           |
-| Infrastructure    | Amazon Web Services, Vercel                          |
-| Database          | PostgreSQL                                           |
-| Monitoring        | Sentry, UptimeRobot                                  |
-| Environment setup | Docker                                               |
-| CI/CD             | GitHub Actions                                       |
-| Design            | Figma, Lucid                                         |
-| etc.              | Stylelint, ESLint, Prettier, Husky Jest, Git, GitHub |
+| カテゴリー | 技術 |
+| - | - |
+| フロントエンド | HTML, CSS, JavaScript |
+| バックエンド | Java 22.0.2, Spring(Spring Boot 3.2.6/Spring Framework 6.1.8/Spring MVC 6.1.8), MyBatis 3.5.14 |
+| データベース | MySQL 8.0.35 |
+| API | Google Maps API(Places API / Directions API / Maps API) |
+| インフラストラクチャー | Amazon Web Services(VPC/RDS/EC2/Route 53/ACM/ALB) |
+| コード管理 | Git 2.45.0, GitHub |
+| 開発環境 | Eclipse 4.31.0 |
 
 <br />
 
