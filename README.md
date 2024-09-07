@@ -19,7 +19,7 @@ https://chainstoresearch.com/chainstoresearch
 <br />
 
 ## アプリケーションのイメージ
-![アプリケーションのイメージ](docs/img/app-view/app-image.mov)
+![アプリケーションのイメージ](docs/img/app-view/calc-image.gif)
 
 <br />
 
