@@ -31,7 +31,7 @@ https://chainstoresearch.com/chainstoresearch
 
 | 店舗検索 |
 | - |
-| ![店舗検索機能](/docs/img/app-view/search-stores-around-current-location.gif) ![店舗検索機能](/docs/img/app-view/search-stores-around-station.gif) |
+| ![店舗検索機能](/docs/img/app-view/search-stores-around-current-location.gif) |
 | 現在地、もしくは駅を中心として、半径500m以内にある店舗を検索できます。 |
 
 | ルート検索 |　メニュー表示・シャッフル |
