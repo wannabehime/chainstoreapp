@@ -26,17 +26,17 @@ https://chainstoresearch.com/chainstoresearch
 ## 機能一覧
 | トップ画面 |　駅名サジェスト |
 | - | - |
-| ![トップ画面](/docs/img/app-view/welcome_1.1.png) | ![駅名サジェスト機能](/docs/img/app-view/login_1.1.png) |
+| ![トップ画面](docs/img/app-view/top-view.png) | ![駅名サジェスト機能](docs/img/app-view/suggest-stations.gif) |
 | 地図上に現在地が表示されます。 | 店舗検索の中心として、駅名の一部を入力すると、駅名候補がサジェストされます。 |
 
 | 店舗検索 |
 | - |
-| ![店舗検索機能](/docs/img/app-view/select-business_1.1.png) |
+| ![店舗検索機能](/docs/img/app-view/search-stores-around-current-location.gif) ![店舗検索機能](/docs/img/app-view/search-stores-around-station.gif) |
 | 現在地、もしくは駅を中心として、半径500m以内にある店舗を検索できます。 |
 
 | ルート検索 |　メニュー表示・シャッフル |
 | - | - |
-| ![ルート検索機能](/docs/img/app-view/invoice-detail_1.1.png) | ![メニュー表示・シャッフル機能](/docs/img/app-view/print-invoice_1.1.png) |
+| ![ルート検索機能](/docs/img/app-view/calc-route.gif) | ![メニュー表示・シャッフル機能](/docs/img/app-view/display-menus.gif) |
 | 現在地から店舗までのルートを表示できます。 | 予算を選択すると、メインメニューを1つ含むメニューが、ランダムで表示されます。 |
 
 <br />
