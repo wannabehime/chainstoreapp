@@ -58,7 +58,7 @@ https://chainstoresearch.com/chainstoresearch
 
 ## ER図
 
-![ER図](/docs/img/entity-relationship-diagram/entity-relationship-diagram_1.6.png)
+![ER図](docs/img/entity-relationship-diagram/entity-relationship-diagram.png)
 
 <br />
 
