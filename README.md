@@ -1,4 +1,4 @@
-![ヘッダー画像](/docs/img/header/header.png)
+![ヘッダー画像](docs/header/header.png)
 
 <br />
 
