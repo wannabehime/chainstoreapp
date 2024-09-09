@@ -23,10 +23,10 @@ import com.example.chainstoreapp.service.StoreService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("chainstoresearch") // URLとクラスをマッピング
+@RequestMapping("chainstorenavi") // URLとクラスをマッピング
 @RequiredArgsConstructor // finalが付けられたフィールドを引数とするコンストラクタを自動生成。かつ、コンストラクタが1つのみのとき、DIでインスタンスを受け取るコンストラクタを示す@Autowiredを省略可
 
-public class ChainStoreSearchController {
+public class ChainStoreNaviController {
 
 //	サービスのDI
 	private final StationService stationService;
@@ -36,7 +36,7 @@ public class ChainStoreSearchController {
 //	------ ホーム画面の表示 ------
 	@GetMapping
 	public String displayIndexPage() {
-		return "chainstoresearch/index";
+		return "chainstorenavi/index";
 	}
 	
 //	------ 入力値から、候補となる駅リストを取得 ------
