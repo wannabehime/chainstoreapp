@@ -34,7 +34,7 @@ export class MenuManager {
     getMenus(menuResultWrapper) {
 	    const brandName = document.getElementById('brand-name').value;
 	    const priceLimit = document.getElementById('price-limit').value;
-        fetch(`/chainstoresearch/get-menus?brandName=${brandName}&priceLimit=${priceLimit}`)
+        fetch(`/chainstorenavi/get-menus?brandName=${brandName}&priceLimit=${priceLimit}`)
             .then(response => { // fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
                 if (!response.ok) {
                     throw new Error(); // Promiseオブジェクトがrejectになるのはネットワークエラーなので、リクエスト失敗時にcatchで捕捉できるよう例外を投げる

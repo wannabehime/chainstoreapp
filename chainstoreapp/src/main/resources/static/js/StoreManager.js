@@ -16,7 +16,7 @@ export class StoreManager {
 	 */
     searchStores(formData) {
         const request = new URLSearchParams(formData).toString(); // URLSearchParams:クエリ文字列を生成
-        fetch(`/chainstoresearch/search-stores?${request}`)
+        fetch(`/chainstorenavi/search-stores?${request}`)
             .then(response => { // fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
                 if (!response.ok) {
                     throw new Error(); // Promiseオブジェクトがrejectになるのはネットワークエラーなので、リクエスト失敗時にcatchで捕捉できるよう例外を投げる

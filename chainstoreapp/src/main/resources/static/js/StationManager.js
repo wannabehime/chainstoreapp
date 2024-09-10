@@ -23,7 +23,7 @@ export class StationManager {
             return;
         }
 
-        fetch(`/chainstoresearch/get-stations?input=${this.centerInput.value}`)
+        fetch(`/chainstorenavi/get-stations?input=${this.centerInput.value}`)
             .then(response => { //fetchの戻り値であるPromiseオブジェクトは、成功時then・失敗時catchを呼ぶ
                 if (!response.ok) {
                     throw new Error(); //Promiseオブジェクトがrejectになるのはネットワークエラーなので、リクエスト失敗時にcatchで捕捉できるよう例外を投げる
